@@ -7,22 +7,25 @@ public class InputManager : BaseManager
 {
     TestInput testInput;
 
-    public override void Load()
+    public override void Load(Define.GameMode _gameMode)
     {
-        switch (Managers.Instance.gameMode)
+        switch (_gameMode)
         {
-            case Define.GameMode.ANDROID:
-                break;
-            case Define.GameMode.IOS:
-                break;
             case Define.GameMode.EDITOR:
                 break;
             case Define.GameMode.TEST:
                 // 여기서 target attach를 set하여 순서를 정할 것임
-                if(testInput == null)
+                if (testInput == null)
                 {
-                    testInput = Util.AttachObj<TestInput>(testInput.gameObject);
-                    
+                    testInput = Util.AttachObj<TestInput>("testInput");
+                }
+                break;
+            case Define.GameMode.MAPTOOL:
+                // 여기서 target attach를 set하여 순서를 정할 것임
+                if (testInput == null)
+                {
+                    testInput = Util.AttachObj<TestInput>("testInput");
+
                 }
                 break;
         }

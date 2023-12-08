@@ -5,6 +5,9 @@ using YhProj;
 
 public class TestInput : MonoBehaviour
 {
+    // 콜라이더를 넣어서 일단 드래그 할 수 있게 만들긴 해야함
+    // 드래그 영역 막아야 함
+
     [SerializeField]
     float moveSpeed = 3f;
 
@@ -18,7 +21,7 @@ public class TestInput : MonoBehaviour
 
     void Awake()
     {
-        target = Util.AttachObj<Transform>(target.gameObject);
+        target = Util.AttachObj<Transform>();
 
         targetPosition = StaticDefine.START_POSITION;
         target.transform.position = targetPosition;

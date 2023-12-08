@@ -25,7 +25,7 @@ public class JsonWindow : EditorWindow
     {
         EditorGUILayout.LabelField("JSON Editor", EditorStyles.boldLabel);
 
-        // 데이터 입력 필드
+        // 데이터 입력 필드 // 후에 타입을 정하여 변경 할 예정이긴 함.. 근데 너무 노가다 작업인데 방법이 없나?
         EditorGUILayout.Space(10);
         GUILayout.Label("Enter StageData:", EditorStyles.boldLabel);
         stageData.lv = EditorGUILayout.IntField("Level", stageData.lv);

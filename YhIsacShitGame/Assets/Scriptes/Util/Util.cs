@@ -140,7 +140,8 @@ public static class Util
     #endregion
 
     #region Attach Obj
-    public static T AttachObj<T>(GameObject _target, string _name = null) where T :  Component
+    // 후에 find 이름을 찾는 법도 만들어야 할 듯?
+    public static T AttachObj<T>(string _name = null) where T :  Component
     {
         T ret = null;
 
@@ -151,7 +152,7 @@ public static class Util
             name = typeof(T).Name;
         }
 
-        _target = GameObject.Find(name);
+        GameObject _target = GameObject.Find(name);
 
         if (_target == null)
         {
@@ -168,5 +169,33 @@ public static class Util
 
         return ret;
     }
+
+    public static T AttachObj<T>(GameObject _go, string _name = null) where T : Component
+    {
+        string name = _name;
+
+        if (string.IsNullOrEmpty(name))
+        {
+            name = typeof(T).Name;
+        }
+
+        _go = GameObject.Find(name);
+
+        if (_go == null)
+        {
+            GameObject container = new GameObject(name);
+            _go = container;
+        }
+
+        T component = _go.GetComponent<T>();
+
+        if (component == null)
+        {
+            component = _go.AddComponent<T>();
+        }
+
+        return component;
+    }
+
     #endregion Attach Obj
 }

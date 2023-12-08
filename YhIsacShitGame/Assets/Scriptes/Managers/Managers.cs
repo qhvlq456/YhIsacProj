@@ -17,6 +17,9 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
     Define.DebugLogeer logType;
 
     List<BaseManager> baseManagerList = new List<BaseManager>();
+
+
+    // maptool mode일 때 데이터?를 저장 할 곳이 필요하긴 한데.. 임시로 여길 사용할까?
     protected override void Awake()
     {
         base.Awake();
@@ -32,6 +35,8 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
 #endif
         // manager set and define
         // load에서 순서와 상관없이 동작해야 함 // 즉 data만 셋팅? 그럼 ijson이 필요할지도?
+        // lazy로 하여 필요할 때만 호출 하겠끔 해야겠다 get함수를 만들어 사용할 것!!
+
         RegisterManager(new PlayerManager());
         RegisterManager(new MapManager());
         RegisterManager(new ObjectPoolManager());
@@ -53,7 +58,7 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
     {
         foreach(var manager in baseManagerList)
         {
-            manager.Load();
+            manager.Load(gameMode);
         }
     }
     public void UpdateAllManagers()
@@ -70,7 +75,7 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
             manager.Delete();
         }
     }
-    public T GetManager<T>() where T : BaseManager
+    public T GetManager<T>() where T : BaseManager, new()
     {
         T ret = null;
 
@@ -80,6 +85,12 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
             {
                 ret = baseManagerList[i] as T;
             }
+        }
+
+        if(ret == null)
+        {
+            ret = new T();
+            RegisterManager(ret);
         }
 
         return ret;

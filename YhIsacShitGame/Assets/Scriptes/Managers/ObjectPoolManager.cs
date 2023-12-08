@@ -10,7 +10,8 @@ public class ObjectPoolManager : BaseManager
     Transform root;
     // object pool 상위 부모 자식들의 갯수에 따라 생성 가능과 회수를 결정한다
     Dictionary<Define.BaseType,Transform> parentTrfDic = new Dictionary<Define.BaseType, Transform>();
-    public override void Load()
+
+    public override void Load(Define.GameMode _gameMode)
     {
 
     }

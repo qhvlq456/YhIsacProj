@@ -12,6 +12,7 @@ namespace YhProj
         {
             TEST,
             EDITOR,
+            MAPTOOL,
             ANDROID,
             IOS
         }
@@ -24,14 +25,6 @@ namespace YhProj
             BUILD,
             ITEM,
             UI
-        }
-        // manager type 등 정의
-        public enum ManagerType
-        {
-            TILE,
-            BUILD,
-            CHARACTER,
-            ITEM
         }
         // log를 보이게 할 것인지 안보이게 할 것인지
         public enum DebugLogeer
@@ -82,7 +75,7 @@ namespace YhProj
         public static int USER_LEVEL = 1;
         public static int MAX_LEVEL = 10;
 
-        public static int MAX_CREATE_TILE_NUM = 50;
+        public static int MAX_CREATE_TILE_NUM = 12;
 
         public static string JSON_MAP_FILE_NAME = "StageData.json";
 
@@ -97,7 +90,7 @@ namespace YhProj
         // 임시 일단 넣을거
         public static float TILE_YPOSITION = 0f;
 
-        // executionDataPath // scriptableobject 실행 환경 오브젝트
+        // executionDataPath // scriptableobject 실행 환경 오브젝트 // 일단 에디터 폴더에 없음 에러가 발생하긴 해서 임시로 에디터 폴더로 지정
         public static string EXECUTIONDATA_PATH = "Assets/Editor/ExecutionData.asset";
 
         public static UnityEngine.Vector3 START_POSITION = UnityEngine.Vector3.zero;

@@ -24,8 +24,8 @@ public class PlayerManager : BaseManager
     }
 
     public PlayerInfo playerInfo;
-    
-    public override void Load()
+
+    public override void Load(Define.GameMode _gameMode)
     {
         
     }
