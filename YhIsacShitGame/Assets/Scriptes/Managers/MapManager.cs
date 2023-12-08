@@ -168,13 +168,13 @@ public class MapManager : BaseManager
         {
             rowLineRendererList.Add(Util.AttachObj<LineRenderer>($"rowLineRenderer_{i}"));
             rowLineRendererList[i].transform.parent = rowLinerendererTrf;
-            rowLineRendererList[i].startWidth = .5f;
-            rowLineRendererList[i].endWidth = .5f;
+            rowLineRendererList[i].startWidth = .25f;
+            rowLineRendererList[i].endWidth = .25f;
 
             colLineRendererList.Add(Util.AttachObj<LineRenderer>($"colLineRenderer_{i}"));
             colLineRendererList[i].transform.parent = colLinerendererTrf;
-            colLineRendererList[i].startWidth = .5f;
-            colLineRendererList[i].endWidth = .5f;
+            colLineRendererList[i].startWidth = .25f;
+            colLineRendererList[i].endWidth = .25f;
         }
 
         float xOffset = 2.5f;
@@ -222,15 +222,15 @@ public class MapManager : BaseManager
 
             colLineRenderer.positionCount = colPointerList.Count;
             colLineRenderer.SetPositions(colPointerList.ToArray());
+
+            // 이게 의존성이 인풋에 대한 의존성이 많아지니 계속 의존성이 생기게 됨 그럼으로 인풋의 target을 의존성을 없애는 작업 필요!!
+            int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
+
+            Vector3 targetPos = new Vector3(colLinePoniterDic[halfIdx], 10, rowLinePoniterDic[halfIdx]);
+
+            Managers.Instance.GetManager<InputManager>().target.transform.position = targetPos;
+            Debug.LogError($"targetPos = {targetPos}");
         }
-
-        TestCamera camera = Util.AttachObj<TestCamera>(Camera.main.gameObject, "Main Camera");
-
-        int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
-
-        Vector3 cameraPos = new Vector3(colLinePoniterDic[halfIdx], 10, rowLinePoniterDic[halfIdx]);
-
-        camera.transform.position = cameraPos;
     }
     #endregion
 }

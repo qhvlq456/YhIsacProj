@@ -38,14 +38,23 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
         // lazy로 하여 필요할 때만 호출 하겠끔 해야겠다 get함수를 만들어 사용할 것!!
 
         RegisterManager(new PlayerManager());
-        RegisterManager(new MapManager());
         RegisterManager(new ObjectPoolManager());
+        RegisterManager(new InputManager());
+        RegisterManager(new MapManager()); // 나중에 순서에 상관없이 load되게 끔 변경해야 됨
         RegisterManager(new UIManager());
         RegisterManager(new LogManager());
     }
     private void Start()
     {
         LoadAllManagers();
+        EventMediator.Instance.LoadSequnceEvent(GetManager<PlayerManager>().playerInfo);
+    }
+    private void Update()
+    {
+        foreach(var manager in baseManagerList)
+        {
+            manager.Update();
+        }
     }
     public void RegisterManager(BaseManager _baseManager)
     {
@@ -63,6 +72,7 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
     }
     public void UpdateAllManagers()
     {
+        // 나중에 업데이트만 가능한 매니처를 추려서 성능을 향상 시키자
         foreach (var manager in baseManagerList)
         {
             manager.Update();

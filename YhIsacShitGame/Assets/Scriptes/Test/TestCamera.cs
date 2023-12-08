@@ -10,14 +10,16 @@ public class TestCamera : MonoBehaviour
 
     private void Awake()
     {
-        xOffset = transform.position - target.position;
-
         // test set
         Camera cam = GetComponent<Camera>();
         cam.orthographic = true;
         cam.orthographicSize = 16;
 
         transform.eulerAngles = new Vector3(90, 0, 0);
+    }
+    private void Start()
+    {
+        
     }
     private void Update()
     {

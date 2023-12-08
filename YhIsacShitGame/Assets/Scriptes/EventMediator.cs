@@ -10,6 +10,7 @@ using System;
 public class EventMediator : Singleton<EventMediator>
 {
     public event Action<int> OnPlayerLevelChange;
+    public event Action<PlayerInfo> OnLoadSequenceEvent;
 
     #region Player Levelup Event
     public void RelayPlayerLevelChange(int _data)
@@ -18,5 +19,11 @@ public class EventMediator : Singleton<EventMediator>
     }
     #endregion
 
+    #region Load sequence event
+    public void LoadSequnceEvent(PlayerInfo _playerInfo)
+    {
+        OnLoadSequenceEvent?.Invoke(_playerInfo);
+    }
+    #endregion
 
 }
