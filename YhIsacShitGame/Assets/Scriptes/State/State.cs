@@ -1,10 +1,13 @@
+using System.Numerics;
+
 namespace YhProj
 {
-    public abstract class State
+    public class State
     {
-        public abstract void Update();
-        public abstract void Exit();
-        public abstract void Enter();
+        public virtual void Update() { }
+        public virtual void Exit() { }
+        public virtual void Enter() { }
+        public virtual void Enter(Vector3 _position) { }
         //public abstract void OnInput();
         //public abstract void OnTrigger();
     }

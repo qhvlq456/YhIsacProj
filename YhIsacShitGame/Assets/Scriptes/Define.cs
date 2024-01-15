@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System;
 
 namespace YhProj
@@ -13,8 +11,7 @@ namespace YhProj
             TEST,
             EDITOR,
             MAPTOOL,
-            ANDROID,
-            IOS
+            BUILDTOOL
         }
         // 모든 게임 데이터의 베이스의 타입 // base type -> subType 으로 간다
         public enum BaseType
@@ -62,7 +59,21 @@ namespace YhProj
             LEFT,
             RIGHT,
             TOP,
-            BOTTOM
+            BOTTOM,
+            LEFT_TOP, // 좌상
+            RIGHT_TOP, // 우상
+            LEFT_BOTTOM, // 좌하
+            RIGHT_BOTTOM // 우하
+        }
+
+
+        // input
+        public enum InputStateType
+        {
+            NONE,
+            SELECT,
+            DRAG,
+            MOVE,
         }
     }
 

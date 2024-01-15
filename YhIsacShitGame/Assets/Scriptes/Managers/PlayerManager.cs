@@ -23,7 +23,12 @@ public class PlayerInfo
 
 public class PlayerManager : BaseManager
 {
-    public PlayerInfo playerInfo;
+    public PlayerInfo playerInfo { get; private set; }
+
+    public PlayerManager(PlayerInfo _playerInfo)
+    {
+        playerInfo = _playerInfo;
+    }
 
     public override void Load(Define.GameMode _gameMode)
     {

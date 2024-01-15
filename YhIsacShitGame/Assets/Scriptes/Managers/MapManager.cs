@@ -40,6 +40,8 @@ public class MapManager : BaseManager
             case Define.GameMode.TEST:
                 break;
             case Define.GameMode.MAPTOOL:
+                EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
+                EventMediator.Instance.OnLoadSequenceEvent += LoadPlayerEvent;
                 LoadMapTool();
                 break;
         }
@@ -82,6 +84,8 @@ public class MapManager : BaseManager
             // tile object 를 초기화 object를 초기화 함으로써 data도 초기화 됨
             currentTileObjList[i].Delete();
         }
+
+        EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
     }
 
     /// <summary>
@@ -98,7 +102,19 @@ public class MapManager : BaseManager
     {
         //StageData stageData = stageDataList.Find(x => x.lv == _level);
     }
+    public void LoadPlayerEvent(PlayerInfo _playerInfo)
+    {
+        Debug.LogError("MapManager LoadPlayerEvent!!");
 
+        // 이게 의존성이 인풋에 대한 의존성이 많아지니 계속 의존성이 생기게 됨 그럼으로 인풋의 target을 의존성을 없애는 작업 필요!!
+        int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
+
+        Vector3 targetPos = new Vector3(colLinePoniterDic[halfIdx], 10, rowLinePoniterDic[halfIdx]);
+
+        // 후에 변경할것?
+        Managers.Instance.lookTarget.transform.position = targetPos;
+        Debug.LogError($"targetPos = {targetPos}");
+    }
     #region Default Mode
     void LoadDefault()
     {
@@ -161,6 +177,9 @@ public class MapManager : BaseManager
          * 인풋에 대한 기획도 필요
          */
 
+        BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
+        bottomColider.size = new Vector3(100, 0, 100);
+
         Transform rowLinerendererTrf = Util.AttachObj<Transform>("rowLineParent");
         Transform colLinerendererTrf = Util.AttachObj<Transform>("colLineParent");
 
@@ -222,14 +241,6 @@ public class MapManager : BaseManager
 
             colLineRenderer.positionCount = colPointerList.Count;
             colLineRenderer.SetPositions(colPointerList.ToArray());
-
-            // 이게 의존성이 인풋에 대한 의존성이 많아지니 계속 의존성이 생기게 됨 그럼으로 인풋의 target을 의존성을 없애는 작업 필요!!
-            int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
-
-            Vector3 targetPos = new Vector3(colLinePoniterDic[halfIdx], 10, rowLinePoniterDic[halfIdx]);
-
-            Managers.Instance.GetManager<InputManager>().target.transform.position = targetPos;
-            Debug.LogError($"targetPos = {targetPos}");
         }
     }
     #endregion
