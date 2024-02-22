@@ -1,5 +1,6 @@
 namespace YhProj
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
@@ -7,23 +8,36 @@ namespace YhProj
     // 선택에 대한 행동을 구현해야 함
     public class SelectState : State
     {
-        BaseObject baseObject;
-
+        #region Factory Method
+        public SelectState() { }
         public SelectState(BaseObject _baseObject) 
         { 
-            if(_baseObject != null)
-            {
-                baseObject = _baseObject;
-            }
+            
         }
-        public override void Enter()
+        // 팩토리 메서드
+        public static SelectState Create()
         {
+            return new SelectState();
+        }
+        #endregion
+
+        public override void Enter(BaseObject _baseObject)
+        {
+            EditorTileObject editorTileObject = _baseObject as EditorTileObject;
             // 초기화 설정
-            Debug.Log("SelectState click enter!!");
+            if (editorTileObject != null)
+            {
+                editorTileObject.Load(editorTileObject.tileData);
+                Managers.Instance.GetManager<UIManager>().ShowUI<MapToolUI, EditorTileObject>("MapToolUI", editorTileObject);
+            }
+            else
+            {
+                Debug.LogError($"target is null");
+            }
         }
         public override void Update()
         {
-            Debug.Log("SelectState click Update!!");
+            
         }
 
         public override void Exit()

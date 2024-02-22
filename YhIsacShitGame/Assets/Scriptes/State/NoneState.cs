@@ -6,7 +6,13 @@ namespace YhProj
 {
     public class NoneState : State
     {
-        public override void Enter()
+        public NoneState() { }
+        public static NoneState Create()
+        {
+            return new NoneState();
+        }
+
+        public override void Enter(BaseObject _baseObject)
         {
             
         }

@@ -30,20 +30,18 @@ public class JsonWindow : EditorWindow
         GUILayout.Label("Enter StageData:", EditorStyles.boldLabel);
         stageData.lv = EditorGUILayout.IntField("Level", stageData.lv);
         stageData.stage = EditorGUILayout.IntField("Stage", stageData.stage);
-        stageData.r = EditorGUILayout.IntField("Rows", stageData.r);
-        stageData.c = EditorGUILayout.IntField("Columns", stageData.c);
         stageData.xOffset = EditorGUILayout.FloatField("X Offset", stageData.xOffset);
         stageData.zOffset = EditorGUILayout.FloatField("Z Offset", stageData.zOffset);
         EditorGUILayout.Space(50);
         // 타일 배열 입력 필드
-        stageData.tileArr = new TileData[stageData.r, stageData.c];
+        stageData.tileArr = new TileData[stageData.Row, stageData.Col];
 
         // 스크롤 뷰
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-        for (int i = 0; i < stageData.r; i++)
+        for (int i = 0; i < stageData.Row; i++)
         {
-            for (int j = 0; j < stageData.c; j++)
+            for (int j = 0; j < stageData.Col; j++)
             {
                 if(stageData.tileArr[i,j] == null)
                 {
@@ -55,7 +53,6 @@ public class JsonWindow : EditorWindow
                 stageData.tileArr[i, j].name = EditorGUILayout.TextField("Name", stageData.tileArr[i, j].name);
                 stageData.tileArr[i, j].index = EditorGUILayout.IntField("Value", stageData.tileArr[i, j].index);
                 stageData.tileArr[i, j].direction = (Define.Direction)EditorGUILayout.EnumPopup("Direction", stageData.tileArr[i, j].direction);
-                stageData.tileArr[i, j].isSection = EditorGUILayout.Toggle("Is Section", stageData.tileArr[i, j].isSection);
 
                 EditorGUILayout.Space(5);
             }

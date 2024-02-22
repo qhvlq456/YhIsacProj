@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine.XR;
-
 namespace YhProj
 {
     public abstract class StateController

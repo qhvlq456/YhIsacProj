@@ -1,24 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+using System.Linq;
 using UnityEngine;
 using YhProj;
 
 /// <summary>
 /// Map에 대한 데이터를 총괄
 /// map을 create, update, delete를 한다
+/// 후에 모드 컨트롤러를 생성하여 다른 모드들에 대한 클래스를 정의 후 모드에 따라 분류하여 로직을 만들어 사용하자 아마 inputmanager보면 알듯?
 /// </summary>
 public class MapManager : BaseManager
 {
-    // start # : mode none
-    List<TilePosition> tilePositionList = new List<TilePosition>();
-
+    Transform root;
 
     // 각 행과 열에 맞는 tile data를 가지고 있음
-    List<StageData> stageDataList = new List<StageData>();
-    List<TileObject> currentTileObjList = new List<TileObject>();
+    // 후에 stage 를 삭제하고 dictionary로 관리할 것도 생각해 봐야 함
+    Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
     // end
 
 
@@ -32,60 +30,39 @@ public class MapManager : BaseManager
     List<LineRenderer> colLineRendererList = new List<LineRenderer>();
     public override void Load(Define.GameMode _gameMode)
     {
-        switch(_gameMode)
+        if(root == null)
+        {
+            root = Util.AttachObj<Transform>("Map");
+            root.transform.position = Vector3.zero;
+        }
+
+        switch (_gameMode)
         {
             case Define.GameMode.EDITOR:
-                LoadDefault();
+                EventMediator.Instance.OnPlayerLevelChange -= OnPlayerLevelChange;
+                EventMediator.Instance.OnPlayerLevelChange += OnPlayerLevelChange;
                 break;
             case Define.GameMode.TEST:
                 break;
             case Define.GameMode.MAPTOOL:
+                // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
+                List<StageData> stageDataList = Util.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
+
+                stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
+
+                BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
+                bottomColider.size = new Vector3(100, 0, 100);
+
                 EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
                 EventMediator.Instance.OnLoadSequenceEvent += LoadPlayerEvent;
-                LoadMapTool();
                 break;
         }
     }
-    #region Tile Create and Remove
-    public void CreateTile(int _stage)
-    {
-        StageData stageData = stageDataList.Find(x => x.stage == _stage);
-        TilePosition tilePosition = tilePositionList.Find(x => x.stage == _stage);
-
-        for(int i = 0; i < stageData.tileArr.GetLength(0); i++)
-        {
-            for(int j = 0; j < stageData.tileArr.GetLength(1); j++)
-            {
-                TileData tileData = stageData.tileArr[i, j];
-
-                TileObject tileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, tileData.name).GetComponent<TileObject>();
-                tileObject.transform.position = tilePosition.GetIndexByPosition(i, j);
-                tileObject.Load(tileData);
-
-                currentTileObjList.Add(tileObject);
-            }
-        }
-    }
-    public void RemoveTile()
-    {
-        for(int i = 0; i < currentTileObjList.Count; i++)
-        {
-            currentTileObjList[i].Delete();
-            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.TILE, currentTileObjList[i].transform, 0);
-        }
-    }
-    #endregion
     // 타일에 대한 delete, update라고 생각하면 안되긴 함...
     public override void Delete()
     {
-        // object pool을 이용하여 회수 할 것임
-        for (int i = 0; i < currentTileObjList.Count; i++)
-        {
-            // tile object 를 초기화 object를 초기화 함으로써 data도 초기화 됨
-            currentTileObjList[i].Delete();
-        }
-
         EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
+        EventMediator.Instance.OnPlayerLevelChange -= OnPlayerLevelChange;
     }
 
     /// <summary>
@@ -95,8 +72,61 @@ public class MapManager : BaseManager
     /// </summary>
     public override void Update()
     {
-        
+     
     }
+
+    // 말이 안되긴 함 편집이면 편집 , 생성이면 생성을 따로 구별 할 필요가 있음
+
+    #region Tile Load and Delete and Save
+    public void LoadTile(StageData _stageData)
+    {
+        // 있어도 덮어 쓰게끔 변경
+
+        float z = 0f;
+        float x = 0f;
+
+        for (int i = 0; i < _stageData.Row; i++)
+        {
+            x = 0f;
+            for (int j = 0; j < _stageData.Col; j++)
+            {
+                TileData tileData = new TileData();
+
+                if (_stageData.tileArr[i, j] != null)
+                {
+                    tileData = _stageData.tileArr[i, j];
+                }
+                else
+                {
+                    tileData.index = i * _stageData.Row + j;
+                    tileData.type = Define.BaseType.TILE;
+                    tileData.roadType = Define.RoadType.ENEMY;
+                }
+
+                EditorTileObject editorTileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, "EditorTileObject").GetComponent<EditorTileObject>();
+
+                editorTileObject.transform.position = new Vector3(x, 0, z);
+                editorTileObject.transform.parent = root;
+                editorTileObject.Load(tileData);
+                tileObjectList.Add(editorTileObject);
+
+                x += _stageData.xOffset;
+            }
+
+            z += _stageData.zOffset;
+        }
+    }
+    public void DeleteTile()
+    {
+        // object pool을 이용하여 회수 할 것임
+        for (int i = 0; i < tileObjectList.Count; i++)
+        {
+            tileObjectList[i].Delete();
+            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.TILE, tileObjectList[i].transform);
+            // tile object 를 초기화 object를 초기화 함으로써 data도 초기화 됨
+        }
+    }
+    #endregion
     // player가 레벨업을 할 때마다 호출
     public void OnPlayerLevelChange(int _level)
     {
@@ -104,8 +134,6 @@ public class MapManager : BaseManager
     }
     public void LoadPlayerEvent(PlayerInfo _playerInfo)
     {
-        Debug.LogError("MapManager LoadPlayerEvent!!");
-
         // 이게 의존성이 인풋에 대한 의존성이 많아지니 계속 의존성이 생기게 됨 그럼으로 인풋의 target을 의존성을 없애는 작업 필요!!
         int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
 
@@ -113,61 +141,10 @@ public class MapManager : BaseManager
 
         // 후에 변경할것?
         Managers.Instance.lookTarget.transform.position = targetPos;
-        Debug.LogError($"targetPos = {targetPos}");
     }
-    #region Default Mode
-    void LoadDefault()
-    {
-        EventMediator.Instance.OnPlayerLevelChange -= OnPlayerLevelChange;
-        EventMediator.Instance.OnPlayerLevelChange += OnPlayerLevelChange;
-
-        // 수정 필요 어떤 행과 열 기준으로 어떤 것은 초기화가 되어야 함
-        for (int i = 0; i < stageDataList.Count; i++)
-        {
-            StageData stageData = stageDataList[i];
-            List<float> xPostionList = new List<float>();
-            List<float> zPostionList = new List<float>();
-
-            float x = 0;
-            float z = 0;
-
-            for (int j = 0; j < stageData.tileArr.GetLength(0); j++)
-            {
-                xPostionList.Add(x);
-                x += stageData.xOffset;
-            }
-
-            for (int j = 0; j < stageData.tileArr.GetLength(1); j++)
-            {
-                zPostionList.Add(z);
-                z += stageData.zOffset;
-            }
-
-            tilePositionList.Add(new TilePosition(stageData.stage, xPostionList, zPostionList));
-        }
-
-        if (stageDataList.Count > 0)
-        {
-            return;
-        }
-
-        List<StageData> stageDataJsonList = Util.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
-
-        if (stageDataList != null)
-        {
-            foreach (var stageData in stageDataList)
-            {
-                stageDataList.Add(stageData);
-            }
-        }
-        else
-        {
-            Debug.LogError("Not Load StageData!!");
-        }
-    }
-    #endregion
 
     #region MapTool Mode
+    [Obsolete]
     void LoadMapTool()
     {
         /*
@@ -180,6 +157,89 @@ public class MapManager : BaseManager
         BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
         bottomColider.size = new Vector3(100, 0, 100);
 
+        float xOffset = 1;
+        float zOffset = 1;
+        // x position set 
+        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
+        {
+            float x = i * xOffset;
+            colLinePoniterDic.Add(i, x);
+        }
+
+        // z position set 
+        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
+        {
+            float z = i * zOffset;
+            rowLinePoniterDic.Add(i, z);
+        }
+
+        // row numbering
+        for(int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
+        {
+            Transform rowTrf = Util.AttachObj<Transform>($"Row_Number_{i}");
+            Transform colTrf = Util.AttachObj<Transform>($"Col_Number_{i}");
+
+            rowTrf.parent = root;
+            colTrf.parent = root;
+
+            rowTrf.transform.localPosition = new Vector3(rowLinePoniterDic[i], 0, -1f);
+            colTrf.transform.localPosition = new Vector3(-1f, 0, colLinePoniterDic[i]);
+        }
+
+
+        int idx = 0;
+        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
+        {
+            float z = rowLinePoniterDic[i];
+
+            for (int j = 0; j < StaticDefine.MAX_CREATE_TILE_NUM; j++)
+            {
+                float x = colLinePoniterDic[j];
+                EditorTileObject editorTileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, "EditorTileObject").GetComponent<EditorTileObject>();
+                editorTileObject.transform.parent = root;
+                // builder든 뭐든간에 데이터를 넣어야 함
+                editorTileObject.transform.localPosition = new Vector3(x, 0, z);
+                editorTileObject.Load(new TileData(idx, "MapToolTile_" + idx, Define.BaseType.TILE, Define.Direction.LEFT));
+                tileObjectList.Add(editorTileObject);
+                idx++;
+            }
+        }
+    }
+
+    public void SaveMapTool(StageData _stage)
+    {
+        TileData[,] tileDataArr = new TileData[_stage.Row, _stage.Col];
+        
+        for (int i = 0; i < _stage.Row; i++)
+        {
+            for (int j = 0; j < _stage.Col; j++)
+            {
+                int idx = i * _stage.Row + j;
+                TileData tileData = tileObjectList[idx].tileData;
+                // builder든 뭐든간에 데이터를 넣어야 함
+                tileDataArr[i, j] = tileData;
+            }
+        }
+
+        _stage.tileArr = tileDataArr;
+        
+        if (stageDataDic.ContainsKey(_stage.stage))
+        {
+            stageDataDic[_stage.stage] = _stage;
+        }
+        else
+        {
+            stageDataDic.Add(_stage.stage ,_stage);
+        }
+
+        Util.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, "StageData", stageDataDic.Values.ToList());
+    }
+    #endregion
+
+    #region Draw LineRenderer
+    [Obsolete]
+    void DrawLineRenderer()
+    {
         Transform rowLinerendererTrf = Util.AttachObj<Transform>("rowLineParent");
         Transform colLinerendererTrf = Util.AttachObj<Transform>("colLineParent");
 
@@ -194,23 +254,6 @@ public class MapManager : BaseManager
             colLineRendererList[i].transform.parent = colLinerendererTrf;
             colLineRendererList[i].startWidth = .25f;
             colLineRendererList[i].endWidth = .25f;
-        }
-
-        float xOffset = 2.5f;
-        float zOffset = 2.5f;
-
-        // x position set 
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            float x = i * xOffset;
-            colLinePoniterDic.Add(i, x);
-        }
-
-        // z position set 
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            float z = i * zOffset;
-            rowLinePoniterDic.Add(i, z);
         }
 
         for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
@@ -243,5 +286,7 @@ public class MapManager : BaseManager
             colLineRenderer.SetPositions(colPointerList.ToArray());
         }
     }
+
     #endregion
+
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using YhProj;
 
 public class InputManager : BaseManager
@@ -34,9 +35,19 @@ public class InputManager : BaseManager
     }
     public override void Update()
     {
-        stateController.OnEnter();
-        stateController.Update();
-        stateController.OnExit();
+        // ui가 없거나 활성화된 UI가 없을 때만 드래그 이벤트 처리
+        // "마우스 포인터가 UI 요소 위에 있지 않고, 동시에 활성화된 UI가 없을 때" 
+        // 원래는 그냥 isactiveui만 사용하려 했느나 간헐적으로 드래그가 되는 현상으로 인해 조건문 두개로 통합
+        
+        // 이 부분은 보류
+        //if (!IsPointerOverUIObject() && !Managers.Instance.GetManager<UIManager>().IsActiveUI)
+
+        if(!Managers.Instance.GetManager<UIManager>().IsActiveUI)
+        {
+            stateController.OnEnter();
+            stateController.Update();
+            stateController.OnExit();
+        }
     }
     public override void Delete()
     {
@@ -46,7 +57,16 @@ public class InputManager : BaseManager
     public void LoadPlayerEvent(PlayerInfo _playerInfo)
     {
         // camera controller를 만들어 관리하는 방법으로 할 것임 statecontroller랑 비슷하다고 생각하면 될듯??
-        Managers.Instance.testCamera.target = target;
         Debug.LogError("InputManager LoadPlayerEvent!!");
+    }
+
+    // 이 부분은 보류
+    private bool IsPointerOverUIObject()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        return results.Count > 0;
     }
 }

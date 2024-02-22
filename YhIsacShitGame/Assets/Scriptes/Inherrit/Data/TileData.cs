@@ -7,21 +7,22 @@ using YhProj;
 public class TileData : BaseData
 {
     public Define.Direction direction;
-    // true = 배치 가능한 길, false = 배치 불가능한 길
-    public bool isSection;
+
     // server 에서 할 일
-    // 해당 타일의 건물 인덱스 만약 존재한다면 0보다 큰 값 , 없다면 == 0
-    public int buildIdx;
-    // 해당 타일의 캐릭터 인덱스 만약 존재한다면 0보다 큰 값, 없다면 == 0
-    public int characterIdx;
-    // 배치가 가능한 자리인가?
-    public int batch;
-    public bool IsCharacter()
+    // 해당 타일이 적 길인지 아군 길인지, 데코인지 판단하는 값
+    public Define.RoadType roadType;
+    // 배치된 오브젝트 인덱스 후에 다른것들로 통합할 필요가 있다.
+    public int batchIdx;
+
+    public TileData() { }
+    public TileData(int _index, string _name, Define.BaseType _type, Define.Direction _direction) : base(_index, _type, _name)
     {
-        bool ret = false;
-        return ret;
+        direction = _direction;
+        batchIdx = 0;
+        roadType = Define.RoadType.ENEMY;
     }
-    public bool IsBuild()
+
+    public bool IsCharacter()
     {
         bool ret = false;
         return ret;

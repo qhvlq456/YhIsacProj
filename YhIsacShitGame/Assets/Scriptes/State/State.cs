@@ -6,7 +6,7 @@ namespace YhProj
     {
         public virtual void Update() { }
         public virtual void Exit() { }
-        public virtual void Enter() { }
+        public virtual void Enter(BaseObject _baseObject) { }
         public virtual void Enter(Vector3 _position) { }
         //public abstract void OnInput();
         //public abstract void OnTrigger();

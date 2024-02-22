@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Compilation;
 using UnityEngine;
 using YhProj;
 
@@ -13,7 +14,26 @@ public class ObjectPoolManager : BaseManager
 
     public override void Load(Define.GameMode _gameMode)
     {
+        root = Util.AttachObj<Transform>("ObjectPoolRoot");
 
+        for (int i = 0; i < (int)Define.BaseType.COUNT; i++)
+        {
+            Define.BaseType baseType = (Define.BaseType)i;
+            string objName = baseType.ToString();
+            GameObject go = new GameObject(objName);
+            go.transform.parent = root;
+            parentTrfDic.Add(baseType, go.transform);
+        }
+
+        switch (_gameMode)
+        {
+            case Define.GameMode.EDITOR:
+                break;
+            case Define.GameMode.TEST:
+                break;
+            case Define.GameMode.MAPTOOL:
+                break;
+        }
     }
     public override void Delete()
     {
@@ -50,14 +70,13 @@ public class ObjectPoolManager : BaseManager
                 break;
         }
         // end
-
+        
         if (parentTrf.childCount == 0)
         {
             // active ture or false 는 portrait 때문에 한건데 일단 보류
-            parentTrf.gameObject.SetActive(true);
-            GameObject copyObj = Util.InstantiateResource<GameObject>(path);
-            ret = copyObj.transform;
-            parentTrf.gameObject.SetActive(false);
+            ret = Util.InstantiateResource<Transform>(path);
+            ret.parent = parentTrf;
+            ret.gameObject.SetActive(false);
         }
         else
         {
@@ -72,9 +91,9 @@ public class ObjectPoolManager : BaseManager
     /// <summary>
     /// 회수 함수 
     /// </summary>
-    public void Retrieve(Define.BaseType _type, Transform _trf, int _childNum)
+    public void Retrieve(Define.BaseType _type, Transform _trf)
     {
-        _trf.parent = parentTrfDic[_type].transform.GetChild(_childNum);
+        _trf.parent = parentTrfDic[_type];
         _trf.localPosition = Vector3.zero;
         _trf.localRotation = Quaternion.identity;
         _trf.localScale = Vector3.one;

@@ -85,7 +85,7 @@ public class CustomExecutionData: Editor
         #region DefineSymbols button
         // Start DefineSymbols button
         if (GUILayout.Button("PlayerSetting Symbol Update", GUILayout.Height(50)))
-        {            
+        {
             List<string> defineList = symbols.Split(';').ToList();
 
             // 중복 제거
@@ -105,6 +105,7 @@ public class CustomExecutionData: Editor
 #else
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defineList.ToArray()));
 #endif
+            AssetDatabase.SaveAssets();
         }
 
         EditorGUILayout.Space();
@@ -124,10 +125,19 @@ public class CustomExecutionData: Editor
 #else
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defineList.ToArray()));
 #endif
+            AssetDatabase.SaveAssets();
         }
         // end DefineSymbols button
         #endregion DefineSymbols button
 
+        EditorGUILayout.Space();
+
+        #region Save
+        if (GUILayout.Button("Save", GUILayout.Height(50)))
+        {
+            AssetDatabase.SaveAssets();
+        }
+        #endregion
         EditorGUILayout.Space();
     }
     /*

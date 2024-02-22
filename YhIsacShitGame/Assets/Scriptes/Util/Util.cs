@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Text;
 using System.IO;
 using UnityEngine;
+using System;
 
 public static class Util
 {
@@ -17,16 +17,35 @@ public static class Util
     {
         return JsonConvert.SerializeObject(_obj);
     }
-    public static void CreateJsonFile(string _createPath, string _fileName, string _jsonData)
+    public static void CreateJsonFile(string _createPath, string _fileName, object _jsonData)
     {
-        FileStream fileStream = new FileStream(Path.Combine(Application.dataPath + _createPath + _fileName), FileMode.Create);
-        byte[] data = Encoding.UTF8.GetBytes(_jsonData);
-        fileStream.Write(data, 0, data.Length);
-        fileStream.Close();
+        string jsonData = DataToJson(_jsonData);
+        string filePath = string.Format("{0}/{1}/{2}.json", Application.dataPath, _createPath, _fileName);
+
+        try
+        {
+            using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                byte[] data = Encoding.UTF8.GetBytes(jsonData);
+                fileStream.Write(data, 0, data.Length);
+                fileStream.Close();
+            }
+
+            Debug.Log($"JSON file created successfully at: {filePath}");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to create JSON file. Exception: {e.Message}");
+        }
+
+        // FileStream fileStream = new FileStream(Path.Combine(Application.dataPath + _createPath + _fileName), FileMode.Create);
+        //byte[] data = Encoding.UTF8.GetBytes(jsonData);
+        //fileStream.Write(data, 0, data.Length);
+        //fileStream.Close();
     }
     public static T LoadJson<T>(string _loadPath, string _fileName)
     {
-        string filePath = Path.Combine(Application.dataPath + _loadPath, _fileName);
+        string filePath = string.Format("{0}/{1}/{2}", Application.dataPath, _loadPath, _fileName);
 
         if(File.Exists(filePath))
         {
@@ -39,14 +58,14 @@ public static class Util
         }
         else
         {
-            Debug.LogWarningFormat("Uile LoadJson Warning \n filePath : {0}, _loadPath : {1}, _fileName : {2}}", filePath, _loadPath, _fileName);
+            Debug.LogWarningFormat("Utile LoadJson Warning \n filePath : {0}, _loadPath : {1}, _fileName : {2}}", filePath, _loadPath, _fileName);
             return default;
         }
     }
 
     public static List<T> LoadJsonArray<T>(string _loadPath, string _fileName)
     {
-        string filePath = Path.Combine(Application.dataPath + _loadPath, _fileName);
+        string filePath = string.Format("{0}/{1}/{2}", Application.dataPath, _loadPath, _fileName);
 
         if (File.Exists(filePath))
         {
@@ -59,24 +78,24 @@ public static class Util
         }
         else
         {
-            Debug.LogWarningFormat("Uile LoadJsonArray Warning \n filePath : {0}, _loadPath : {1}, _fileName : {2}}", filePath, _loadPath, _fileName);
-            return null; // 또는 예외 처리를 추가하여 반환값을 선택할 수 있습니다.
+            Debug.LogWarningFormat("Util LoadJsonArray Warning \n filePath : {0}, _loadPath : {1}, _fileName : {2}", filePath, _loadPath, _fileName);
+            return new List<T>(); // 또는 예외 처리를 추가하여 반환값을 선택할 수 있습니다.
         }
     }
     #endregion
 
     #region Resource Util
-    public static T InstantiateResource<T>(string _path) where T : Object
+    public static T InstantiateResource<T>(string _path) where T : UnityEngine.Object
     {
-        T resObj = Resources.Load<T>(_path);
+        GameObject resObj = Resources.Load<GameObject>(_path);
 
         if(resObj == null)
         {
-            Debug.LogWarningFormat("Uile GetResource resobj Warning \n resobj : {0}, path : {1}}", resObj, _path);
+            Debug.LogWarningFormat("Util GetResource resobj Warning \n resobj : {0}, path : {1}", resObj, _path);
             return null;
         }
 
-        T copyObj = Object.Instantiate(resObj);
+        T copyObj = UnityEngine.Object.Instantiate(resObj).GetComponent<T>();
 
         return copyObj;
     }

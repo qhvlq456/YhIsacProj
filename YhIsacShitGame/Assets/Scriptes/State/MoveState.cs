@@ -5,13 +5,19 @@ using YhProj;
 
 public class MoveState : State
 {
+    public MoveState() { }
+    public static MoveState Create()
+    {
+        return new MoveState();
+    }
+
     public override void Update()
     {
         base.Update();
     }
-    public override void Enter()
+    public override void Enter(BaseObject _baseObject)
     {
-        base.Enter();
+        base.Enter(_baseObject);
     }
 
     public override void Enter(System.Numerics.Vector3 _position)

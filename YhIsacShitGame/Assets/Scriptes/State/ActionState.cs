@@ -5,7 +5,7 @@ using YhProj;
 
 public class ActionState : State
 {
-    public override void Enter()
+    public override void Enter(BaseObject _baseObject)
     {
         
     }

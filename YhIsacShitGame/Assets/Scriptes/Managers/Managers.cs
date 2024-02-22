@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using YhProj;
+using static UnityEngine.GraphicsBuffer;
+using TMPro;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -35,7 +38,7 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
 #if UNITY_EDITOR
         if (executionData == null)
         {
-            executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.EXECUTIONDATA_PATH);
+            executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset");
         }
 
         gameMode = executionData.gameMode;
@@ -48,6 +51,8 @@ public class Managers : Singleton<Managers>, YhProj.ILogger
         lookTarget = Util.AttachObj<Transform>("LookTarget");
         // 카메라도 게임모드에 따라 변경 시도 할 것ㅇ미
         testCamera = Util.AttachObj<TestCamera>("Main Camera");
+        testCamera.target = lookTarget;
+        lookTarget.transform.position = StaticDefine.START_POSITION;
 
         RegisterManager(new PlayerManager(new PlayerInfo()));
         RegisterManager(new ObjectPoolManager());

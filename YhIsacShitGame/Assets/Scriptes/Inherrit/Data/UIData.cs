@@ -1,23 +1,22 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj;
 
-public class UIData : BaseData
+[System.Serializable]
+public class UIData : ScriptableObject
 {
-    public Define.UIRootType _uiRootType { protected set; get; }
-
-    public override void Load()
-    {
-        
-    }
-    public override void Update()
-    {
-        
-    }
-    public override void Delete()
-    {
-        
-    }
-
+    public string resourceUIPath;
+    public string mapToolUIPath;
+    // 나중에 데이터가 잘 들어갔는지 보고싶음 주석 푸셈
+    //[HideInInspector]
+    public List<UIInfo> mainUIDataList = new List<UIInfo>();
+    //[HideInInspector]
+    public List<UIInfo> popupUIDataList = new List<UIInfo>();
+    //[HideInInspector]
+    public List<UIInfo> tooltipUIDataList = new List<UIInfo>();
+    //[HideInInspector]
+    public List<UIInfo> contextualUIDataList = new List<UIInfo>();
+    //[HideInInspector]
+    public List<UIInfo> testUIDataList = new List<UIInfo>();
 }
+
+

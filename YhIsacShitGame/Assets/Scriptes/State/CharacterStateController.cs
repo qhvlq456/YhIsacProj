@@ -22,7 +22,7 @@ public class CharacterStateController : StateController
         {
             currentState.Exit();
             currentState = _nextState;
-            currentState.Enter();
+            currentState.Enter(null);
         }
     }
 }

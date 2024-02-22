@@ -5,9 +5,9 @@ using YhProj;
 
 public class ContextualUI : BaseUI
 {
-    public override void Show(UIData _uiData)
+    public override void Show(UIInfo _uiInfo)
     {
-        base.Show(_uiData);
+        base.Show(_uiInfo);
     }
     public override void Hide()
     {

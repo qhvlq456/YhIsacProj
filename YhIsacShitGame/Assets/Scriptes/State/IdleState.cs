@@ -5,7 +5,7 @@ using YhProj;
 
 public class IdleState : State
 {
-    public override void Enter()
+    public override void Enter(BaseObject _baseObject)
     {
         
     }

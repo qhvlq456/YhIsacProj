@@ -1,0 +1,106 @@
+{
+  "r": 3,
+  "c": 3,
+  "xOffset": 1.0,
+  "zOffset": 1.0,
+  "lv": 1,
+  "stage": 1,
+  "tileArr": [
+    [
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      },
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      },
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      }
+    ],
+    [
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      },
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      },
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      }
+    ],
+    [
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      },
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      },
+      {
+        "direction": 0,
+        "isSection": false,
+        "buildIdx": 0,
+        "characterIdx": 0,
+        "batch": 0,
+        "index": 0,
+        "type": 0,
+        "name": null
+      }
+    ]
+  ]
+}

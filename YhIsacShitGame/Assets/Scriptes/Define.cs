@@ -13,7 +13,7 @@ namespace YhProj
             MAPTOOL,
             BUILDTOOL
         }
-        // 모든 게임 데이터의 베이스의 타입 // base type -> subType 으로 간다
+        // 모든 게임 데이터의 베이스의 타입 // base type -> subType 으로 간다, 필드 오브젝트만
         public enum BaseType
         {
             NONE,
@@ -21,7 +21,7 @@ namespace YhProj
             CHARACTER,
             BUILD,
             ITEM,
-            UI
+            COUNT
         }
         // log를 보이게 할 것인지 안보이게 할 것인지
         public enum DebugLogeer
@@ -39,7 +39,7 @@ namespace YhProj
         // uiroot 하위 랜더링할 캔버스 종류들
         public enum UIRootType
         {
-            MAIN_UI,
+            MAIN_UI, // 항상 고정값이 되어야 함
             POPUP_UI,
             TOOLTIP_UI,
             CONTEXTUAL_UI,
@@ -63,7 +63,7 @@ namespace YhProj
             LEFT_TOP, // 좌상
             RIGHT_TOP, // 우상
             LEFT_BOTTOM, // 좌하
-            RIGHT_BOTTOM // 우하
+            RIGHT_BOTTOM, // 우하
         }
 
 
@@ -75,8 +75,16 @@ namespace YhProj
             DRAG,
             MOVE,
         }
+
+        public enum RoadType
+        {
+            MINE,
+            ENEMY,
+            DECO
+        }
     }
 
+    // 나중에 경로에 대한 지정이 다시 필요할듯
     /// <summary>
     /// 지정된 맥스 레벨 값 하지만 임시용임 나중에 set할 것 임
     /// </summary>
@@ -90,19 +98,17 @@ namespace YhProj
 
         public static string JSON_MAP_FILE_NAME = "StageData.json";
 
-
         // json 위치 
         public static string JSON_MAP_DATA_PATH = "StreamingAssets";
 
-
         // 리소스 위치
-        public static string TILE_PATH = "";
+        public static string TILE_PATH = "Map/Tool";
 
         // 임시 일단 넣을거
         public static float TILE_YPOSITION = 0f;
 
         // executionDataPath // scriptableobject 실행 환경 오브젝트 // 일단 에디터 폴더에 없음 에러가 발생하긴 해서 임시로 에디터 폴더로 지정
-        public static string EXECUTIONDATA_PATH = "Assets/Editor/ExecutionData.asset";
+        public static string SCRIPTABLEOBJECT_PATH = "Assets/Resources/ScriptableObjects/";
 
         public static UnityEngine.Vector3 START_POSITION = UnityEngine.Vector3.zero;
 

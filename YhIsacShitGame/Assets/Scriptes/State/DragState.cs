@@ -8,18 +8,24 @@ namespace YhProj
     {
         float moveSpeed;
 
+        // 아래 targetposion 빼고 다른 값들이 zero로 set되어 있어서 그럼
         Vector3 targetPosition = Vector3.zero;
         Vector3 downPosition = Vector3.zero;
         Vector3 dragPosition = Vector3.zero;
 
         Transform target;
-
         public DragState(Transform _taget, float _moveSpeed)
         {
             target = _taget;
             moveSpeed = _moveSpeed;
         }
-        public override void Enter()
+        // 팩토리 메서드
+        public static DragState Create(Transform _taget, float _moveSpeed)
+        {
+            return new DragState(_taget, _moveSpeed);
+        }
+
+        public override void Enter(BaseObject _baseObject)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -30,15 +36,11 @@ namespace YhProj
                 Debug.DrawRay(ray.origin, ray.direction * 1000, Color.yellow);
             }
 
-            downPosition = hit.point;
-
-            Debug.Log("DragState: Enter");
+            downPosition =  hit.point;
         }
         public override void Update()
         {
             // Handle dragging logic here
-            Debug.Log("DragState: Dragging!");
-
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             RaycastHit hit;
@@ -49,7 +51,6 @@ namespace YhProj
 
                 dragPosition = hit.point;
                 Vector3 distance = dragPosition - downPosition;
-
                 targetPosition = target.position - distance;
 
                 // 일단 이건 왜 있는지 잘 모르겠어서 주석
@@ -61,9 +62,6 @@ namespace YhProj
             // Update target position based on drag movement
 
             targetPosition = new Vector3(target.transform.position.x, 0, target.transform.position.z);
-
-
-            Debug.Log("DragState: Update");
         }
         public override void Exit()
         {
