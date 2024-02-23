@@ -175,7 +175,11 @@ public class MapToolMainUI : MainUI
 
         logText.text = "Stage : " + stage.ToString();
 
+
+        // 이 부분이 문제인듯? 또 딜레마네
         StageData stageData = new StageData(stage, lv, new TileData[row, col]);
+
+
         stageData.tileSize = tileSize;
         stageData.xOffset = xOffset;
         stageData.zOffset = zOffset;

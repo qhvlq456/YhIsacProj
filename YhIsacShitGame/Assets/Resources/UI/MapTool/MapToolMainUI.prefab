@@ -7513,22 +7513,22 @@ MonoBehaviour:
   - inputType: 0
     titleText: {fileID: 1297361363876673925}
     inputField: {fileID: 132360689948629890}
-  - inputType: 0
+  - inputType: 1
     titleText: {fileID: 3166373880673205529}
     inputField: {fileID: 7052340968455472070}
-  - inputType: 0
+  - inputType: 2
     titleText: {fileID: 8963742774867883020}
     inputField: {fileID: 2711914160840780515}
-  - inputType: 0
+  - inputType: 3
     titleText: {fileID: 4279093961664631545}
     inputField: {fileID: 7319088099478539882}
-  - inputType: 0
+  - inputType: 4
     titleText: {fileID: 3991611790285525219}
     inputField: {fileID: 8043702183656819552}
-  - inputType: 0
+  - inputType: 5
     titleText: {fileID: 974151438317548693}
     inputField: {fileID: 4688487638078038170}
-  - inputType: 0
+  - inputType: 6
     titleText: {fileID: 7581317631654790108}
     inputField: {fileID: 6028230092910351414}
   textDropDownList:

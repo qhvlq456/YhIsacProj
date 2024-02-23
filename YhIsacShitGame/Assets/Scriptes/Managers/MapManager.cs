@@ -51,6 +51,29 @@ public class MapManager : BaseManager
                 // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
                 List<StageData> stageDataList = Util.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
 
+                string log = "";
+
+                foreach (var stageData in stageDataList) 
+                {
+                    if(stageData == null || stageData.tileArr == null) { continue;}
+                    Debug.LogError($"stage data = {stageData.lv}");
+                    Debug.LogError($"row = {stageData.Row}");
+                    Debug.LogError($"col = {stageData.Col}");
+
+                    for (int i = 0; i < stageData.tileArr.GetLength(0); i++)
+                    {
+                        for(int j = 0; j < stageData.tileArr.GetLength(1); j++)
+                        {
+                            log += $"[{i}, {j}] = {stageData.tileArr[i, j].name}, type = {stageData.tileArr[i, j].type} ";
+                        }
+
+                        log += '\n';
+                    }
+                    Debug.LogError(log);
+                    log = "";
+                }
+
+
                 stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
 
                 BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
@@ -95,7 +118,9 @@ public class MapManager : BaseManager
             {
                 TileData tileData = new TileData();
 
-                if (_stageData.tileArr[i, j] != null)
+                Debug.LogError($"_stageData.tileArr[i, j] == null ? {_stageData.tileArr[i, j] == null}");
+                Debug.LogError($"_stageData.tileArr == null ? {_stageData.tileArr == null}");
+                if (_stageData.tileArr[i,j] != null)
                 {
                     tileData = _stageData.tileArr[i, j];
                 }

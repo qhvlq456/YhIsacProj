@@ -78,9 +78,54 @@ public class MapToolUI : BaseUI
         base.Show(_uiInfo);
         editorTileObject = _param as EditorTileObject;
 
+        InfoText();
+    }
+    public void ExitBtnClick()
+    {
+        ClearBtnClick();
+        Managers.Instance.GetManager<UIManager>().HideUI(uiInfo);
+    }
+    public void ApplyBtnClick()
+    {
+        bool isEmpty = categoryUIDic.Values.Any(x => x.IsNotValue());
+
+        if(isEmpty) 
+        {
+            Debug.LogError($"is empty");
+        }
+        else
+        {
+            TileData originData = editorTileObject.tileData;
+
+            TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["roadtype"].GetValue())
+                .SetDirection(categoryUIDic["direction"].GetValue())
+                .SetBatchIdx(int.Parse(categoryUIDic["batchidx"].GetValue().ToString()))
+                .SetName(categoryUIDic["name"].GetValue().ToString())
+                .SetType(originData.type)
+                .SetIndex(originData.index)
+                .Build();
+
+
+            editorTileObject.Load(newTileData);
+        }
+
+        InfoText();
+    }
+
+    public void ClearBtnClick()
+    {
+        // input field甸 傈何 empty 贸府
+        foreach(var item in categoryUIDic) 
+        {
+            item.Value.ClearBtnClick();
+        }
+    }
+
+    void InfoText()
+    {
         string showInfoStr = "";
 
-        if(editorTileObject.tileData != null)
+        if (editorTileObject.tileData != null)
         {
             showInfoStr = $"Tile Data \n " +
                 $"name : {editorTileObject.tileData.name}, " +
@@ -95,58 +140,6 @@ public class MapToolUI : BaseUI
             showInfoStr = "Tile Data is null";
         }
 
-        DefaultSetting();
         infoText.text = showInfoStr;
-    }
-    public void ExitBtnClick()
-    {
-        ClearBtnClick();
-        Managers.Instance.GetManager<UIManager>().HideUI(uiInfo);
-    }
-    public void ApplyBtnClick()
-    {
-        bool isEmpty = categoryUIDic.Values.Any(x => x.IsNotValue());
-
-
-        TileData originData = editorTileObject.tileData;
-
-        TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["roadtype"].GetValue())
-            .SetDirection(categoryUIDic["direction"].GetValue())
-            .SetBatchIdx(int.Parse(categoryUIDic["batchidx"].GetValue().ToString()))
-            .SetName(categoryUIDic["name"].GetValue().ToString())
-            .SetType(originData.type)
-            .SetIndex(originData.index)
-            .Build();
-
-
-        editorTileObject.Load(newTileData);
-
-        if (editorTileObject.tileData != null)
-        {
-            infoText.text = $"Tile Data \n " +
-                $"name : {editorTileObject.tileData.name}, " +
-                $"index : {editorTileObject.tileData.index}, " +
-                $"type : {editorTileObject.tileData.type}, " +
-                $"Direction : {editorTileObject.tileData.direction}, " +
-                $"batchIdx : {editorTileObject.tileData.batchIdx}, " +
-                $"roadType : {editorTileObject.tileData.roadType}";
-        }
-    }
-
-    public void ClearBtnClick()
-    {
-        // input field甸 傈何 empty 贸府
-        foreach(var item in categoryUIDic) 
-        {
-            item.Value.ClearBtnClick();
-        }
-    }
-
-    void DefaultSetting()
-    {
-        foreach (var item in categoryUIDic) 
-        { 
-            item.Value.DefaultSetting();
-        }
     }
 }

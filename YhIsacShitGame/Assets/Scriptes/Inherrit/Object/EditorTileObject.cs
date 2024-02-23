@@ -58,15 +58,12 @@ public class EditorTileObject : TileObject
         {
             case Define.RoadType.MINE:
                 meshRenderer.material.color = mineRoadColor;
-                Debug.LogError("mine");
                 break;
             case Define.RoadType.ENEMY:
                 meshRenderer.material.color = enemyRoadColor;
-                Debug.LogError("enemy");
                 break;
             case Define.RoadType.DECO:
                 meshRenderer.material.color = decoRoadColor;
-                Debug.LogError("deco");
                 break;
         }
     }
