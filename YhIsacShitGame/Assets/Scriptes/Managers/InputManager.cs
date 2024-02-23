@@ -26,8 +26,8 @@ public class InputManager : BaseManager
                 // 여기서 target attach를 set하여 순서를 정할 것임
                 break;
             case Define.GameMode.MAPTOOL:
-                EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
-                EventMediator.Instance.OnLoadSequenceEvent += LoadPlayerEvent;
+                EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+                EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
                 // 여기서 target attach를 set하여 순서를 정할 것임
                 stateController = new EditStateController(target);
                 break;
@@ -51,7 +51,7 @@ public class InputManager : BaseManager
     }
     public override void Delete()
     {
-        EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
+        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
     }
 
     public void LoadPlayerEvent(PlayerInfo _playerInfo)

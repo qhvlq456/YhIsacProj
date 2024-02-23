@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -12,7 +11,7 @@ public class MapToolMainUI : MainUI
     [Serializable]
     public struct sTextInputUI
     {
-        public TextInputType textInputType;
+        public InputType inputType;
         public TextMeshProUGUI titleText;
         public TMP_InputField inputField;
     }
@@ -24,13 +23,21 @@ public class MapToolMainUI : MainUI
         public Button btn;
         public TextMeshProUGUI btnText;
     }
+
+    [Serializable]
+    public struct sTextDropDownUI
+    {
+        public DropDownType dropDownType;
+        public TMP_Dropdown dropdown;
+        public TextMeshProUGUI titleText;
+    }
     public enum ButtonType
     {
         save,
         load,
         delete,
     }
-    public enum TextInputType
+    public enum InputType
     {
         row,
         col,
@@ -40,22 +47,47 @@ public class MapToolMainUI : MainUI
         xOffset,
         zOffset
     }
-
-    public List<sButtonUI> buttonList = new List<sButtonUI>();
-    public List<sTextInputUI> textInputList = new List<sTextInputUI>();
-
-    [SerializeField]
-    private Toggle editorToggle;
+    public enum DropDownType
+    {
+        stage,
+    }
 
     [SerializeField]
-    private TextMeshProUGUI stageText;
+    private List<sButtonUI> buttonList = new List<sButtonUI>();
+
+    [SerializeField]
+    private List<sTextInputUI> textInputList = new List<sTextInputUI>();
+
+    [SerializeField]
+    private List<sTextDropDownUI> textDropDownList = new List<sTextDropDownUI>();
+
+    [SerializeField]
+    private TextMeshProUGUI logText;
 
     [SerializeField]
     private StageData currentStageData = null;
 
     private void Awake()
     {
-        foreach(var btn in  buttonList)
+        foreach(var dropDown in textDropDownList) 
+        {
+            UnityAction<int> valueCallback = null;
+
+            switch (dropDown.dropDownType)
+            {
+                case DropDownType.stage:
+                    valueCallback = OnDropdownValueChanged;
+                    break;
+            }
+
+            if (valueCallback != null)
+            {
+                dropDown.dropdown.onValueChanged.AddListener(valueCallback);
+                dropDown.titleText.text = dropDown.dropDownType.ToString();
+            }
+        }
+
+        foreach (var btn in  buttonList)
         {
             btn.btn.onClick.RemoveAllListeners();
 
@@ -72,7 +104,6 @@ public class MapToolMainUI : MainUI
                 case ButtonType.delete:
                     btnCallback = DeleteBtnClick;
                     break;
-                
             }
 
             if (btnCallback != null)
@@ -85,10 +116,20 @@ public class MapToolMainUI : MainUI
         foreach(var text in textInputList)
         {
             text.inputField.text = "";
-            text.titleText.text = text.textInputType.ToString();
+            text.titleText.text = text.inputType.ToString();
         }
 
-        stageText.text = "Empty";
+        logText.text = "Empty";
+    }
+    public override void Show(UIInfo _uiInfo)
+    {
+        base.Show(_uiInfo);
+
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
+        stageDropDown.ClearOptions();
+
+        List<string> dropDownOptionList = Managers.Instance.GetManager<MapManager>().GetStageDataList().Select(x => x.stage.ToString()).ToList();
+        stageDropDown.AddOptions(dropDownOptionList);
     }
 
     /// <summary>
@@ -106,28 +147,33 @@ public class MapToolMainUI : MainUI
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
             Managers.Instance.GetManager<MapManager>().SaveMapTool(currentStageData);
-            // inputfield is null
+
+            TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
+            stageDropDown.ClearOptions();
+
+            List<string> dropDownOptionList = Managers.Instance.GetManager<MapManager>().GetStageDataList().Select(x => x.stage.ToString()).ToList();
+            stageDropDown.AddOptions(dropDownOptionList);
+
+            textInputList.ForEach(ui => ui.inputField.text = "");
         }
 
-        stageText.text = text;
+        logText.text = text;
     }
     /// <summary>
-    /// Stage data에 맞게끔 tileobject를 생성하는 메서드 // stage data 가 필요함
+    /// Stage data에 맞게끔 tileobject를 생성하는 메서드
     /// </summary>
     public void LoadBtnClick() 
     {
-        // 생성/ 편집을 나누어야 함
-        // 로드 이후 스테이지 데이터를 가지고 있어야 하는 것도 판단해야 함
-        int row = GetInputFieldToType<int>(TextInputType.row);
-        int col = GetInputFieldToType<int>(TextInputType.col);
-        int stage = GetInputFieldToType<int>(TextInputType.stage);
-        int lv = GetInputFieldToType<int>(TextInputType.lv);
+        int row = GetInputFieldToType<int>(InputType.row);
+        int col = GetInputFieldToType<int>(InputType.col);
+        int stage = GetInputFieldToType<int>(InputType.stage);
+        int lv = GetInputFieldToType<int>(InputType.lv);
 
-        float tileSize = GetInputFieldToType<float>(TextInputType.tileSize);
-        float xOffset = GetInputFieldToType<float>(TextInputType.xOffset);
-        float zOffset = GetInputFieldToType<float>(TextInputType.zOffset);
+        float tileSize = GetInputFieldToType<float>(InputType.tileSize);
+        float xOffset = GetInputFieldToType<float>(InputType.xOffset);
+        float zOffset = GetInputFieldToType<float>(InputType.zOffset);
 
-        stageText.text = "Stage : " + stage.ToString();
+        logText.text = "Stage : " + stage.ToString();
 
         StageData stageData = new StageData(stage, lv, new TileData[row, col]);
         stageData.tileSize = tileSize;
@@ -135,6 +181,7 @@ public class MapToolMainUI : MainUI
         stageData.zOffset = zOffset;
 
         currentStageData = stageData;
+
         Managers.Instance.GetManager<MapManager>().LoadTile(currentStageData);
     }
     /// <summary>
@@ -142,18 +189,68 @@ public class MapToolMainUI : MainUI
     /// </summary>
     public void DeleteBtnClick() 
     {
-        stageText.text = "Stage : Empty";
+        logText.text = "Stage : Empty";
         currentStageData = null;
 
         Managers.Instance.GetManager<MapManager>().DeleteTile();
     }
+    
+    /// <summary>
+    /// Stage Data를 삭제함
+    /// </summary>
+    public void RemoveBtnClick()
+    {
+        int stage = GetInputFieldToType<int>(InputType.stage);
+
+        if(Managers.Instance.GetManager<MapManager>().IsConstainsStage(stage))
+        {
+            Managers.Instance.GetManager<MapManager>().DeleteMapTool(stage);
+            logText.text = "Delete Stage Success!!";
+        }
+        else
+        {
+
+        }
+    }
+    public void OnDropdownValueChanged(int _value)
+    {
+        StageData stageData = Managers.Instance.GetManager<MapManager>().GetStageData(_value);
+
+        if(stageData != null)
+        {
+            currentStageData = stageData;
+
+            for(int i = 0; i < textInputList.Count; i++)
+            {
+                textInputList[i].inputField.text = GetPropertyValue(currentStageData, textInputList[i].inputType).ToString();
+            }
+        }
+        else
+        {
+
+        }
+    }
+    object GetPropertyValue(StageData stageData, InputType inputType)
+    {
+        return inputType switch
+        {
+            InputType.row => stageData.Row,
+            InputType.col => stageData.Col,
+            InputType.stage => stageData.stage,
+            InputType.lv => stageData.lv,
+            InputType.tileSize => stageData.tileSize,
+            InputType.xOffset => stageData.xOffset,
+            InputType.zOffset => stageData.zOffset,
+            _ => null
+        };
+    }
 
     // 후에 타입별로 클래스로 나누어 다시 짤것임
-    T GetInputFieldToType<T>(TextInputType _textInputType)
+    T GetInputFieldToType<T>(InputType _inputType)
     {
         T ret = default(T);
 
-        string inputText = textInputList.Find(x => x.textInputType == _textInputType).inputField.text;
+        string inputText = textInputList.Find(x => x.inputType == _inputType).inputField.text;
 
         if (TryParseValue(inputText, out T value))
         {

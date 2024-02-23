@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using YhProj;
 using TMPro;
+using System.Linq;
 
 
 public class MapToolUI : BaseUI
@@ -28,7 +29,7 @@ public class MapToolUI : BaseUI
     private TextMeshProUGUI infoText;
 
     // scorllview
-    private Dictionary<string, MapToolCategoryUI> categoryUIList = new Dictionary<string, MapToolCategoryUI>();
+    private Dictionary<string, MapToolCategoryUI> categoryUIDic = new Dictionary<string, MapToolCategoryUI>();
 
     [Header("ScrollView")]
     [SerializeField]
@@ -68,7 +69,7 @@ public class MapToolUI : BaseUI
             mapToolCategoryUI.transform.SetParent(contentTrf, false);
             mapToolCategoryUI.Set(field);
 
-            categoryUIList.Add(field.Name.ToLower(), mapToolCategoryUI);
+            categoryUIDic.Add(field.Name.ToLower(), mapToolCategoryUI);
         }
     }
 
@@ -94,6 +95,7 @@ public class MapToolUI : BaseUI
             showInfoStr = "Tile Data is null";
         }
 
+        DefaultSetting();
         infoText.text = showInfoStr;
     }
     public void ExitBtnClick()
@@ -103,12 +105,15 @@ public class MapToolUI : BaseUI
     }
     public void ApplyBtnClick()
     {
+        bool isEmpty = categoryUIDic.Values.Any(x => x.IsNotValue());
+
+
         TileData originData = editorTileObject.tileData;
 
-        TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIList["roadtype"].GetValue())
-            .SetDirection(categoryUIList["direction"].GetValue())
-            .SetBatchIdx(int.Parse(categoryUIList["batchidx"].GetValue().ToString()))
-            .SetName(categoryUIList["name"].GetValue().ToString())
+        TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["roadtype"].GetValue())
+            .SetDirection(categoryUIDic["direction"].GetValue())
+            .SetBatchIdx(int.Parse(categoryUIDic["batchidx"].GetValue().ToString()))
+            .SetName(categoryUIDic["name"].GetValue().ToString())
             .SetType(originData.type)
             .SetIndex(originData.index)
             .Build();
@@ -131,9 +136,17 @@ public class MapToolUI : BaseUI
     public void ClearBtnClick()
     {
         // input field들 전부 empty 처리
-        foreach(var item in categoryUIList) 
+        foreach(var item in categoryUIDic) 
         {
             item.Value.ClearBtnClick();
+        }
+    }
+
+    void DefaultSetting()
+    {
+        foreach (var item in categoryUIDic) 
+        { 
+            item.Value.DefaultSetting();
         }
     }
 }

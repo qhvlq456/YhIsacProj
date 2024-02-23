@@ -14,7 +14,7 @@ public class PlayerInfo
         set
         {
             lv = value;
-            EventMediator.Instance.RelayPlayerLevelChange(lv);
+            EventMediator.RelayPlayerLevelChange(lv);
         }
     }
     public int gold;
@@ -32,8 +32,8 @@ public class PlayerManager : BaseManager
 
     public override void Load(Define.GameMode _gameMode)
     {
-        EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
-        EventMediator.Instance.OnLoadSequenceEvent += LoadPlayerEvent;
+        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+        EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
     }
 
     public override void Update()
@@ -42,7 +42,7 @@ public class PlayerManager : BaseManager
     }
     public override void Delete()
     {
-        EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
+        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
     }
     public void LoadPlayerEvent(PlayerInfo _playerInfo)
     {

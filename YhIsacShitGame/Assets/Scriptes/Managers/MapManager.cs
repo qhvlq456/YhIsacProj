@@ -17,6 +17,9 @@ public class MapManager : BaseManager
     // 각 행과 열에 맞는 tile data를 가지고 있음
     // 후에 stage 를 삭제하고 dictionary로 관리할 것도 생각해 봐야 함
     Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
+    public StageData GetStageData(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage] : null;
+    public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
+    public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();
     // end
 
 
@@ -39,8 +42,8 @@ public class MapManager : BaseManager
         switch (_gameMode)
         {
             case Define.GameMode.EDITOR:
-                EventMediator.Instance.OnPlayerLevelChange -= OnPlayerLevelChange;
-                EventMediator.Instance.OnPlayerLevelChange += OnPlayerLevelChange;
+                EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
+                EventMediator.OnPlayerLevelChange += OnPlayerLevelChange;
                 break;
             case Define.GameMode.TEST:
                 break;
@@ -53,16 +56,16 @@ public class MapManager : BaseManager
                 BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
                 bottomColider.size = new Vector3(100, 0, 100);
 
-                EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
-                EventMediator.Instance.OnLoadSequenceEvent += LoadPlayerEvent;
+                EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+                EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
                 break;
         }
     }
     // 타일에 대한 delete, update라고 생각하면 안되긴 함...
     public override void Delete()
     {
-        EventMediator.Instance.OnLoadSequenceEvent -= LoadPlayerEvent;
-        EventMediator.Instance.OnPlayerLevelChange -= OnPlayerLevelChange;
+        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+        EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
     }
 
     /// <summary>
@@ -233,6 +236,19 @@ public class MapManager : BaseManager
         }
 
         Util.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, "StageData", stageDataDic.Values.ToList());
+    }
+
+    public void DeleteMapTool(int _stage)
+    {
+        if(stageDataDic.ContainsKey(_stage))
+        {
+            stageDataDic.Remove(_stage);
+            Util.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, "StageData", stageDataDic.Values.ToList());
+        }
+        else
+        {
+
+        }
     }
     #endregion
 

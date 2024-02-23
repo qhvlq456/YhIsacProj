@@ -9,7 +9,7 @@ using System.Reflection;
 
 public class MapToolCategoryUI : MonoBehaviour
 {
-    public FieldInfo fieldInfo;
+    private FieldInfo fieldInfo;
 
     [SerializeField]
     private TextMeshProUGUI titleText;
@@ -87,6 +87,33 @@ public class MapToolCategoryUI : MonoBehaviour
         {
             inputField.text = "";
         }
+    }
+
+    public void DefaultSetting()
+    {
+        object value = fieldInfo.GetValue(dropDown.value);
+
+        if (dropDown.gameObject.activeSelf)
+        {
+            dropDown.value = (int)value;
+        }
+
+        if (inputField.gameObject.activeSelf)
+        {
+            inputField.text = value.ToString();
+        }
+    }
+
+    public bool IsNotValue()
+    {
+        bool ret = false;
+
+        if (inputField.gameObject.activeSelf)
+        {
+            ret = string.IsNullOrEmpty(inputField.text);
+        }
+
+        return ret;
     }
     
 }
