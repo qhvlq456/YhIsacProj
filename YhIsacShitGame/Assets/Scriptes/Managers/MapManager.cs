@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using YhProj;
 
 /// <summary>
@@ -18,6 +19,7 @@ public class MapManager : BaseManager
     // 후에 stage 를 삭제하고 dictionary로 관리할 것도 생각해 봐야 함
     Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
     public StageData GetStageData(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage] : null;
+    public TileData[,] GetStateByTileArr(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage].tileArr : null;
     public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
     public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();
     // end

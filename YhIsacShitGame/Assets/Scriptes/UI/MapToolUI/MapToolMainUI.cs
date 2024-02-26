@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class MapToolMainUI : MainUI
@@ -133,7 +134,7 @@ public class MapToolMainUI : MainUI
     }
 
     /// <summary>
-    /// Stage Data¿¡ Ç¥½ÃµÇ¾îÁ® ÀÖ´Â ¸ğµç tile data jsonÀ¸·Î ÀúÀåÇÏ´Â ¸Ş¼­µå
+    /// Stage Dataì— í‘œì‹œë˜ì–´ì ¸ ìˆëŠ” ëª¨ë“  tile data jsonìœ¼ë¡œ ì €ì¥í•˜ëŠ” ë©”ì„œë“œ
     /// </summary>
     public void SaveBtnClick() 
     {
@@ -160,7 +161,7 @@ public class MapToolMainUI : MainUI
         logText.text = text;
     }
     /// <summary>
-    /// Stage data¿¡ ¸Â°Ô²û tileobject¸¦ »ı¼ºÇÏ´Â ¸Ş¼­µå
+    /// Stage dataì— ë§ê²Œë” tileobjectë¥¼ ìƒì„±í•˜ëŠ” ë©”ì„œë“œ
     /// </summary>
     public void LoadBtnClick() 
     {
@@ -176,9 +177,12 @@ public class MapToolMainUI : MainUI
         logText.text = "Stage : " + stage.ToString();
 
 
-        // ÀÌ ºÎºĞÀÌ ¹®Á¦ÀÎµí? ¶Ç µô·¹¸¶³×
-        StageData stageData = new StageData(stage, lv, new TileData[row, col]);
+        // ì´ ë¶€ë¶„ì´ ë¬¸ì œì¸ë“¯? ë˜ ë”œë ˆë§ˆë„¤ ,, ì•„ë¬´ë¦¬ ìƒê°ì„í•´ë„ í† ê¸€ì´ í•„ìš” í•  ë“¯?
+        // ì•„ë‹˜ jsonì— íƒ€ì¼ ë°ì´í„°ê°€ ì¡´ì¬í•œë‹¤ë©´ ê·¸ ê°’ì„ ê°€ì ¸ì™€ì„œ ì‚¬ìš©í•˜ë©´ ë ê±° ê°™ê¸´ í•¨
+        // ê·¼ë° ì• ì´ˆì— ë‘ê°œ ë¶„ë¦¬ ì‹œì¼œì„œ í•œ ê²ƒì´ ë” ì¢‹ì•„ë³´ì´ê¸°ë„ í•¨
+        TileData[,] copyTileArr = Managers.Instance.GetManager<MapManager>().GetStateByTileArr(stage);
 
+        StageData stageData = new StageData(stage, lv, copyTileArr == null ? new TileData[row,col] : copyTileArr);
 
         stageData.tileSize = tileSize;
         stageData.xOffset = xOffset;
@@ -189,7 +193,7 @@ public class MapToolMainUI : MainUI
         Managers.Instance.GetManager<MapManager>().LoadTile(currentStageData);
     }
     /// <summary>
-    /// Stage Data¿¡ Ç¥½ÃµÇ¾îÁ® ÀÖ´Â ¸ğµç tile data »èÁ¦ÇÏ´Â ¸Ş¼­µå
+    /// Stage Dataì— í‘œì‹œë˜ì–´ì ¸ ìˆëŠ” ëª¨ë“  tile data ì‚­ì œí•˜ëŠ” ë©”ì„œë“œ
     /// </summary>
     public void DeleteBtnClick() 
     {
@@ -200,7 +204,7 @@ public class MapToolMainUI : MainUI
     }
     
     /// <summary>
-    /// Stage Data¸¦ »èÁ¦ÇÔ
+    /// Stage Dataë¥¼ ì‚­ì œí•¨
     /// </summary>
     public void RemoveBtnClick()
     {
@@ -249,7 +253,7 @@ public class MapToolMainUI : MainUI
         };
     }
 
-    // ÈÄ¿¡ Å¸ÀÔº°·Î Å¬·¡½º·Î ³ª´©¾î ´Ù½Ã Â©°ÍÀÓ
+    // í›„ì— íƒ€ì…ë³„ë¡œ í´ë˜ìŠ¤ë¡œ ë‚˜ëˆ„ì–´ ë‹¤ì‹œ ì§¤ê²ƒì„
     T GetInputFieldToType<T>(InputType _inputType)
     {
         T ret = default(T);
