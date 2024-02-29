@@ -25,29 +25,31 @@ namespace YhProj
         public virtual void DBCallback(params BaseData[] _parameters)
         {
             // callback attach is play event 
-            // ¾î¶² ÁÖÃ¼¿¡°Ô ¹ÞÀº send¿¡ ´ëÇÑ callbackÀ» ¹ÞÀ½ µÊ
+            // ì–´ë–¤ ì£¼ì²´ì—ê²Œ ë°›ì€ sendì— ëŒ€í•œ callbackì„ ë°›ìŒ ë¨
         }
 
         public virtual void DBSend(params BaseData[] _parameters)
         {
-            // ¾î¶² ÁÖÃ¼¿¡°Ô send¸¦ º¸³»¸é µÊ
+            // ì–´ë–¤ ì£¼ì²´ì—ê²Œ sendë¥¼ ë³´ë‚´ë©´ ë¨
             // set event -> send -> call -> complete
 
         }
         #endregion
         #region IJson JsonToData, DataToJson
-        public virtual void JsonToData(string _json)
-        {
-
-        }
-        public virtual void DataToJson()
-        {
-
-        }
         #endregion
         public virtual void Logger()
         {
             UnityEngine.Debug.LogWarningFormat("Base Data \n index : {0}, type : {1}", index, type);
+        }
+
+        public void SaveJson<T>(T _data)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LoadJson()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

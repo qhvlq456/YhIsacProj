@@ -3,12 +3,12 @@ using YhProj;
 
 public class TileObject : BaseObject
 {
-    // ³ªÁß¿¡ saveÇØ¾ß ÇÏ´Âµ­
+    // ë‚˜ì¤‘ì— saveí•´ì•¼ í•˜ëŠ”ë…
     public TileData tileData;
     //public Renderer renderer;
 
-    // Èì ÀÌ°Íµµ object·Î ¸¸µé¾î¼­ ´ÙÀ½ tile obj, etcobj µîµî ³ª´«°Íµµ ±¦ÂúÀ» °Í °°À½ 
-    // dbsend, callback±îÁö ´Ù ¹ŞÀº µ¥ÀÌÅÍ¶ó°í »ı°¢ÇÏ°í ÀÛ¼º
+    // í  ì´ê²ƒë„ objectë¡œ ë§Œë“¤ì–´ì„œ ë‹¤ìŒ tile obj, etcobj ë“±ë“± ë‚˜ëˆˆê²ƒë„ ê´œì°®ì„ ê²ƒ ê°™ìŒ 
+    // dbsend, callbackê¹Œì§€ ë‹¤ ë°›ì€ ë°ì´í„°ë¼ê³  ìƒê°í•˜ê³  ì‘ì„±
 
     public override void Load<T>(T _baseData)
     {

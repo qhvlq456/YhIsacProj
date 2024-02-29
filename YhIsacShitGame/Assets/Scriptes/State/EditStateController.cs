@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using YhProj;
 using System;
-using UnityEngine.EventSystems;
 
 /// <summary>
-/// ¸ãÅø¿¡ ´ëÇÑ »óÅÂ Å¬·¡½º¸¦ ÄÁÆ®·Ñ ÇÏ´Â Å¬·¡½º
+/// ë©¥íˆ´ì— ëŒ€í•œ ìƒíƒœ í´ë˜ìŠ¤ë¥¼ ì»¨íŠ¸ë¡¤ í•˜ëŠ” í´ë˜ìŠ¤
 /// </summary>
 public class EditStateController : StateController
 {
     public Transform target;
     public float moveSpeed = 4.5f;
-    private float clickThreshold = 0.1f; // Å¬¸¯ ÆÇº°À» À§ÇÑ ½Ã°£ ÀÓ°è°ª
+    private float clickThreshold = 0.1f; // í´ë¦­ íŒë³„ì„ ìœ„í•œ ì‹œê°„ ì„ê³„ê°’
 
     Dictionary<Type, State> stateDic = new Dictionary<Type, State>();
     Vector3 mouseDownPosition = Vector3.zero;
@@ -26,10 +25,10 @@ public class EditStateController : StateController
     }
     
     /// <summary>
-    /// state ¸¦ ¸®ÅÏÇÏ´Â ÇÔ¼ö
+    /// state ë¥¼ ë¦¬í„´í•˜ëŠ” í•¨ìˆ˜
     /// </summary>
-    /// <typeparam name="T"> °¡Á®¿À°í ½ÍÀº »óÅÂ Å¬·¡½º </typeparam>
-    /// <param name="args"> »õ·Ó°Ô »ı¼º µÉ °æ¿ì ÇØ´ç ¸Å°³º¯¼ö </param>
+    /// <typeparam name="T"> ê°€ì ¸ì˜¤ê³  ì‹¶ì€ ìƒíƒœ í´ë˜ìŠ¤ </typeparam>
+    /// <param name="args"> ìƒˆë¡­ê²Œ ìƒì„± ë  ê²½ìš° í•´ë‹¹ ë§¤ê°œë³€ìˆ˜ </param>
     /// <returns></returns>
     T GetState<T>(params object[] args) where T : State
     {
@@ -48,13 +47,13 @@ public class EditStateController : StateController
         return ret;
     }
 
-    // 1. drag »óÅÂ°¡ ¾Æ´Ò¶§ select¸¦ ÇÒ ¼ö ÀÖÀ½
-    // 2. drag »óÅÂÀÏ ¶§ ¾Æ¹«°Íµµ ¸ø ÇÔ
+    // 1. drag ìƒíƒœê°€ ì•„ë‹ë•Œ selectë¥¼ í•  ìˆ˜ ìˆìŒ
+    // 2. drag ìƒíƒœì¼ ë•Œ ì•„ë¬´ê²ƒë„ ëª» í•¨
 
-    // 1. µå·¡±×¸¦ ÆÇº°ÇÒ ¼ö ¾øÀ½
-    // 2. µå·¡±×½Ã ¿ÀºêÁ§Æ®¸¦ Å¬¸¯ Ã³¸®ÇØ¼± ¾È‰Î
-    // 3. exitÀÇ È°¿ë¼ºÀÌ ¾øÀ½
-    // 4. updateÀÇ È°¿ë¼ºÀÌ ¾øÀ½
+    // 1. ë“œë˜ê·¸ë¥¼ íŒë³„í•  ìˆ˜ ì—†ìŒ
+    // 2. ë“œë˜ê·¸ì‹œ ì˜¤ë¸Œì íŠ¸ë¥¼ í´ë¦­ ì²˜ë¦¬í•´ì„  ì•ˆëŒ
+    // 3. exitì˜ í™œìš©ì„±ì´ ì—†ìŒ
+    // 4. updateì˜ í™œìš©ì„±ì´ ì—†ìŒ
     
     public override void Update()
     {
@@ -83,7 +82,7 @@ public class EditStateController : StateController
     }
     private bool IsMouseDragging()
     {
-        // ÀÌºÎºĞ ÃßÈÄ¿¡ ¼öÁ¤ ÇÊ¿ä °£ÇæÀûÀ¸·Î ¹ß»ıÇÔ
+        // ì´ë¶€ë¶„ ì¶”í›„ì— ìˆ˜ì • í•„ìš” ê°„í—ì ìœ¼ë¡œ ë°œìƒí•¨
         Vector3 currentMousePosition = Input.mousePosition;
         float distanceX = Mathf.Abs(currentMousePosition.x - mouseDownPosition.x);
         float distanceY = Mathf.Abs(currentMousePosition.y - mouseDownPosition.y);
@@ -103,13 +102,13 @@ public class EditStateController : StateController
         }
         else
         {
-            // select state°¡ Á¸ÀçÇÏ´Â »óÅÂÀÏ ¶§ Ã¹ Å¬¸¯ ½Ãµµ½Ã move stateÀÓ
+            // select stateê°€ ì¡´ì¬í•˜ëŠ” ìƒíƒœì¼ ë•Œ ì²« í´ë¦­ ì‹œë„ì‹œ move stateì„
             currentState = GetState<NoneState>();
         }
 
         currentState.Enter(null);
     }
-    // move stateµµ ¼³Á¤ÇÏ¿©¾ß ÇÔ
+    // move stateë„ ì„¤ì •í•˜ì—¬ì•¼ í•¨
     private void ChangeStateOnMouseDrag()
     {
         RaycastHit hit;
@@ -138,7 +137,7 @@ public class EditStateController : StateController
 
             if (baseObject != null)
             {
-                // holdÀÎÁö selectÀÎÁö ½Ã°£ÃÊ º¸°í ÆÇ´ÜÇÏ¿©¾ß ÇÔ
+                // holdì¸ì§€ selectì¸ì§€ ì‹œê°„ì´ˆ ë³´ê³  íŒë‹¨í•˜ì—¬ì•¼ í•¨
                 currentState = GetState<SelectState>();
             }
         }
@@ -156,8 +155,8 @@ public class EditStateController : StateController
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity))
         {
-            // ÀüÀÇ »óÅÂ°¡ 
-            // ¼±ÅÃ »óÅÂ 
+            // ì „ì˜ ìƒíƒœê°€ 
+            // ì„ íƒ ìƒíƒœ 
             if(currentState is SelectState)
             {
                 BaseObject baseObject = hit.collider.GetComponent<BaseObject>();
@@ -167,7 +166,7 @@ public class EditStateController : StateController
                     currentState.Enter(baseObject);
                 }
             }
-            // È¦µå »óÅÂ
+            // í™€ë“œ ìƒíƒœ
             else if(currentState is HoldState)
             {
 

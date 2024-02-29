@@ -5,14 +5,17 @@ namespace YhProj
         public State currentState { get; set; }
         public virtual void OnEnter()
         {
-            // »óÅÂ°¡ º¯°æµÉ ¶§¸¶´Ù È£Ãâ
+            // ìƒíƒœê°€ ë³€ê²½ë  ë•Œë§ˆë‹¤ í˜¸ì¶œ
         }
 
         public virtual void OnExit()
         {
-            // »óÅÂ°¡ º¯°æµÉ ¶§¸¶´Ù È£Ãâ
+            // ìƒíƒœê°€ ë³€ê²½ë  ë•Œë§ˆë‹¤ í˜¸ì¶œ
         }
-        public abstract void Update();
+        public virtual void Update()
+        {
+            // ìƒíƒœê°€ ì—…ë°ì´íŠ¸ ë  ë•Œë§ˆë‹¤ í˜¸ì¶œ
+        }
 
     }
 }

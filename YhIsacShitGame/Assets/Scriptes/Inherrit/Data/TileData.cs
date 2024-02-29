@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.Examples;
 using UnityEngine;
 using YhProj;
 
@@ -8,10 +9,10 @@ public class TileData : BaseData
 {
     public Define.Direction direction;
 
-    // server ¿¡¼­ ÇÒ ÀÏ
-    // ÇØ´ç Å¸ÀÏÀÌ Àû ±æÀÎÁö ¾Æ±º ±æÀÎÁö, µ¥ÄÚÀÎÁö ÆÇ´ÜÇÏ´Â °ª
+    // server ì—ì„œ í•  ì¼
+    // í•´ë‹¹ íƒ€ì¼ì´ ì  ê¸¸ì¸ì§€ ì•„êµ° ê¸¸ì¸ì§€, ë°ì½”ì¸ì§€ íŒë‹¨í•˜ëŠ” ê°’
     public Define.RoadType roadType;
-    // ¹èÄ¡µÈ ¿ÀºêÁ§Æ® ÀÎµ¦½º ÈÄ¿¡ ´Ù¸¥°Íµé·Î ÅëÇÕÇÒ ÇÊ¿ä°¡ ÀÖ´Ù.
+    // ë°°ì¹˜ëœ ì˜¤ë¸Œì íŠ¸ ì¸ë±ìŠ¤ í›„ì— ë‹¤ë¥¸ê²ƒë“¤ë¡œ í†µí•©í•  í•„ìš”ê°€ ìˆë‹¤.
     public int batchIdx;
 
     public TileData() { }

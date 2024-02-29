@@ -5,7 +5,7 @@ namespace YhProj
 {
     public interface IJson
     {
-        void JsonToData(string _json);
-        void DataToJson();
+        void SaveJson<T>(T _data);
+        void LoadJson();
     }
 }

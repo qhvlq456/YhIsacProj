@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using YhProj;
 
 [System.Serializable]
 public class StageData
@@ -19,7 +20,7 @@ public class StageData
         tileArr = _tileArr;
     }
 
-    // Á÷·ÄÈ­·ÎÀÎÇÑ ÇÔ¼öÃ³¸®
+    // ì§ë ¬í™”ë¡œì¸í•œ í•¨ìˆ˜ì²˜ë¦¬
     [JsonIgnore]
     public int Row => tileArr.GetLength(0);
     [JsonIgnore]

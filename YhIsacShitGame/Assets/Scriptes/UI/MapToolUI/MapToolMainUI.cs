@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Transactions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class MapToolMainUI : MainUI
@@ -147,7 +147,7 @@ public class MapToolMainUI : MainUI
         else
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
-            Managers.Instance.GetManager<MapManager>().SaveMapTool(currentStageData);
+            Managers.Instance.GetManager<MapManager>().SaveMapJson(currentStageData);
 
             TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
             stageDropDown.ClearOptions();
@@ -165,6 +165,11 @@ public class MapToolMainUI : MainUI
     /// </summary>
     public void LoadBtnClick() 
     {
+        if(currentStageData != null)
+        {
+            Managers.Instance.GetManager<MapManager>().DeleteTile();
+        }
+
         int row = GetInputFieldToType<int>(InputType.row);
         int col = GetInputFieldToType<int>(InputType.col);
         int stage = GetInputFieldToType<int>(InputType.stage);
@@ -176,10 +181,6 @@ public class MapToolMainUI : MainUI
 
         logText.text = "Stage : " + stage.ToString();
 
-
-        // 이 부분이 문제인듯? 또 딜레마네 ,, 아무리 생각을해도 토글이 필요 할 듯?
-        // 아님 json에 타일 데이터가 존재한다면 그 값을 가져와서 사용하면 될거 같긴 함
-        // 근데 애초에 두개 분리 시켜서 한 것이 더 좋아보이기도 함
         TileData[,] copyTileArr = Managers.Instance.GetManager<MapManager>().GetStateByTileArr(stage);
 
         StageData stageData = new StageData(stage, lv, copyTileArr == null ? new TileData[row,col] : copyTileArr);
@@ -222,9 +223,11 @@ public class MapToolMainUI : MainUI
     }
     public void OnDropdownValueChanged(int _value)
     {
+        Debug.LogError($"value = {_value}");
         StageData stageData = Managers.Instance.GetManager<MapManager>().GetStageData(_value);
+        Debug.LogError($"stageData stage = {stageData.stage}");
 
-        if(stageData != null)
+        if (stageData != null)
         {
             currentStageData = stageData;
 
@@ -238,17 +241,17 @@ public class MapToolMainUI : MainUI
 
         }
     }
-    object GetPropertyValue(StageData stageData, InputType inputType)
+    object GetPropertyValue(StageData _stageData, InputType _inputType)
     {
-        return inputType switch
+        return _inputType switch
         {
-            InputType.row => stageData.Row,
-            InputType.col => stageData.Col,
-            InputType.stage => stageData.stage,
-            InputType.lv => stageData.lv,
-            InputType.tileSize => stageData.tileSize,
-            InputType.xOffset => stageData.xOffset,
-            InputType.zOffset => stageData.zOffset,
+            InputType.row => _stageData.Row,
+            InputType.col => _stageData.Col,
+            InputType.stage => _stageData.stage,
+            InputType.lv => _stageData.lv,
+            InputType.tileSize => _stageData.tileSize,
+            InputType.xOffset => _stageData.xOffset,
+            InputType.zOffset => _stageData.zOffset,
             _ => null
         };
     }

@@ -7,21 +7,25 @@ using YhProj;
 
 public class ObjectPoolManager : BaseManager
 {
-    // object poolÀÇ ÃÖ»ó´Ü root ºÎ¸ğ
-    Transform root;
-    // object pool »óÀ§ ºÎ¸ğ ÀÚ½ÄµéÀÇ °¹¼ö¿¡ µû¶ó »ı¼º °¡´É°ú È¸¼ö¸¦ °áÁ¤ÇÑ´Ù
-    Dictionary<Define.BaseType,Transform> parentTrfDic = new Dictionary<Define.BaseType, Transform>();
+    // object poolì˜ ìµœìƒë‹¨ root ë¶€ëª¨
+    private Transform root;
+    // object pool ìƒìœ„ ë¶€ëª¨ ìì‹ë“¤ì˜ ê°¯ìˆ˜ì— ë”°ë¼ ìƒì„± ê°€ëŠ¥ê³¼ íšŒìˆ˜ë¥¼ ê²°ì •í•œë‹¤
+    private Dictionary<Define.BaseType,Transform> parentTrfDic = new Dictionary<Define.BaseType, Transform>();
 
     public override void Load(Define.GameMode _gameMode)
     {
         root = Util.AttachObj<Transform>("ObjectPoolRoot");
+        root.position = Vector3.back * 100f;
 
         for (int i = 0; i < (int)Define.BaseType.COUNT; i++)
         {
             Define.BaseType baseType = (Define.BaseType)i;
             string objName = baseType.ToString();
+
             GameObject go = new GameObject(objName);
             go.transform.parent = root;
+            go.transform.localPosition = Vector3.zero;
+
             parentTrfDic.Add(baseType, go.transform);
         }
 
@@ -45,13 +49,13 @@ public class ObjectPoolManager : BaseManager
 
     }
     /// <summary>
-    /// »ı¼º ÇÔ¼ö ±âº» default Å¸ÀÏ ÇüÅÂ¸¦ set ÇÏ°í ¸®ÅÏÇÔ µ¥ÀÌÅÍ¸¦ ¾Ë¾Æ¼­ ³Ö¾î ¼ÂÆÃÇØ¾ß ÇÑ´Ù
+    /// ìƒì„± í•¨ìˆ˜ ê¸°ë³¸ default íƒ€ì¼ í˜•íƒœë¥¼ set í•˜ê³  ë¦¬í„´í•¨ ë°ì´í„°ë¥¼ ì•Œì•„ì„œ ë„£ì–´ ì…‹íŒ…í•´ì•¼ í•œë‹¤
     /// </summary>
     public Transform Pooling(Define.BaseType _type, string _objName ,Transform _parent = null)
     {
         Transform ret = null;
         Transform parentTrf = parentTrfDic[_type].transform;
-        // start ÈÄ¿¡ ÀÌ ºÎºĞ¸¸ partialÇÏ¿© resmanager¸¦ ¸¸µé¾î¼­ °ü¸®
+        // start í›„ì— ì´ ë¶€ë¶„ë§Œ partialí•˜ì—¬ resmanagerë¥¼ ë§Œë“¤ì–´ì„œ ê´€ë¦¬
         string path = "";
 
         switch(_type)
@@ -73,7 +77,7 @@ public class ObjectPoolManager : BaseManager
         
         if (parentTrf.childCount == 0)
         {
-            // active ture or false ´Â portrait ¶§¹®¿¡ ÇÑ°Çµ¥ ÀÏ´Ü º¸·ù
+            // active ture or false ëŠ” portrait ë•Œë¬¸ì— í•œê±´ë° ì¼ë‹¨ ë³´ë¥˜
             ret = Util.InstantiateResource<Transform>(path);
             ret.parent = parentTrf;
             ret.gameObject.SetActive(false);
@@ -89,7 +93,7 @@ public class ObjectPoolManager : BaseManager
         return ret;
     }
     /// <summary>
-    /// È¸¼ö ÇÔ¼ö 
+    /// íšŒìˆ˜ í•¨ìˆ˜ 
     /// </summary>
     public void Retrieve(Define.BaseType _type, Transform _trf)
     {

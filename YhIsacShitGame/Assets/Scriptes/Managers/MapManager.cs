@@ -3,36 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using YhProj;
 
+// ijsonìœ¼ë¡œ ì´ê²ƒë“¤ë„ loadí•´ì•¼ í•¨
 /// <summary>
-/// Map¿¡ ´ëÇÑ µ¥ÀÌÅÍ¸¦ ÃÑ°ı
-/// mapÀ» create, update, delete¸¦ ÇÑ´Ù
-/// ÈÄ¿¡ ¸ğµå ÄÁÆ®·Ñ·¯¸¦ »ı¼ºÇÏ¿© ´Ù¸¥ ¸ğµåµé¿¡ ´ëÇÑ Å¬·¡½º¸¦ Á¤ÀÇ ÈÄ ¸ğµå¿¡ µû¶ó ºĞ·ùÇÏ¿© ·ÎÁ÷À» ¸¸µé¾î »ç¿ëÇÏÀÚ ¾Æ¸¶ inputmanagerº¸¸é ¾Ëµí?
+/// Mapì— ëŒ€í•œ ë°ì´í„°ë¥¼ ì´ê´„
+/// mapì„ create, update, deleteë¥¼ í•œë‹¤
+/// í›„ì— ëª¨ë“œ ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ ìƒì„±í•˜ì—¬ ë‹¤ë¥¸ ëª¨ë“œë“¤ì— ëŒ€í•œ í´ë˜ìŠ¤ë¥¼ ì •ì˜ í›„ ëª¨ë“œì— ë”°ë¼ ë¶„ë¥˜í•˜ì—¬ ë¡œì§ì„ ë§Œë“¤ì–´ ì‚¬ìš©í•˜ì ì•„ë§ˆ inputmanagerë³´ë©´ ì•Œë“¯?
 /// </summary>
 public class MapManager : BaseManager
 {
-    Transform root;
+    public Transform root { get; private set; }
 
-    // °¢ Çà°ú ¿­¿¡ ¸Â´Â tile data¸¦ °¡Áö°í ÀÖÀ½
-    // ÈÄ¿¡ stage ¸¦ »èÁ¦ÇÏ°í dictionary·Î °ü¸®ÇÒ °Íµµ »ı°¢ÇØ ºÁ¾ß ÇÔ
-    Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
+    private MapController mapController;
+
+    private IJson json;
+
+    private Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
     public StageData GetStageData(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage] : null;
     public TileData[,] GetStateByTileArr(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage].tileArr : null;
     public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
     public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();
-    // end
+    
 
-
-    //  start # mode : maptool
-    Dictionary<int, float> rowLinePoniterDic = new Dictionary<int, float>();
-    Dictionary<int, float> colLinePoniterDic = new Dictionary<int, float>();
-    List<TileObject> tileObjectList = new List<TileObject>();
-    // end
-
-    List<LineRenderer> rowLineRendererList = new List<LineRenderer>();
-    List<LineRenderer> colLineRendererList = new List<LineRenderer>();
     public override void Load(Define.GameMode _gameMode)
     {
         if(root == null)
@@ -41,233 +34,64 @@ public class MapManager : BaseManager
             root.transform.position = Vector3.zero;
         }
 
-        switch (_gameMode)
+        // ì¼ë‹¨ ì—¬ê¸°ì„œ ë¨¼ê°€ ìƒì„±ì„ í•˜ê¸´ í•´ì•¼ í•¨ ë°ì´í„°ë¥¼
+        List<StageData> stageDataList = Util.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
+        // stageDataList.RemoveAll(x => x.stage == 0);
+
+        stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
+
+        switch(_gameMode)
         {
-            case Define.GameMode.EDITOR:
-                EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
-                EventMediator.OnPlayerLevelChange += OnPlayerLevelChange;
-                break;
-            case Define.GameMode.TEST:
-                break;
             case Define.GameMode.MAPTOOL:
-                // ÀÏ´Ü ¿©±â¼­ ¸Õ°¡ »ı¼ºÀ» ÇÏ±ä ÇØ¾ß ÇÔ µ¥ÀÌÅÍ¸¦
-                List<StageData> stageDataList = Util.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
-
-                string log = "";
-
-                foreach (var stageData in stageDataList) 
-                {
-                    if(stageData == null || stageData.tileArr == null) { continue;}
-                    Debug.LogError($"stage data = {stageData.lv}");
-                    Debug.LogError($"row = {stageData.Row}");
-                    Debug.LogError($"col = {stageData.Col}");
-
-                    for (int i = 0; i < stageData.tileArr.GetLength(0); i++)
-                    {
-                        for(int j = 0; j < stageData.tileArr.GetLength(1); j++)
-                        {
-                            log += $"[{i}, {j}] = {stageData.tileArr[i, j].name}, type = {stageData.tileArr[i, j].type} ";
-                        }
-
-                        log += '\n';
-                    }
-                    Debug.LogError(log);
-                    log = "";
-                }
-
-
-                stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
-
-                BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
-                bottomColider.size = new Vector3(100, 0, 100);
-
-                EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
-                EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
+                mapController = new EditorMapController(this);
+                json = mapController as IJson;
                 break;
         }
+
+        mapController.Load();
     }
-    // Å¸ÀÏ¿¡ ´ëÇÑ delete, update¶ó°í »ı°¢ÇÏ¸é ¾ÈµÇ±ä ÇÔ...
+    // íƒ€ì¼ì— ëŒ€í•œ delete, updateë¼ê³  ìƒê°í•˜ë©´ ì•ˆë˜ê¸´ í•¨...
     public override void Delete()
     {
         EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
         EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
+
+        mapController.Delete();
     }
 
     /// <summary>
-    /// stage¿¡ ¸Â´Â µ¥ÀÌÅÍ¸¦ updateÇÏ´Â ÇÔ¼ö
-    /// tileobject¿¡ Á¸ÀçÇÏ´Â tiledata¸¦ ¾÷µ¥ÀÌÆ® ÇÏ°í ·»´õ¸µÀ» ´Ù½Ã ÇÔ
-    /// ÀÎÆ÷¿¡¼­ µ¥ÀÌÅÍ setÇÏ·Á°í ÇÑ°ÅÀÓ
+    /// stageì— ë§ëŠ” ë°ì´í„°ë¥¼ updateí•˜ëŠ” í•¨ìˆ˜
+    /// tileobjectì— ì¡´ì¬í•˜ëŠ” tiledataë¥¼ ì—…ë°ì´íŠ¸ í•˜ê³  ë Œë”ë§ì„ ë‹¤ì‹œ í•¨
+    /// ì¸í¬ì—ì„œ ë°ì´í„° setí•˜ë ¤ê³  í•œê±°ì„
     /// </summary>
     public override void Update()
     {
-     
+        mapController.Update();
     }
 
-    // ¸»ÀÌ ¾ÈµÇ±ä ÇÔ ÆíÁıÀÌ¸é ÆíÁı , »ı¼ºÀÌ¸é »ı¼ºÀ» µû·Î ±¸º° ÇÒ ÇÊ¿ä°¡ ÀÖÀ½
+    // ë§ì´ ì•ˆë˜ê¸´ í•¨ í¸ì§‘ì´ë©´ í¸ì§‘ , ìƒì„±ì´ë©´ ìƒì„±ì„ ë”°ë¡œ êµ¬ë³„ í•  í•„ìš”ê°€ ìˆìŒ
 
     #region Tile Load and Delete and Save
     public void LoadTile(StageData _stageData)
     {
-        // ÀÖ¾îµµ µ¤¾î ¾²°Ô²û º¯°æ
-
-        float z = 0f;
-        float x = 0f;
-
-        for (int i = 0; i < _stageData.Row; i++)
-        {
-            x = 0f;
-            for (int j = 0; j < _stageData.Col; j++)
-            {
-                TileData tileData = new TileData();
-
-                Debug.LogError($"_stageData.tileArr[i, j] == null ? {_stageData.tileArr[i, j] == null}");
-                Debug.LogError($"_stageData.tileArr == null ? {_stageData.tileArr == null}");
-                if (_stageData.tileArr[i,j] != null)
-                {
-                    tileData = _stageData.tileArr[i, j];
-                }
-                else
-                {
-                    tileData.index = i * _stageData.Row + j;
-                    tileData.type = Define.BaseType.TILE;
-                    tileData.roadType = Define.RoadType.ENEMY;
-                }
-
-                EditorTileObject editorTileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, "EditorTileObject").GetComponent<EditorTileObject>();
-
-                editorTileObject.transform.position = new Vector3(x, 0, z);
-                editorTileObject.transform.parent = root;
-                editorTileObject.Load(tileData);
-                tileObjectList.Add(editorTileObject);
-
-                x += _stageData.xOffset;
-            }
-
-            z += _stageData.zOffset;
-        }
+        mapController.LoadTile(_stageData);
     }
     public void DeleteTile()
     {
-        // object poolÀ» ÀÌ¿ëÇÏ¿© È¸¼ö ÇÒ °ÍÀÓ
-        for (int i = 0; i < tileObjectList.Count; i++)
-        {
-            tileObjectList[i].Delete();
-            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.TILE, tileObjectList[i].transform);
-            // tile object ¸¦ ÃÊ±âÈ­ object¸¦ ÃÊ±âÈ­ ÇÔÀ¸·Î½á dataµµ ÃÊ±âÈ­ µÊ
-        }
+        mapController.DeleteTile();
     }
     #endregion
-    // player°¡ ·¹º§¾÷À» ÇÒ ¶§¸¶´Ù È£Ãâ
-    public void OnPlayerLevelChange(int _level)
+    
+    public void SaveMapJson<T>(T _data)
     {
-        //StageData stageData = stageDataList.Find(x => x.lv == _level);
-    }
-    public void LoadPlayerEvent(PlayerInfo _playerInfo)
-    {
-        // ÀÌ°Ô ÀÇÁ¸¼ºÀÌ ÀÎÇ²¿¡ ´ëÇÑ ÀÇÁ¸¼ºÀÌ ¸¹¾ÆÁö´Ï °è¼Ó ÀÇÁ¸¼ºÀÌ »ı±â°Ô µÊ ±×·³À¸·Î ÀÎÇ²ÀÇ targetÀ» ÀÇÁ¸¼ºÀ» ¾ø¾Ö´Â ÀÛ¾÷ ÇÊ¿ä!!
-        int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
+        // controllerì— ë”°ë¼ ë³€ê²½í•˜ê¸° ë§¤ê°œë³€ìˆ˜ ë³€ê²½
+        json.SaveJson(_data);
 
-        Vector3 targetPos = new Vector3(colLinePoniterDic[halfIdx], 10, rowLinePoniterDic[halfIdx]);
-
-        // ÈÄ¿¡ º¯°æÇÒ°Í?
-        Managers.Instance.lookTarget.transform.position = targetPos;
-    }
-
-    #region MapTool Mode
-    [Obsolete]
-    void LoadMapTool()
-    {
-        /*
-         * x, y = 0,0 ¿¡¼­ ¾ç¼ö·Î ½ÃÀÛµÊ
-         * ·»´õ¸µÀ» ÇÏ¿© °¢ ±¸¿ª(Çà°ú ¿­)À» ¹Ì¸® ±×·ÁÁÜ
-         * ÀÏ´Ü È¯°æÀº À©µµ¿ì
-         * ÀÎÇ²¿¡ ´ëÇÑ ±âÈ¹µµ ÇÊ¿ä
-         */
-
-        BoxCollider bottomColider = Util.AttachObj<BoxCollider>("Bottom");
-        bottomColider.size = new Vector3(100, 0, 100);
-
-        float xOffset = 1;
-        float zOffset = 1;
-        // x position set 
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            float x = i * xOffset;
-            colLinePoniterDic.Add(i, x);
-        }
-
-        // z position set 
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            float z = i * zOffset;
-            rowLinePoniterDic.Add(i, z);
-        }
-
-        // row numbering
-        for(int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            Transform rowTrf = Util.AttachObj<Transform>($"Row_Number_{i}");
-            Transform colTrf = Util.AttachObj<Transform>($"Col_Number_{i}");
-
-            rowTrf.parent = root;
-            colTrf.parent = root;
-
-            rowTrf.transform.localPosition = new Vector3(rowLinePoniterDic[i], 0, -1f);
-            colTrf.transform.localPosition = new Vector3(-1f, 0, colLinePoniterDic[i]);
-        }
-
-
-        int idx = 0;
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            float z = rowLinePoniterDic[i];
-
-            for (int j = 0; j < StaticDefine.MAX_CREATE_TILE_NUM; j++)
-            {
-                float x = colLinePoniterDic[j];
-                EditorTileObject editorTileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, "EditorTileObject").GetComponent<EditorTileObject>();
-                editorTileObject.transform.parent = root;
-                // builderµç ¹¹µç°£¿¡ µ¥ÀÌÅÍ¸¦ ³Ö¾î¾ß ÇÔ
-                editorTileObject.transform.localPosition = new Vector3(x, 0, z);
-                editorTileObject.Load(new TileData(idx, "MapToolTile_" + idx, Define.BaseType.TILE, Define.Direction.LEFT));
-                tileObjectList.Add(editorTileObject);
-                idx++;
-            }
-        }
-    }
-
-    public void SaveMapTool(StageData _stage)
-    {
-        TileData[,] tileDataArr = new TileData[_stage.Row, _stage.Col];
-        
-        for (int i = 0; i < _stage.Row; i++)
-        {
-            for (int j = 0; j < _stage.Col; j++)
-            {
-                int idx = i * _stage.Row + j;
-                TileData tileData = tileObjectList[idx].tileData;
-                // builderµç ¹¹µç°£¿¡ µ¥ÀÌÅÍ¸¦ ³Ö¾î¾ß ÇÔ
-                tileDataArr[i, j] = tileData;
-            }
-        }
-
-        _stage.tileArr = tileDataArr;
-        
-        if (stageDataDic.ContainsKey(_stage.stage))
-        {
-            stageDataDic[_stage.stage] = _stage;
-        }
-        else
-        {
-            stageDataDic.Add(_stage.stage ,_stage);
-        }
-
-        Util.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, "StageData", stageDataDic.Values.ToList());
     }
 
     public void DeleteMapTool(int _stage)
     {
-        if(stageDataDic.ContainsKey(_stage))
+        if(IsConstainsStage(_stage))
         {
             stageDataDic.Remove(_stage);
             Util.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, "StageData", stageDataDic.Values.ToList());
@@ -277,59 +101,22 @@ public class MapManager : BaseManager
 
         }
     }
-    #endregion
 
-    #region Draw LineRenderer
-    [Obsolete]
-    void DrawLineRenderer()
+    #region MapManager Event
+    // playerê°€ ë ˆë²¨ì—…ì„ í•  ë•Œë§ˆë‹¤ í˜¸ì¶œ
+    public void OnPlayerLevelChange(int _level)
     {
-        Transform rowLinerendererTrf = Util.AttachObj<Transform>("rowLineParent");
-        Transform colLinerendererTrf = Util.AttachObj<Transform>("colLineParent");
-
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            rowLineRendererList.Add(Util.AttachObj<LineRenderer>($"rowLineRenderer_{i}"));
-            rowLineRendererList[i].transform.parent = rowLinerendererTrf;
-            rowLineRendererList[i].startWidth = .25f;
-            rowLineRendererList[i].endWidth = .25f;
-
-            colLineRendererList.Add(Util.AttachObj<LineRenderer>($"colLineRenderer_{i}"));
-            colLineRendererList[i].transform.parent = colLinerendererTrf;
-            colLineRendererList[i].startWidth = .25f;
-            colLineRendererList[i].endWidth = .25f;
-        }
-
-        for (int i = 0; i < StaticDefine.MAX_CREATE_TILE_NUM; i++)
-        {
-            LineRenderer rowLineRenderer = rowLineRendererList[i];
-            LineRenderer colLineRenderer = colLineRendererList[i];
-
-            List<Vector3> rowPointerList = new List<Vector3>();
-            List<Vector3> colPointerList = new List<Vector3>();
-
-            for (int j = 0; j < StaticDefine.MAX_CREATE_TILE_NUM; j++)
-            {
-                float rowPointerX = rowLinePoniterDic[i];
-                float rowPointerZ = colLinePoniterDic[j];
-
-                float colPointerX = colLinePoniterDic[j];
-                float colPointerZ = rowLinePoniterDic[i];
-
-                Vector3 rowPos = new Vector3(rowPointerX, 0, rowPointerZ);
-                Vector3 colPos = new Vector3(colPointerX, 0, colPointerZ);
-
-                rowPointerList.Add(rowPos);
-                colPointerList.Add(colPos);
-            }
-
-            rowLineRenderer.positionCount = rowPointerList.Count;
-            rowLineRenderer.SetPositions(rowPointerList.ToArray());
-
-            colLineRenderer.positionCount = colPointerList.Count;
-            colLineRenderer.SetPositions(colPointerList.ToArray());
-        }
+        //StageData stageData = stageDataList.Find(x => x.lv == _level);
     }
+    public void LoadPlayerEvent(PlayerInfo _playerInfo)
+    {
+        // ì´ê²Œ ì˜ì¡´ì„±ì´ ì¸í’‹ì— ëŒ€í•œ ì˜ì¡´ì„±ì´ ë§ì•„ì§€ë‹ˆ ê³„ì† ì˜ì¡´ì„±ì´ ìƒê¸°ê²Œ ë¨ ê·¸ëŸ¼ìœ¼ë¡œ ì¸í’‹ì˜ targetì„ ì˜ì¡´ì„±ì„ ì—†ì• ëŠ” ì‘ì—… í•„ìš”!!
+        // int halfIdx = StaticDefine.MAX_CREATE_TILE_NUM / 2;
 
+        // Vector3 targetPos = new Vector3(colLinePoniterDic[halfIdx], 10, rowLinePoniterDic[halfIdx]);
+
+        // í›„ì— ë³€ê²½í• ê²ƒ?
+        // Managers.Instance.lookTarget.transform.position = targetPos;
+    }
     #endregion
-
 }

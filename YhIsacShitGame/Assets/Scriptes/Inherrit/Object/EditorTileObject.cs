@@ -33,8 +33,6 @@ public class EditorTileObject : TileObject
         
         lineRenderer.transform.parent = transform;
         lineRenderer.transform.localPosition = new Vector3(-0.5f, 0, -0.5f);
-        transform.localScale = Vector3.one * 0.8f;
-
         lineRenderer.startWidth = .15f;
         lineRenderer.endWidth = .15f;
 
@@ -45,7 +43,7 @@ public class EditorTileObject : TileObject
         lineRenderer.SetPosition(2, new Vector3(1, 0, 0));
         lineRenderer.SetPosition(3, new Vector3(0, 0, 0));
         lineRenderer.SetPosition(4, new Vector3(0, 0, 1));
-        // ´Ù½Ã µ¹¾Æ°¡´Â°Å »ı°¢ÇØ¾ß ÇÔ
+        // ë‹¤ì‹œ ëŒì•„ê°€ëŠ”ê±° ìƒê°í•´ì•¼ í•¨
         lineRenderer.SetPosition(5, new Vector3(1, 0, 1));
     }
 
@@ -53,6 +51,8 @@ public class EditorTileObject : TileObject
     public override void Load<T>(T _baseData)
     {
         base.Load(_baseData);
+
+        transform.localScale = Vector3.one * 0.8f;
 
         switch (tileData.roadType)
         {
