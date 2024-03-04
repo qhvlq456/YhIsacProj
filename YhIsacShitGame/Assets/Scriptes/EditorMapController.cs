@@ -38,24 +38,15 @@ public class EditorMapController : MapController<TileObject>, IJson
     {
         // 에디터 모드에서의 삭제 동작
         // object pool을 이용하여 회수 할 것임
-        for (int i = 0; i < tileList.Count; i++)
-        {
-            tileList[i].Delete();
-            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.TILE, tileList[i].transform);
-            // tile object 를 초기화 object를 초기화 함으로써 data도 초기화 됨
-        }
+        DeleteTile();
     }
-    // 식 변경 필요 인덱스를 기준으로 오프셋 이동로직으로 변경
-    // 아직도 문제가 존재함
-    // 간헐적 랜덤으로 변경되는데 이유를 모르겠네
+    // 인덱스는 그냥... 흠 순서 문제인거 같은데
     public override void LoadTile(StageData _stageData)
     {
-        float z = 0f;
-        float x = 0f;
+        string log = "";
 
         for (int i = 0; i < _stageData.Row; i++)
         {
-            x = 0f;
             for (int j = 0; j < _stageData.Col; j++)
             {
                 TileData tileData = new TileData();
@@ -70,22 +61,22 @@ public class EditorMapController : MapController<TileObject>, IJson
                     tileData.roadType = Define.RoadType.ENEMY;
                 }
 
-                // 인덱스는 기본으로 정해져야 함
                 tileData.index = i * _stageData.Col + j;
 
                 EditorTileObject editorTileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, "EditorTileObject").GetComponent<EditorTileObject>();
+                int z = tileData.index / _stageData.Row;
+                int x = tileData.index % _stageData.Col;
 
-                editorTileObject.name = (i * _stageData.Col + j).ToString();
                 editorTileObject.transform.position = new Vector3(x, 0, z);
                 editorTileObject.transform.parent = mapManager.root;
                 editorTileObject.Load(tileData);
                 tileList.Add(editorTileObject);
-
-                x += _stageData.xOffset;
+                log += $"idx = {tileData.index}, road type = {tileData.roadType}, ";
             }
-
-            z += _stageData.zOffset;
+            log += '\n';
         }
+
+        Debug.LogError(log);
     }
     public override void DeleteTile()
     {
@@ -96,35 +87,35 @@ public class EditorMapController : MapController<TileObject>, IJson
             Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.TILE, tileList[i].transform);
             // tile object 를 초기화 object를 초기화 함으로써 data도 초기화 됨
         }
+
+        tileList.Clear();
     }
 
     public void SaveJson<T>(T _data)
     {
-        if (_data is StageData stage)
+        if (_data is StageData stageData)
         {
-            TileData[,] tileDataArr = new TileData[stage.Row, stage.Col];
+            string log = "";
 
-            for (int i = 0; i < stage.Row; i++)
+            TileData[,] tileDataArr = new TileData[stageData.Row, stageData.Col];
+
+            for (int i = 0; i < stageData.Row; i++)
             {
-                for (int j = 0; j < stage.Col; j++)
+                for (int j = 0; j < stageData.Col; j++)
                 {
-                    int idx = i * stage.Col + j;
+                    int idx = i * stageData.Col + j;
                     TileData tileData = tileList[idx].tileData;
                     // builder든 뭐든간에 데이터를 넣어야 함
                     tileDataArr[i, j] = tileData;
+                    log += $"idx = {tileData.index}, road type = {tileData.roadType}, ";
                 }
+                log += '\n';
             }
 
-            stage.tileArr = tileDataArr;
+            stageData.tileArr = tileDataArr;
 
-            if (mapManager.IsConstainsStage(stage.stage))
-            {
-                mapManager.GetStageData(stage.stage).tileArr = stage.tileArr;
-            }
-            else
-            {
-                mapManager.GetStageDataList().Add(stage);
-            }
+            mapManager.AddStageData(stageData);
+            Debug.LogError(log);
 
             Util.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME, mapManager.GetStageDataList());
         }

@@ -20,8 +20,19 @@ public class MapManager : BaseManager
     private IJson json;
 
     private Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
+    public void AddStageData(StageData _stageData)
+    {
+        if(IsConstainsStage(_stageData.stage))
+        {
+            stageDataDic[_stageData.stage] = _stageData;
+        }
+        else
+        {
+            stageDataDic.Add(_stageData.stage, _stageData);
+        }
+    }
     public StageData GetStageData(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage] : null;
-    public TileData[,] GetStateByTileArr(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage].tileArr : null;
+    public TileData[,] GetTileArrByStage(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage].tileArr : null;
     public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
     public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();
     
@@ -36,7 +47,6 @@ public class MapManager : BaseManager
 
         // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
         List<StageData> stageDataList = Util.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
-        // stageDataList.RemoveAll(x => x.stage == 0);
 
         stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
 

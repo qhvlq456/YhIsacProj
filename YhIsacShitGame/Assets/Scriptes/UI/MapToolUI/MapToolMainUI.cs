@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -125,12 +126,7 @@ public class MapToolMainUI : MainUI
     public override void Show(UIInfo _uiInfo)
     {
         base.Show(_uiInfo);
-
-        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
-        stageDropDown.ClearOptions();
-
-        List<string> dropDownOptionList = Managers.Instance.GetManager<MapManager>().GetStageDataList().Select(x => x.stage.ToString()).ToList();
-        stageDropDown.AddOptions(dropDownOptionList);
+        UpdateDropDown();
     }
 
     /// <summary>
@@ -148,16 +144,11 @@ public class MapToolMainUI : MainUI
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
             Managers.Instance.GetManager<MapManager>().SaveMapJson(currentStageData);
-
-            TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
-            stageDropDown.ClearOptions();
-
-            List<string> dropDownOptionList = Managers.Instance.GetManager<MapManager>().GetStageDataList().Select(x => x.stage.ToString()).ToList();
-            stageDropDown.AddOptions(dropDownOptionList);
-
-            textInputList.ForEach(ui => ui.inputField.text = "");
+            UpdateDropDown();
         }
 
+        DeleteBtnClick();
+        currentStageData = null;
         logText.text = text;
     }
     /// <summary>
@@ -181,7 +172,7 @@ public class MapToolMainUI : MainUI
 
         logText.text = "Stage : " + stage.ToString();
 
-        TileData[,] copyTileArr = Managers.Instance.GetManager<MapManager>().GetStateByTileArr(stage);
+        TileData[,] copyTileArr = Managers.Instance.GetManager<MapManager>().GetTileArrByStage(stage);
 
         StageData stageData = new StageData(stage, lv, copyTileArr == null ? new TileData[row,col] : copyTileArr);
 
@@ -202,6 +193,7 @@ public class MapToolMainUI : MainUI
         currentStageData = null;
 
         Managers.Instance.GetManager<MapManager>().DeleteTile();
+        textInputList.ForEach(ui => ui.inputField.text = "");
     }
     
     /// <summary>
@@ -223,9 +215,10 @@ public class MapToolMainUI : MainUI
     }
     public void OnDropdownValueChanged(int _value)
     {
-        Debug.LogError($"value = {_value}");
-        StageData stageData = Managers.Instance.GetManager<MapManager>().GetStageData(_value);
-        Debug.LogError($"stageData stage = {stageData.stage}");
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
+        int idx = int.Parse(stageDropDown.options[_value].text);
+
+        StageData stageData = Managers.Instance.GetManager<MapManager>().GetStageData(idx);
 
         if (stageData != null)
         {
@@ -286,5 +279,14 @@ public class MapToolMainUI : MainUI
         }
 
         return false;
+    }
+
+    void UpdateDropDown()
+    {
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
+        stageDropDown.ClearOptions();
+
+        List<string> dropDownOptionList = Managers.Instance.GetManager<MapManager>().GetStageDataList().Select(x => x.stage.ToString()).ToList();
+        stageDropDown.AddOptions(dropDownOptionList);
     }
 }

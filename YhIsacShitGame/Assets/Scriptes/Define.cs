@@ -5,7 +5,7 @@ namespace YhProj
     [Serializable]
     public class Define
     {
-        // °ÔÀÓ ½ÇÇà½Ã ¾î¶² ¸ğµå·Î ¼±ÅÃ ÇÒÁöÀÇ Å¸ÀÔ
+        // ê²Œì„ ì‹¤í–‰ì‹œ ì–´ë–¤ ëª¨ë“œë¡œ ì„ íƒ í• ì§€ì˜ íƒ€ì…
         public enum GameMode
         {
             TEST,
@@ -13,7 +13,7 @@ namespace YhProj
             MAPTOOL,
             BUILDTOOL
         }
-        // ¸ğµç °ÔÀÓ µ¥ÀÌÅÍÀÇ º£ÀÌ½ºÀÇ Å¸ÀÔ // base type -> subType À¸·Î °£´Ù, ÇÊµå ¿ÀºêÁ§Æ®¸¸
+        // ëª¨ë“  ê²Œì„ ë°ì´í„°ì˜ ë² ì´ìŠ¤ì˜ íƒ€ì… // base type -> subType ìœ¼ë¡œ ê°„ë‹¤, í•„ë“œ ì˜¤ë¸Œì íŠ¸ë§Œ
         public enum BaseType
         {
             NONE,
@@ -23,7 +23,7 @@ namespace YhProj
             ITEM,
             COUNT
         }
-        // log¸¦ º¸ÀÌ°Ô ÇÒ °ÍÀÎÁö ¾Èº¸ÀÌ°Ô ÇÒ °ÍÀÎÁö
+        // logë¥¼ ë³´ì´ê²Œ í•  ê²ƒì¸ì§€ ì•ˆë³´ì´ê²Œ í•  ê²ƒì¸ì§€
         public enum DebugLogeer
         {
             ENABLE,
@@ -36,18 +36,18 @@ namespace YhProj
             ALHPA,
             LIVE
         }
-        // uiroot ÇÏÀ§ ·£´õ¸µÇÒ Äµ¹ö½º Á¾·ùµé
+        // uiroot í•˜ìœ„ ëœë”ë§í•  ìº”ë²„ìŠ¤ ì¢…ë¥˜ë“¤
         public enum UIRootType
         {
-            MAIN_UI, // Ç×»ó °íÁ¤°ªÀÌ µÇ¾î¾ß ÇÔ
+            MAIN_UI, // í•­ìƒ ê³ ì •ê°’ì´ ë˜ì–´ì•¼ í•¨
             POPUP_UI,
             TOOLTIP_UI,
             CONTEXTUAL_UI,
-            TEST_UI, // Å×½ºÆ®´Â Ç×»ó ¾Æ·¡ (¼ÖÁ÷È÷ ¼ø¼­ »ó°ü¾øÀ½)
+            TEST_UI, // í…ŒìŠ¤íŠ¸ëŠ” í•­ìƒ ì•„ë˜ (ì†”ì§íˆ ìˆœì„œ ìƒê´€ì—†ìŒ)
             COUNT
         }
 
-        // define symbol µé enumÃ³¸®
+        // define symbol ë“¤ enumì²˜ë¦¬
         public enum DefineSymbol
         {
             TEST1,
@@ -60,10 +60,10 @@ namespace YhProj
             RIGHT,
             TOP,
             BOTTOM,
-            LEFT_TOP, // ÁÂ»ó
-            RIGHT_TOP, // ¿ì»ó
-            LEFT_BOTTOM, // ÁÂÇÏ
-            RIGHT_BOTTOM, // ¿ìÇÏ
+            LEFT_TOP, // ì¢Œìƒ
+            RIGHT_TOP, // ìš°ìƒ
+            LEFT_BOTTOM, // ì¢Œí•˜
+            RIGHT_BOTTOM, // ìš°í•˜
         }
 
 
@@ -84,13 +84,13 @@ namespace YhProj
         }
     }
 
-    // ³ªÁß¿¡ °æ·Î¿¡ ´ëÇÑ ÁöÁ¤ÀÌ ´Ù½Ã ÇÊ¿äÇÒµí
+    // ë‚˜ì¤‘ì— ê²½ë¡œì— ëŒ€í•œ ì§€ì •ì´ ë‹¤ì‹œ í•„ìš”í• ë“¯
     /// <summary>
-    /// ÁöÁ¤µÈ ¸Æ½º ·¹º§ °ª ÇÏÁö¸¸ ÀÓ½Ã¿ëÀÓ ³ªÁß¿¡ setÇÒ °Í ÀÓ
+    /// ì§€ì •ëœ ë§¥ìŠ¤ ë ˆë²¨ ê°’ í•˜ì§€ë§Œ ì„ì‹œìš©ì„ ë‚˜ì¤‘ì— setí•  ê²ƒ ì„
     /// </summary>
     public class StaticDefine
     {
-        // ÀÓ½Ã¿ë µ¥ÀÌÅÍ ÀúÀå¿ë
+        // ì„ì‹œìš© ë°ì´í„° ì €ì¥ìš©
         public static int USER_LEVEL = 1;
         public static int MAX_LEVEL = 10;
 
@@ -98,16 +98,16 @@ namespace YhProj
 
         public static string JSON_MAP_FILE_NAME = "StageData.json";
 
-        // json À§Ä¡ 
+        // json ìœ„ì¹˜ 
         public static string JSON_MAP_DATA_PATH = "StreamingAssets";
 
-        // ¸®¼Ò½º À§Ä¡
+        // ë¦¬ì†ŒìŠ¤ ìœ„ì¹˜
         public static string TILE_PATH = "Map/Tool";
 
-        // ÀÓ½Ã ÀÏ´Ü ³ÖÀ»°Å
+        // ì„ì‹œ ì¼ë‹¨ ë„£ì„ê±°
         public static float TILE_YPOSITION = 0f;
 
-        // executionDataPath // scriptableobject ½ÇÇà È¯°æ ¿ÀºêÁ§Æ® // ÀÏ´Ü ¿¡µğÅÍ Æú´õ¿¡ ¾øÀ½ ¿¡·¯°¡ ¹ß»ıÇÏ±ä ÇØ¼­ ÀÓ½Ã·Î ¿¡µğÅÍ Æú´õ·Î ÁöÁ¤
+        // executionDataPath // scriptableobject ì‹¤í–‰ í™˜ê²½ ì˜¤ë¸Œì íŠ¸ // ì¼ë‹¨ ì—ë””í„° í´ë”ì— ì—†ìŒ ì—ëŸ¬ê°€ ë°œìƒí•˜ê¸´ í•´ì„œ ì„ì‹œë¡œ ì—ë””í„° í´ë”ë¡œ ì§€ì •
         public static string SCRIPTABLEOBJECT_PATH = "Assets/Resources/ScriptableObjects/";
 
         public static UnityEngine.Vector3 START_POSITION = UnityEngine.Vector3.zero;

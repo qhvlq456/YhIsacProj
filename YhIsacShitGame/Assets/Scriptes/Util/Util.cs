@@ -20,7 +20,7 @@ public static class Util
     public static void CreateJsonFile(string _createPath, string _fileName, object _jsonData)
     {
         string jsonData = DataToJson(_jsonData);
-        string filePath = string.Format("{0}/{1}/{2}.json", Application.dataPath, _createPath, _fileName);
+        string filePath = string.Format("{0}/{1}/{2}", Application.dataPath, _createPath, _fileName);
 
         try
         {
@@ -78,8 +78,8 @@ public static class Util
         }
         else
         {
-            Debug.LogWarningFormat("Util LoadJsonArray Warning \n filePath : {0}, _loadPath : {1}, _fileName : {2}", filePath, _loadPath, _fileName);
-            return new List<T>(); // ¶Ç´Â ¿¹¿Ü Ã³¸®¸¦ Ãß°¡ÇÏ¿© ¹İÈ¯°ªÀ» ¼±ÅÃÇÒ ¼ö ÀÖ½À´Ï´Ù.
+            Debug.LogWarningFormat("Util LoadJsonArray Warning \n {0}", filePath);
+            return new List<T>(); // ë˜ëŠ” ì˜ˆì™¸ ì²˜ë¦¬ë¥¼ ì¶”ê°€í•˜ì—¬ ë°˜í™˜ê°’ì„ ì„ íƒí•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
         }
     }
     #endregion
@@ -104,7 +104,7 @@ public static class Util
     #region Load BundleData
     public static void LoadBunlde()
     {
-        // Á¤ÀÇ ÇÊ¿ä
+        // ì •ì˜ í•„ìš”
     }
     #endregion
 
@@ -159,7 +159,7 @@ public static class Util
     #endregion
 
     #region Attach Obj
-    // ÈÄ¿¡ find ÀÌ¸§À» Ã£´Â ¹ıµµ ¸¸µé¾î¾ß ÇÒ µí?
+    // í›„ì— find ì´ë¦„ì„ ì°¾ëŠ” ë²•ë„ ë§Œë“¤ì–´ì•¼ í•  ë“¯?
     public static T AttachObj<T>(string _name = null) where T :  Component
     {
         T ret = null;

@@ -4,8 +4,8 @@ using YhProj;
 [System.Serializable]
 public class StageData
 {
-    public int lv { get; set; }
-    public int stage { get; set; }
+    public int lv;
+    public int stage;
     public TileData[,] tileArr { get; set; }
 
     public float tileSize;
