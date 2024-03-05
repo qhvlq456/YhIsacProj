@@ -97,7 +97,7 @@ public class MapToolUI : BaseUI
         {
             TileData originData = editorTileObject.tileData;
 
-            TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["roadtype"].GetValue())
+            TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["elementtype"].GetValue())
                 .SetDirection(categoryUIDic["direction"].GetValue())
                 .SetBatchIdx(int.Parse(categoryUIDic["batchidx"].GetValue().ToString()))
                 .SetName(categoryUIDic["name"].GetValue().ToString())
