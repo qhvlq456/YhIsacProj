@@ -66,17 +66,7 @@ namespace YhProj
             RIGHT_BOTTOM, // 우하
         }
 
-
-        // input
-        public enum InputStateType
-        {
-            NONE,
-            SELECT,
-            DRAG,
-            MOVE,
-        }
-
-        public enum RoadType
+        public enum ElementType
         {
             MINE,
             ENEMY,

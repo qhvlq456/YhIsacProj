@@ -19,7 +19,7 @@ public class MapToolUI : BaseUI
     private readonly string mapToolCategoryPath = "UI/MapTool/MapToolCategory";
 
     [Header("Data")]
-    // ÇöÀç Å¬¸¯ÇØ¼­ UI¸¦ Ç¥½ÃµÇ°ÔÇÑ ¿ÀºêÁ§Æ®
+    // í˜„ì¬ í´ë¦­í•´ì„œ UIë¥¼ í‘œì‹œë˜ê²Œí•œ ì˜¤ë¸Œì íŠ¸
     public EditorTileObject editorTileObject;
 
     [SerializeField]
@@ -114,7 +114,7 @@ public class MapToolUI : BaseUI
 
     public void ClearBtnClick()
     {
-        // input fieldµé ÀüºÎ empty Ã³¸®
+        // input fieldë“¤ ì „ë¶€ empty ì²˜ë¦¬
         foreach(var item in categoryUIDic) 
         {
             item.Value.ClearBtnClick();
@@ -133,7 +133,7 @@ public class MapToolUI : BaseUI
                 $"type : {editorTileObject.tileData.type}, " +
                 $"Direction : {editorTileObject.tileData.direction}, " +
                 $"batchIdx : {editorTileObject.tileData.batchIdx}, " +
-                $"roadType : {editorTileObject.tileData.roadType}";
+                $"roadType : {editorTileObject.tileData.elementType}";
         }
         else
         {

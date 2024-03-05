@@ -18,16 +18,16 @@ public class TileDataBuilder : BaseDataBuilder<TileData>
         return this;
     }
 
-    public TileDataBuilder SetRoadType(RoadType _roadType)
+    public TileDataBuilder SetRoadType(ElementType _elementType)
     {
-        data.roadType = _roadType;
+        data.elementType = _elementType;
         return this;
     }
-    public TileDataBuilder SetRoadType(object _roadType)
+    public TileDataBuilder SetRoadType(object _elementObj)
     {
-        if(Enum.TryParse(_roadType.ToString(), out RoadType roadType))
+        if(Enum.TryParse(_elementObj.ToString(), out ElementType _elementType))
         {
-            data.roadType = roadType;
+            data.elementType = _elementType;
         }
 
         return this;

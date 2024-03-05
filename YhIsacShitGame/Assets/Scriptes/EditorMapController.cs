@@ -58,7 +58,7 @@ public class EditorMapController : MapController<TileObject>, IJson
                 else
                 {
                     tileData.type = Define.BaseType.TILE;
-                    tileData.roadType = Define.RoadType.ENEMY;
+                    tileData.elementType = Define.ElementType.ENEMY;
                 }
 
                 tileData.index = i * _stageData.Col + j;
@@ -71,7 +71,7 @@ public class EditorMapController : MapController<TileObject>, IJson
                 editorTileObject.transform.parent = mapManager.root;
                 editorTileObject.Load(tileData);
                 tileList.Add(editorTileObject);
-                log += $"idx = {tileData.index}, road type = {tileData.roadType}, ";
+                log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
             }
             log += '\n';
         }
@@ -107,7 +107,7 @@ public class EditorMapController : MapController<TileObject>, IJson
                     TileData tileData = tileList[idx].tileData;
                     // builder든 뭐든간에 데이터를 넣어야 함
                     tileDataArr[i, j] = tileData;
-                    log += $"idx = {tileData.index}, road type = {tileData.roadType}, ";
+                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
                 }
                 log += '\n';
             }

@@ -54,15 +54,15 @@ public class EditorTileObject : TileObject
 
         transform.localScale = Vector3.one * 0.8f;
 
-        switch (tileData.roadType)
+        switch (tileData.elementType)
         {
-            case Define.RoadType.MINE:
+            case Define.ElementType.MINE:
                 meshRenderer.material.color = mineRoadColor;
                 break;
-            case Define.RoadType.ENEMY:
+            case Define.ElementType.ENEMY:
                 meshRenderer.material.color = enemyRoadColor;
                 break;
-            case Define.RoadType.DECO:
+            case Define.ElementType.DECO:
                 meshRenderer.material.color = decoRoadColor;
                 break;
         }

@@ -52,7 +52,7 @@ public class MapToolCategoryUI : MonoBehaviour
         bool isDropDown = true;
 
         if(type ==  typeof(Direction) || type == typeof(BaseType) 
-           || type == typeof(RoadType) || type == typeof(bool)) 
+           || type == typeof(ElementType) || type == typeof(bool)) 
         {
             isDropDown = true;
         }

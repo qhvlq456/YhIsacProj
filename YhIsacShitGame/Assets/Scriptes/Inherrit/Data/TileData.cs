@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro.Examples;
 using UnityEngine;
 using YhProj;
 
@@ -11,7 +10,7 @@ public class TileData : BaseData
 
     // server 에서 할 일
     // 해당 타일이 적 길인지 아군 길인지, 데코인지 판단하는 값
-    public Define.RoadType roadType;
+    public Define.ElementType elementType;
     // 배치된 오브젝트 인덱스 후에 다른것들로 통합할 필요가 있다.
     public int batchIdx;
 
@@ -20,7 +19,7 @@ public class TileData : BaseData
     {
         direction = _direction;
         batchIdx = 0;
-        roadType = Define.RoadType.ENEMY;
+        elementType = Define.ElementType.ENEMY;
     }
 
     public bool IsCharacter()

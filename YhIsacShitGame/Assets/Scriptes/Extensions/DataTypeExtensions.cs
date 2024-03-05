@@ -16,15 +16,15 @@ public static class DataTypeExtensions
         {
             return Enum.GetNames(typeof(BaseType)).ToList();
         }
-        else if (_type == typeof(RoadType))
+        else if (_type == typeof(ElementType))
         {
-            return Enum.GetNames(typeof(RoadType)).ToList();
+            return Enum.GetNames(typeof(ElementType)).ToList();
         }
         else if (_type == typeof(bool))
         {
             return new List<string> { "True", "False" };
         }
-        // Ãß°¡ ÀÚ·áÇüµé¿¡ ´ëÇÑ Ã³¸®...
+        // ì¶”ê°€ ìë£Œí˜•ë“¤ì— ëŒ€í•œ ì²˜ë¦¬...
         else
         {
             return new List<string>();
