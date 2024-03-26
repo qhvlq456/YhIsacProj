@@ -5,7 +5,9 @@ using UnityEngine;
 using YhProj;
 using TMPro;
 using System.Linq;
-
+using YhProj.Game.Map;
+using YhProj.Game.UI;
+using YhProj.Game;
 
 public class MapToolUI : BaseUI
 {
@@ -65,7 +67,7 @@ public class MapToolUI : BaseUI
                 continue;
             }
 
-            MapToolCategoryUI mapToolCategoryUI = Util.InstantiateResource<MapToolCategoryUI>(mapToolCategoryPath);
+            MapToolCategoryUI mapToolCategoryUI = GameUtil.InstantiateResource<MapToolCategoryUI>(mapToolCategoryPath);
             mapToolCategoryUI.transform.SetParent(contentTrf, false);
             mapToolCategoryUI.Set(field);
 

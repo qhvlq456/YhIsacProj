@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using YhProj;
 
-public class IdleState : State
+namespace YhProj.Game.State
 {
-    public override void Enter(BaseObject _baseObject)
+    public class IdleState : State
     {
-        
-    }
+        public override void Enter(BaseObject _baseObject)
+        {
 
-    public override void Exit()
-    {
-        
-    }
+        }
 
-    public override void Update()
-    {
-        
+        public override void Exit()
+        {
+
+        }
+
+        public override void Update()
+        {
+
+        }
     }
 }

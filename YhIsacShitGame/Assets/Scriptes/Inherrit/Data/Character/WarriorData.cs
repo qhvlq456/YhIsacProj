@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj;
 
-public class WarriorData : CharacterData
+namespace YhProj.Game.Character
 {
-    
+    public class WarriorData : CharacterData
+    {
+
+    }
 }
+

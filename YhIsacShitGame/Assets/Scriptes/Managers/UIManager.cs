@@ -3,274 +3,328 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using System;
-using YhProj;
-using UnityEngine.UIElements;
-using UnityEditor.PackageManager;
-using UnityEngine.Rendering;
 
-/*
- * main ui
- * popup ui
- * toolip ui
- * hud
- * notification
- * dialog
- * Contextual UI ?? 
- * ³Ê¹« ¸¹Àº Äµ¹ö½º »ç¿ëÀº ·»´õ¸µ ¼º´É ÀúÇÏ¸¦ °¡Á® ¿Ã ¼ö ÀÖÀ½À¸·Î ·çÆ® Äµ¹ö½º ÇÏÀ§¿¡ ºó ¿ÀºêÁ§Æ®¸¦ ÀÌ¿ëÇØ Ä«Å×°í¸® ºĞ·ù
- */
-public class UIManager : BaseManager
+namespace YhProj.Game.UI
 {
-    [SerializeField]
-    string uiRootName = "UIRoot";
-
-    List<UIInfo> uiInfoList = new List<UIInfo>();
-
-    Transform root;
-
-    // main ui¸¸ µû·Î 
-    MainUI mainUI;
-    Dictionary<Define.UIRootType, Transform> rootTrfDic = new Dictionary<Define.UIRootType, Transform>();
-    public bool IsActiveUI
+    /*
+     * main ui
+     * popup ui
+     * toolip ui
+     * hud
+     * notification
+     * dialog
+     * Contextual UI ?? 
+     * ë„ˆë¬´ ë§ì€ ìº”ë²„ìŠ¤ ì‚¬ìš©ì€ ë Œë”ë§ ì„±ëŠ¥ ì €í•˜ë¥¼ ê°€ì ¸ ì˜¬ ìˆ˜ ìˆìŒìœ¼ë¡œ ë£¨íŠ¸ ìº”ë²„ìŠ¤ í•˜ìœ„ì— ë¹ˆ ì˜¤ë¸Œì íŠ¸ë¥¼ ì´ìš©í•´ ì¹´í…Œê³ ë¦¬ ë¶„ë¥˜
+     */
+    public class UIManager : BaseManager
     {
-        get
-        {
-            bool ret = false;
+        [SerializeField]
+        string uiRootName = "UIRoot";
 
-            foreach (var ui in rootTrfDic)
+        List<UIInfo> uiInfoList = new List<UIInfo>();
+
+        Transform root;
+
+        // main uië§Œ ë”°ë¡œ 
+        MainUI mainUI;
+        Dictionary<Define.UIRootType, Transform> rootTrfDic = new Dictionary<Define.UIRootType, Transform>();
+        public bool IsActiveUI
+        {
+            get
             {
-                if(ui.Key == Define.UIRootType.MAIN_UI)
+                bool ret = false;
+
+                foreach (var ui in rootTrfDic)
                 {
-                    continue;
+                    if (ui.Key == Define.UIRootType.MAIN_UI)
+                    {
+                        continue;
+                    }
+
+                    var parent = ui.Value;
+
+                    if (parent.childCount > 0 && parent.GetChild(parent.childCount - 1).gameObject.activeSelf)
+                    {
+                        ret = true;
+                        break;
+                    }
                 }
 
-                var parent = ui.Value;
+                return ret;
+            }
+        }
+        public override void Load(Define.GameMode _gameMode)
+        {
+            root = GameUtil.AttachObj<Transform>(uiRootName);
 
-                if (parent.childCount > 0 && parent.GetChild(parent.childCount - 1).gameObject.activeSelf)
+            Canvas canvas = root.gameObject.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            // í•´ìƒë„ì— ë”°ë¼ í¬ê¸° ì¡°ì •
+            CanvasScaler canvasScaler = root.gameObject.GetComponent<CanvasScaler>();
+            canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            canvasScaler.referenceResolution = new Vector2(Screen.width, Screen.height); // í›„ì— ë¦¬ì†”ë£¨ì…˜ ê³ ì • ê°’ ë„£ì„ ê²ƒì„ screen í•¨ìˆ˜ë¼ë“ ì§€?
+
+            // ì´ë²¤íŠ¸ ì „íŒŒë¥¼ ìœ„í•œ ì„¤ì •
+            root.gameObject.GetComponent<GraphicRaycaster>();
+
+            // í›„ì— ê²½ë¡œì— ëŒ€í•œ ì¬ì§€ì •ì´ í•„ìš”í•¨
+            // í†µì¼ì´ í•„ìš”í•  ê²ƒ ê°™ì€ë°..
+            // uidata set 
+            UIData uiData = Resources.Load<UIData>("ScriptableObjects/UIData");
+            uiInfoList.AddRange(uiData.mainUIDataList);
+            uiInfoList.AddRange(uiData.popupUIDataList);
+            uiInfoList.AddRange(uiData.tooltipUIDataList);
+            uiInfoList.AddRange(uiData.contextualUIDataList);
+            uiInfoList.AddRange(uiData.testUIDataList);
+
+            // 1ì€ main uiì´ê¸° ë•Œë¬¸ì— ì œì™¸
+            for (int i = 0; i < (int)Define.UIRootType.COUNT; i++)
+            {
+                string name = string.Format("{0}", (Define.UIRootType)i);
+                GameObject child = new GameObject(name);
+
+                RectTransform childRect = child.AddComponent<RectTransform>();
+                // strech
+                childRect.anchorMin = Vector2.zero;
+                childRect.anchorMax = Vector2.one;
+
+                //Left, Bottom ë³€ê²½
+                childRect.offsetMin = Vector2.zero;
+
+                //Right, Top ë³€ê²½ -> ì›í•˜ëŠ” í¬ê¸° - ê¸°ì¤€í•´ìƒë„ê°’
+                childRect.offsetMax = new Vector2(Screen.width, Screen.height);
+
+                child.transform.SetParent(root, false);
+                child.transform.localPosition = Vector3.zero;
+                child.transform.localScale = Vector3.one;
+
+                if (!rootTrfDic.ContainsKey((Define.UIRootType)i))
                 {
-                    ret = true;
+                    rootTrfDic.Add((Define.UIRootType)i, child.transform);
+                }
+            }
+
+            string mainUIName = "";
+
+            // ë©”ì¸ UI ë³€ê²½ì´ í•„ìš” ê·¸ë¦¬ê³  loading ë“±ë“± ì¡°ì¹˜ê°€ í•„ìš”í•˜ê¸´ í•¨.. ì”¬ì „í™˜ë“±
+            switch (Managers.Instance.gameMode)
+            {
+                case Define.GameMode.EDITOR:
                     break;
-                }
+                case Define.GameMode.TEST:
+                case Define.GameMode.MAPTOOL:
+                    // í…ŒìŠ¤íŠ¸ ëª¨ë“œì˜ ë©”ì¸ UIë¥¼ ì…‹íŒ…í•¨
+                    foreach (var trf in rootTrfDic)
+                    {
+                        bool isActive = trf.Key == Define.UIRootType.TEST_UI;
+                        trf.Value.gameObject.SetActive(isActive);
+                    }
+                    mainUIName = "MapToolMainUI";
+                    break;
             }
 
-            return ret;
+            rootTrfDic[Define.UIRootType.MAIN_UI].gameObject.SetActive(true);
+            mainUI = ShowUI<MapToolMainUI>(mainUIName);
         }
-    }
-    public override void Load(Define.GameMode _gameMode)
-    {
-        root = Util.AttachObj<Transform>(uiRootName);
 
-        Canvas canvas = root.gameObject.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-        // ÇØ»óµµ¿¡ µû¶ó Å©±â Á¶Á¤
-        CanvasScaler canvasScaler = root.gameObject.GetComponent<CanvasScaler>();
-        canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        canvasScaler.referenceResolution = new Vector2(Screen.width, Screen.height); // ÈÄ¿¡ ¸®¼Ö·ç¼Ç °íÁ¤ °ª ³ÖÀ» °ÍÀÓ screen ÇÔ¼ö¶óµçÁö?
-
-        // ÀÌº¥Æ® ÀüÆÄ¸¦ À§ÇÑ ¼³Á¤
-        root.gameObject.GetComponent<GraphicRaycaster>();
-
-        // ÈÄ¿¡ °æ·Î¿¡ ´ëÇÑ ÀçÁöÁ¤ÀÌ ÇÊ¿äÇÔ
-        // ÅëÀÏÀÌ ÇÊ¿äÇÒ °Í °°Àºµ¥..
-        // uidata set 
-        UIData uiData = Resources.Load<UIData>("ScriptableObjects/UIData");
-        uiInfoList.AddRange(uiData.mainUIDataList);
-        uiInfoList.AddRange(uiData.popupUIDataList);
-        uiInfoList.AddRange(uiData.tooltipUIDataList);
-        uiInfoList.AddRange(uiData.contextualUIDataList);
-        uiInfoList.AddRange(uiData.testUIDataList);
-
-        // 1Àº main uiÀÌ±â ¶§¹®¿¡ Á¦¿Ü
-        for (int i = 0; i < (int)Define.UIRootType.COUNT; i++)
+        public override void Update()
         {
-            string name = string.Format("{0}", (Define.UIRootType)i);
-            GameObject child = new GameObject(name);
 
-            RectTransform childRect = child.AddComponent<RectTransform>();
-            // strech
-            childRect.anchorMin = Vector2.zero;
-            childRect.anchorMax = Vector2.one;
+        }
+        public override void Delete()
+        {
 
-            //Left, Bottom º¯°æ
-            childRect.offsetMin = Vector2.zero;
+        }
 
-            //Right, Top º¯°æ -> ¿øÇÏ´Â Å©±â - ±âÁØÇØ»óµµ°ª
-            childRect.offsetMax = new Vector2(Screen.width, Screen.height);
+        public BaseUI GetUI(UIInfo _uiInfo)
+        {
+            List<BaseUI> baseUIList = new List<BaseUI>();
 
-            child.transform.SetParent(root, false);
-            child.transform.localPosition = Vector3.zero;
-            child.transform.localScale = Vector3.one;
+            Transform root = rootTrfDic[_uiInfo.uiRootType];
+            BaseUI baseUI = null;
 
-            if (!rootTrfDic.ContainsKey((Define.UIRootType)i))
+            for (int i = 0; i < root.childCount; i++)
             {
-                rootTrfDic.Add((Define.UIRootType)i, child.transform);
-            }
-        }
+                BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
 
-        string mainUIName = "";
-
-        // ¸ŞÀÎ UI º¯°æÀÌ ÇÊ¿ä ±×¸®°í loading µîµî Á¶Ä¡°¡ ÇÊ¿äÇÏ±ä ÇÔ.. ¾ÀÀüÈ¯µî
-        switch(Managers.Instance.gameMode)
-        {
-            case Define.GameMode.EDITOR:
-                break;
-            case Define.GameMode.TEST:
-            case Define.GameMode.MAPTOOL:
-                // Å×½ºÆ® ¸ğµåÀÇ ¸ŞÀÎ UI¸¦ ¼ÂÆÃÇÔ
-                foreach(var trf in rootTrfDic)
+                if (_uiInfo.name == ui.uiInfo.name)
                 {
-                    bool isActive = trf.Key == Define.UIRootType.TEST_UI;
-                    trf.Value.gameObject.SetActive(isActive);
+                    baseUI = ui;
                 }
-                mainUIName = "MapToolMainUI";
-                break;
-        }
 
-        rootTrfDic[Define.UIRootType.MAIN_UI].gameObject.SetActive(true);
-        mainUI = ShowUI<MapToolMainUI>(mainUIName);
-    }
-
-    public override void Update()
-    {
-        
-    }
-    public override void Delete()
-    {
-        
-    }
-
-    public BaseUI GetUI(UIInfo _uiInfo)
-    {
-        List<BaseUI> baseUIList = new List<BaseUI>();
-
-        Transform root = rootTrfDic[_uiInfo.uiRootType];
-        BaseUI baseUI = null;
-
-        for (int i = 0; i < root.childCount; i++)
-        {
-            BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
-
-            if (_uiInfo.name == ui.uiInfo.name)
-            {
-                baseUI = ui;
+                baseUIList.Add(ui);
             }
 
-            baseUIList.Add(ui);
-        }
-
-        // Á¦ÀÏ ¸¶Áö¸·À¸·Î ¿Å±è
-        if (baseUI != null)
-        {
-            baseUI.transform.SetAsLastSibling();
-        }
-        else
-        {
-            string path = "UI/MapTool/";
-
-            baseUI = Util.InstantiateResource<BaseUI>(path + _uiInfo.name);
-            baseUI.transform.SetParent(root, false);
-            baseUI.transform.localPosition = Vector3.zero;
-            baseUI.transform.SetSiblingIndex(root.childCount - 1);
-        }
-
-        int depth = 0;
-
-        // depth »õ·Î Á¶Á¤
-        for (int i = 0; i < baseUIList.Count; i++)
-        {
-            if (baseUIList[i].gameObject.activeSelf)
+            // ì œì¼ ë§ˆì§€ë§‰ìœ¼ë¡œ ì˜®ê¹€
+            if (baseUI != null)
             {
-                baseUIList[i].depth = depth;
-                depth++;
+                baseUI.transform.SetAsLastSibling();
             }
-        }
-
-        return baseUI;
-    }
-
-    /// <summary>
-    /// ºÎ¸ğÀÇ ÀÚ½Ä °¹¼ö¸¦ ÅëÇØ order¸¦ Á¤ÇÏ¿© UI¸¦ Ç¥½ÃÇÏ´Â ÇÔ¼ö
-    /// ½ºÅÃ°ú °°ÀÌ Á¦ÀÏ ÇÏÀ§¿¡ »ı¼ºµÊ
-    /// </summary>
-    /// <typeparam name="T"> ui ¿¡ ÀåÂøµÇ¾î ÀÖ´Â ÄÄÆ÷³ÍÆ®¸¦ ¹İÈ¯ </typeparam>
-    /// <typeparam name="V">UI¸¦ »ı¼ºÇÏ°í ¼ÂÆÃÀ» À§ÇÑ µ¥ÀÌÅÍÀÇ Å¸ÀÔ</typeparam>
-    /// <param name="_rootType"> »ı¼ºµÉ UI ¿ÀºêÁ§Æ®°¡ ºÎ¸ğ·Î ¼¶±â°Ô µÉ Å¸ÀÔ </param>
-    /// <param name="_uiData"> UI¸¦ »ı¼ºÇÏ°í ¼ÂÆÃÀ» À§ÇÑ µ¥ÀÌÅÍ </param>
-    /// <returns> ÆĞ³ÎÀÇ ÄÄÆ÷³ÍÆ® </returns>
-
-    public T ShowUI<T, V>(string _uiName, V _param = null) where T : Component where V : BaseObject
-    {
-        UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
-
-        if(uiInfo == null)
-        {
-            Debug.LogError("Not UIInfo Set Please Check your uidata.asset");
-            return default(T);
-        }
-
-        BaseUI baseUI = GetUI(uiInfo);
-        
-        baseUI.Show(uiInfo, _param);
-        
-        return baseUI.GetComponent<T>();
-    }
-    public T ShowUI<T>(string _uiName) where T : Component
-    {
-        UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
-
-        if (uiInfo == null)
-        {
-            Debug.LogError("Not UIInfo Set Please Check your uidata.asset");
-            return default(T);
-        }
-
-        BaseUI baseUI = GetUI(uiInfo);
-
-        baseUI.Show(uiInfo);
-
-        return baseUI.GetComponent<T>();
-    }
-
-    public void HideUI(UIInfo _uiInfo)
-    {
-        List<BaseUI> baseUIList = new List<BaseUI>();
-
-        Transform root = rootTrfDic[_uiInfo.uiRootType];
-        BaseUI baseUI = null;
-
-        int idx = root.childCount;
-
-        // ¼ø¼­¿¡ ¸Â°Ô µª½ºµµ Á¶Á¤ÇÏ¿©¾ß ÇÔ
-        for (int i = 0; i < root.childCount; i++)
-        {
-            BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
-
-            if (_uiInfo.name == ui.uiInfo.name)
+            else
             {
-                baseUI = ui;
+                string path = "UI/MapTool/";
+
+                baseUI = GameUtil.InstantiateResource<BaseUI>(path + _uiInfo.name);
+                baseUI.transform.SetParent(root, false);
+                baseUI.transform.localPosition = Vector3.zero;
+                baseUI.transform.SetSiblingIndex(root.childCount - 1);
             }
 
-            baseUIList.Add(ui);
+            int depth = 0;
+
+            // depth ìƒˆë¡œ ì¡°ì •
+            for (int i = 0; i < baseUIList.Count; i++)
+            {
+                if (baseUIList[i].gameObject.activeSelf)
+                {
+                    baseUIList[i].depth = depth;
+                    depth++;
+                }
+            }
+
+            return baseUI;
         }
 
-        int depth = 0;
+        /// <summary>
+        /// ë¶€ëª¨ì˜ ìì‹ ê°¯ìˆ˜ë¥¼ í†µí•´ orderë¥¼ ì •í•˜ì—¬ UIë¥¼ í‘œì‹œí•˜ëŠ” í•¨ìˆ˜
+        /// ìŠ¤íƒê³¼ ê°™ì´ ì œì¼ í•˜ìœ„ì— ìƒì„±ë¨
+        /// </summary>
+        /// <typeparam name="T"> ui ì— ì¥ì°©ë˜ì–´ ìˆëŠ” ì»´í¬ë„ŒíŠ¸ë¥¼ ë°˜í™˜ </typeparam>
+        /// <typeparam name="V">UIë¥¼ ìƒì„±í•˜ê³  ì…‹íŒ…ì„ ìœ„í•œ ë°ì´í„°ì˜ íƒ€ì…</typeparam>
+        /// <param name="_rootType"> ìƒì„±ë  UI ì˜¤ë¸Œì íŠ¸ê°€ ë¶€ëª¨ë¡œ ì„¬ê¸°ê²Œ ë  íƒ€ì… </param>
+        /// <param name="_uiData"> UIë¥¼ ìƒì„±í•˜ê³  ì…‹íŒ…ì„ ìœ„í•œ ë°ì´í„° </param>
+        /// <returns> íŒ¨ë„ì˜ ì»´í¬ë„ŒíŠ¸ </returns>
 
-        for (int i = 0; i < root.childCount; i++)
+        public T ShowUI<T, V>(string _uiName, V _param = null) where T : Component where V : BaseObject
         {
-            if (baseUIList[i].gameObject.activeSelf)
+            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
+
+            if (uiInfo == null)
             {
-                baseUIList[i].depth = depth;
-                depth++;
+                Debug.LogError("Not UIInfo Set Please Check your uidata.asset");
+                return default(T);
+            }
+
+            BaseUI baseUI = GetUI(uiInfo);
+
+            baseUI.Show(uiInfo, _param);
+
+            return baseUI.GetComponent<T>();
+        }
+        public T ShowUI<T>(string _uiName) where T : Component
+        {
+            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
+
+            if (uiInfo == null)
+            {
+                Debug.LogError("Not UIInfo Set Please Check your uidata.asset");
+                return default(T);
+            }
+
+            BaseUI baseUI = GetUI(uiInfo);
+
+            baseUI.Show(uiInfo);
+
+            return baseUI.GetComponent<T>();
+        }
+
+        public void HideUI(UIInfo _uiInfo)
+        {
+            List<BaseUI> baseUIList = new List<BaseUI>();
+
+            Transform root = rootTrfDic[_uiInfo.uiRootType];
+            BaseUI baseUI = null;
+
+            int idx = root.childCount;
+
+            // ìˆœì„œì— ë§ê²Œ ëìŠ¤ë„ ì¡°ì •í•˜ì—¬ì•¼ í•¨
+            for (int i = 0; i < root.childCount; i++)
+            {
+                BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
+
+                if (_uiInfo.name == ui.uiInfo.name)
+                {
+                    baseUI = ui;
+                }
+
+                baseUIList.Add(ui);
+            }
+
+            int depth = 0;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                if (baseUIList[i].gameObject.activeSelf)
+                {
+                    baseUIList[i].depth = depth;
+                    depth++;
+                }
+            }
+
+            if (baseUI != null)
+            {
+                baseUI.Hide();
             }
         }
-
-        if(baseUI != null)
+        public void HideUI(string _name)
         {
-            baseUI.Hide();
+            // nameì€ ë°©ì‹ì„ ë°”ê¾¸ì–´ì•¼ í•  ë“¯?
         }
     }
-    public void HideUI(string _name)
+
+
+
+
+    public static class UIUtil
     {
-        // nameÀº ¹æ½ÄÀ» ¹Ù²Ù¾î¾ß ÇÒ µí?
+        public static T FindChild<T>(GameObject _go, string _name = null, bool _isRecursive = false) where T : UnityEngine.Object
+        {
+            if (_go == null)
+            {
+                return null;
+            }
+
+            if (!_isRecursive)
+            {
+                for (int i = 0; i < _go.transform.childCount; i++)
+                {
+                    Transform child = _go.transform.GetChild(i);
+
+                    if (string.IsNullOrEmpty(child.name) || child.name == _name)
+                    {
+                        T component = child.GetComponent<T>();
+
+                        return component;
+                    }
+                }
+            }
+            else
+            {
+                foreach (T component in _go.GetComponentsInChildren<T>())
+                {
+                    if (string.IsNullOrEmpty(_name) || component.name == _name)
+                    {
+                        return component;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static GameObject FindChild(GameObject _go, string name = null, bool _recursive = false)
+        {
+            Transform trf = FindChild<Transform>(_go, name, _recursive);
+
+            if (trf == null)
+            {
+                return null;
+            }
+
+            return trf.gameObject;
+
+        }
     }
 }
+

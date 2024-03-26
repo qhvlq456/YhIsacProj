@@ -1,9 +1,10 @@
-using YhProj;
-
-public interface IFactory
+namespace YhProj.Game
 {
-    V Create<T, V>(T _data) 
-        where T : BaseData 
-        where V : BaseObject;
+    public interface IFactory
+    {
+        V Create<T, V>(T _data)
+            where T : BaseData
+            where V : BaseObject;
+    }
 }
 

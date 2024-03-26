@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using YhProj;
 
-public class MainUI : BaseUI
+namespace YhProj.Game.UI
 {
-    
+    public class MainUI : BaseUI
+    {
+
+    }
 }

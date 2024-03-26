@@ -1,20 +1,15 @@
-namespace YhProj
+namespace YhProj.Game.Character
 {
+    [System.Serializable]
     public class CharacterData : BaseData
     {
-        protected int health;
-        protected int armor;
-        protected int power;
-        protected int range;
-        protected Define.ElementType elementType;
+        public int health;
+        public int armor;
+        public int power;
+        public int range;
+        public Define.ElementType elementType;
 
-
-        public override void Load()
-        {
-
-        }
-
-        public override void Update()
+        public override void Update(BaseData _baseData)
         {
 
         }

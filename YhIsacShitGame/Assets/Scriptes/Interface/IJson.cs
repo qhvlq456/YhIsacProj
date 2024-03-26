@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
-
-namespace YhProj
+namespace YhProj.Game
 {
     public interface IJson
     {

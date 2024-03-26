@@ -1,24 +1,24 @@
-namespace YhProj
-{
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System;
 
+namespace YhProj.Game.UI
+{
     public class BaseUI : MonoBehaviour
     {
-        // °¢Á¾ UI button, labelµîµîÀ» Ä³½ÌÇÔ
+        // ê°ì¢… UI button, labelë“±ë“±ì„ ìºì‹±í•¨
         protected Dictionary<Type, List<UnityEngine.Object>> uiObjDic = new Dictionary<Type, List<UnityEngine.Object>>();
 
         public UIInfo uiInfo { get; private set; }
 
-        // ugui´Â canvas¿¡¼­ ¼ÖÆÃÀ» Á¶ÀıÇÔ ±×·¡¼­ È®ÀÎ ¶Ç´Â ÇÊ¿ä½Ã °¢ ÆĞ³Î¸¶´Ù canvas¸¦ ³ÖÀ»Áö ÆÇ´ÜÇÏ¿©¾ß ÇÔ
+        // uguiëŠ” canvasì—ì„œ ì†”íŒ…ì„ ì¡°ì ˆí•¨ ê·¸ë˜ì„œ í™•ì¸ ë˜ëŠ” í•„ìš”ì‹œ ê° íŒ¨ë„ë§ˆë‹¤ canvasë¥¼ ë„£ì„ì§€ íŒë‹¨í•˜ì—¬ì•¼ í•¨
         public int depth;
 
-        // ±Ùµ¥ bind°É¾î¼­ ÇÒ°Ô ¾øÀ½¤»
+        // ê·¼ë° bindê±¸ì–´ì„œ í• ê²Œ ì—†ìŒã…‹
         protected void Bind<T>() where T : UnityEngine.Object
         {
-            // ÈÄ¿¡ ±¸Çö
+            // í›„ì— êµ¬í˜„
         }
         public virtual void Show(UIInfo _uiInfo)
         {
@@ -31,7 +31,7 @@ namespace YhProj
         }
         public virtual void Hide()
         {
-            // ÈÄ¿¡ ±¸Çö
+            // í›„ì— êµ¬í˜„
             gameObject.SetActive(false);
         }
     }

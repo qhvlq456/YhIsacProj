@@ -1,68 +1,69 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using YhProj;
 
-public class MapController
+namespace YhProj.Game.Map
 {
-    protected MapManager mapManager;
-
-    public MapController(MapManager _mapManager)
+    public class MapController
     {
-        mapManager = _mapManager;
-    }
-    public virtual void Load()
-    {
-        // 에디터 모드에서의 로드 동작
-        // 맵 편집 기능 등 추가
-    }
+        protected MapManager mapManager;
 
-    public virtual void Update()
-    {
-        // 에디터 모드에서의 업데이트 동작
-    }
-
-    public virtual void Delete()
-    {
-        // 에디터 모드에서의 삭제 동작
-    }
-
-    public virtual void LoadTile(StageData _stageData)
-    {
-
-    }
-    public virtual void DeleteTile()
-    {
-
-    }
-
-}
-public class MapController<T> : MapController
-{
-    protected List<T> tileList = new List<T>();
-    public List<T> TileList
-    {
-        get
+        public MapController(MapManager _mapManager)
         {
-            tileList ??= new List<T>();
-            return tileList;
+            mapManager = _mapManager;
         }
-    }
-
-    public T this[int _index]
-    {
-        get
+        public virtual void Load()
         {
-            return tileList[_index];
+            // 에디터 모드에서의 로드 동작
+            // 맵 편집 기능 등 추가
         }
-        set 
-        { 
-            tileList[_index] = value; 
+
+        public virtual void Update()
+        {
+            // 에디터 모드에서의 업데이트 동작
         }
+
+        public virtual void Delete()
+        {
+            // 에디터 모드에서의 삭제 동작
+        }
+
+        public virtual void LoadTile(StageData _stageData)
+        {
+
+        }
+        public virtual void DeleteTile()
+        {
+
+        }
+
     }
-    public MapController(MapManager _mapManager) : base(_mapManager)
+    public class MapController<T> : MapController
     {
-        mapManager = _mapManager;
+        protected List<T> tileList = new List<T>();
+        public List<T> TileList
+        {
+            get
+            {
+                tileList ??= new List<T>();
+                return tileList;
+            }
+        }
+
+        public T this[int _index]
+        {
+            get
+            {
+                return tileList[_index];
+            }
+            set
+            {
+                tileList[_index] = value;
+            }
+        }
+        public MapController(MapManager _mapManager) : base(_mapManager)
+        {
+            mapManager = _mapManager;
+        }
+
     }
-    
 }

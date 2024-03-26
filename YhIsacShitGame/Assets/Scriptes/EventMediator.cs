@@ -2,28 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using YhProj.Game.Player;
 
-/*
- * ´ëÀå ¸Å´ÏÀú Å¬·¡½º¿Í ´Ù¸¥ ¸Å´ÏÀú Å¬·¡½ºµéÀÇ ÀÌº¥Æ®¸¦ Áß°èÇÏ´Â Å¬·¡½º
- * ¾À¿¡ ¹ÚÇôÁ® ÀÖ´Â ½Ì±ÛÅæÀÌ¿©¾ß ÇÑ´Ù
- */
-public static class EventMediator
+namespace YhProj.Game
 {
-    public static event Action<int> OnPlayerLevelChange;
-    public static event Action<PlayerInfo> OnLoadSequenceEvent;
-
-    #region Player Levelup Event
-    public static void RelayPlayerLevelChange(int _data)
+    /*
+ * ëŒ€ì¥ ë§¤ë‹ˆì € í´ë˜ìŠ¤ì™€ ë‹¤ë¥¸ ë§¤ë‹ˆì € í´ë˜ìŠ¤ë“¤ì˜ ì´ë²¤íŠ¸ë¥¼ ì¤‘ê³„í•˜ëŠ” í´ë˜ìŠ¤
+ * ì”¬ì— ë°•í˜€ì ¸ ìˆëŠ” ì‹±ê¸€í†¤ì´ì—¬ì•¼ í•œë‹¤
+ */
+    public static class EventMediator
     {
-        OnPlayerLevelChange?.Invoke(_data);
-    }
-    #endregion
+        public static event Action<int> OnPlayerLevelChange;
+        public static event Action<PlayerInfo> OnLoadSequenceEvent;
 
-    #region Load sequence event
-    public static void LoadSequnceEvent(PlayerInfo _playerInfo)
-    {
-        OnLoadSequenceEvent?.Invoke(_playerInfo);
-    }
-    #endregion
+        #region Player Levelup Event
+        public static void RelayPlayerLevelChange(int _data)
+        {
+            OnPlayerLevelChange?.Invoke(_data);
+        }
+        #endregion
 
+        #region Load sequence event
+        public static void LoadSequnceEvent(PlayerInfo _playerInfo)
+        {
+            OnLoadSequenceEvent?.Invoke(_playerInfo);
+        }
+        #endregion
+
+    }
 }
+

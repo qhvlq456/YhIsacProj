@@ -4,107 +4,110 @@ using UnityEngine;
 using UnityEditor;
 using Newtonsoft.Json;
 using System;
-using YhProj;
+using YhProj.Game.Map;
 
-public class JsonWindow : EditorWindow
+namespace YhProj.Game.YhEditor
 {
-    StageData stageData = new StageData();
-    string filePath = "Assets/StreamingAssets/StageData.json"; // ¿øÇÏ´Â °æ·Î·Î ¼öÁ¤
-
-    Vector2 scrollPosition;
-
-    [MenuItem("YhProjMeunu/JsonWindow")]
-    static void Open()
+    public class JsonWindow : EditorWindow
     {
-        JsonWindow instance = GetWindow<JsonWindow>();
-        instance.titleContent = new GUIContent("Json Window");
-        instance.Show();
-    }
+        StageData stageData = new StageData();
+        string filePath = "Assets/StreamingAssets/StageData.json"; // ì›í•˜ëŠ” ê²½ë¡œë¡œ ìˆ˜ì •
 
-    private void OnGUI()
-    {
-        EditorGUILayout.LabelField("JSON Editor", EditorStyles.boldLabel);
+        Vector2 scrollPosition;
 
-        // µ¥ÀÌÅÍ ÀÔ·Â ÇÊµå // ÈÄ¿¡ Å¸ÀÔÀ» Á¤ÇÏ¿© º¯°æ ÇÒ ¿¹Á¤ÀÌ±ä ÇÔ.. ±Ùµ¥ ³Ê¹« ³ë°¡´Ù ÀÛ¾÷ÀÎµ¥ ¹æ¹ıÀÌ ¾ø³ª?
-        EditorGUILayout.Space(10);
-        GUILayout.Label("Enter StageData:", EditorStyles.boldLabel);
-        stageData.lv = EditorGUILayout.IntField("Level", stageData.lv);
-        stageData.stage = EditorGUILayout.IntField("Stage", stageData.stage);
-        stageData.xOffset = EditorGUILayout.FloatField("X Offset", stageData.xOffset);
-        stageData.zOffset = EditorGUILayout.FloatField("Z Offset", stageData.zOffset);
-        EditorGUILayout.Space(50);
-        // Å¸ÀÏ ¹è¿­ ÀÔ·Â ÇÊµå
-        stageData.tileArr = new TileData[stageData.Row, stageData.Col];
-
-        // ½ºÅ©·Ñ ºä
-        scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
-
-        for (int i = 0; i < stageData.Row; i++)
+        [MenuItem("YhProjMeunu/JsonWindow")]
+        static void Open()
         {
-            for (int j = 0; j < stageData.Col; j++)
+            JsonWindow instance = GetWindow<JsonWindow>();
+            instance.titleContent = new GUIContent("Json Window");
+            instance.Show();
+        }
+
+        private void OnGUI()
+        {
+            EditorGUILayout.LabelField("JSON Editor", EditorStyles.boldLabel);
+
+            // ë°ì´í„° ì…ë ¥ í•„ë“œ // í›„ì— íƒ€ì…ì„ ì •í•˜ì—¬ ë³€ê²½ í•  ì˜ˆì •ì´ê¸´ í•¨.. ê·¼ë° ë„ˆë¬´ ë…¸ê°€ë‹¤ ì‘ì—…ì¸ë° ë°©ë²•ì´ ì—†ë‚˜?
+            EditorGUILayout.Space(10);
+            GUILayout.Label("Enter StageData:", EditorStyles.boldLabel);
+            stageData.lv = EditorGUILayout.IntField("Level", stageData.lv);
+            stageData.stage = EditorGUILayout.IntField("Stage", stageData.stage);
+            stageData.xOffset = EditorGUILayout.FloatField("X Offset", stageData.xOffset);
+            stageData.zOffset = EditorGUILayout.FloatField("Z Offset", stageData.zOffset);
+            EditorGUILayout.Space(50);
+            // íƒ€ì¼ ë°°ì—´ ì…ë ¥ í•„ë“œ
+            stageData.tileArr = new TileData[stageData.Row, stageData.Col];
+
+            // ìŠ¤í¬ë¡¤ ë·°
+            scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
+
+            for (int i = 0; i < stageData.Row; i++)
             {
-                if(stageData.tileArr[i,j] == null)
+                for (int j = 0; j < stageData.Col; j++)
                 {
-                    stageData.tileArr[i, j] = new TileData();
+                    if (stageData.tileArr[i, j] == null)
+                    {
+                        stageData.tileArr[i, j] = new TileData();
+                    }
+
+                    GUILayout.Label($"Tile ({i}, {j}):", EditorStyles.boldLabel);
+
+                    stageData.tileArr[i, j].name = EditorGUILayout.TextField("Name", stageData.tileArr[i, j].name);
+                    stageData.tileArr[i, j].index = EditorGUILayout.IntField("Value", stageData.tileArr[i, j].index);
+                    stageData.tileArr[i, j].direction = (Define.Direction)EditorGUILayout.EnumPopup("Direction", stageData.tileArr[i, j].direction);
+
+                    EditorGUILayout.Space(5);
                 }
+            }
 
-                GUILayout.Label($"Tile ({i}, {j}):", EditorStyles.boldLabel);
+            // ìŠ¤í¬ë¡¤ë·° ì¢…ë£Œ
+            EditorGUILayout.EndScrollView();
 
-                stageData.tileArr[i, j].name = EditorGUILayout.TextField("Name", stageData.tileArr[i, j].name);
-                stageData.tileArr[i, j].index = EditorGUILayout.IntField("Value", stageData.tileArr[i, j].index);
-                stageData.tileArr[i, j].direction = (Define.Direction)EditorGUILayout.EnumPopup("Direction", stageData.tileArr[i, j].direction);
+            EditorGUILayout.Space(10);
 
-                EditorGUILayout.Space(5);
+            // JSONì„ íŒŒì¼ë¡œ ì €ì¥í•˜ëŠ” ë²„íŠ¼
+            if (GUILayout.Button("Save JSON to File"))
+            {
+                SaveJsonToFile();
+            }
+
+            EditorGUILayout.Space(20);
+
+            // íŒŒì¼ì—ì„œ JSONì„ ì½ì–´ì˜¤ëŠ” ë²„íŠ¼
+            if (GUILayout.Button("Load JSON from File"))
+            {
+                LoadJsonFromFile();
             }
         }
 
-        // ½ºÅ©·Ñºä Á¾·á
-        EditorGUILayout.EndScrollView();
-
-        EditorGUILayout.Space(10);
-
-        // JSONÀ» ÆÄÀÏ·Î ÀúÀåÇÏ´Â ¹öÆ°
-        if (GUILayout.Button("Save JSON to File"))
+        private void SaveJsonToFile()
         {
-            SaveJsonToFile();
+            try
+            {
+                // StageData ê°ì²´ë¥¼ JSONìœ¼ë¡œ ë³€í™˜í•˜ì—¬ íŒŒì¼ì— ì €ì¥
+                string json = JsonConvert.SerializeObject(stageData, Formatting.Indented);
+                System.IO.File.WriteAllText(filePath, json);
+                Debug.Log("JSON saved to file: " + filePath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error saving JSON to file: " + e.Message);
+            }
         }
 
-        EditorGUILayout.Space(20);
-
-        // ÆÄÀÏ¿¡¼­ JSONÀ» ÀĞ¾î¿À´Â ¹öÆ°
-        if (GUILayout.Button("Load JSON from File"))
+        private void LoadJsonFromFile()
         {
-            LoadJsonFromFile();
-        }
-    }
-
-    private void SaveJsonToFile()
-    {
-        try
-        {
-            // StageData °´Ã¼¸¦ JSONÀ¸·Î º¯È¯ÇÏ¿© ÆÄÀÏ¿¡ ÀúÀå
-            string json = JsonConvert.SerializeObject(stageData, Formatting.Indented);
-            System.IO.File.WriteAllText(filePath, json);
-            Debug.Log("JSON saved to file: " + filePath);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error saving JSON to file: " + e.Message);
-        }
-    }
-
-    private void LoadJsonFromFile()
-    {
-        try
-        {
-            // ÆÄÀÏ¿¡¼­ JSON ÀĞ°í StageData °´Ã¼·Î ¿ªÁ÷·ÄÈ­
-            string json = System.IO.File.ReadAllText(filePath);
-            stageData = JsonConvert.DeserializeObject<StageData>(json); // EditorStageData·Î ¿ªÁ÷·ÄÈ­
-            Debug.Log("JSON loaded from file: " + filePath);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("Error loading JSON from file: " + e.Message);
+            try
+            {
+                // íŒŒì¼ì—ì„œ JSON ì½ê³  StageData ê°ì²´ë¡œ ì—­ì§ë ¬í™”
+                string json = System.IO.File.ReadAllText(filePath);
+                stageData = JsonConvert.DeserializeObject<StageData>(json); // EditorStageDataë¡œ ì—­ì§ë ¬í™”
+                Debug.Log("JSON loaded from file: " + filePath);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Error loading JSON from file: " + e.Message);
+            }
         }
     }
 }

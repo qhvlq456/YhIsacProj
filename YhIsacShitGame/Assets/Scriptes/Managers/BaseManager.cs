@@ -1,24 +1,20 @@
-namespace YhProj
+namespace YhProj.Game
 {
     /*
-     * json¿¡¼­´Â ·»´õ¸µ µî ÇÊ¿äÇÑ µ¥ÀÌÅÍ¸¦ ¹Ş¾Æ¾ß ÇÏ¸ç
-     * server¿¡¼­´Â Á¤º¸¸¦ ¹Ş¾Æ¾ß ÇÔ Áï, load and save
+     * jsonì—ì„œëŠ” ë Œë”ë§ ë“± í•„ìš”í•œ ë°ì´í„°ë¥¼ ë°›ì•„ì•¼ í•˜ë©°
+     * serverì—ì„œëŠ” ì •ë³´ë¥¼ ë°›ì•„ì•¼ í•¨ ì¦‰, load and save
      * 
-     * »ı°¢À» ÇÏ±ä ÇÏ¿©¾ß ÇÔ basemanager¿¡¼­ load¿Í delete°¡ ÇÊ¿ä ÇÑ °ÍÀÎ°¡?
+     * ìƒê°ì„ í•˜ê¸´ í•˜ì—¬ì•¼ í•¨ basemanagerì—ì„œ loadì™€ deleteê°€ í•„ìš” í•œ ê²ƒì¸ê°€?
      * 
-     * type¿¡ µû¸¥ load ºĞ±â update, delete ºĞ±â µîµî Á¶Á¤
+     * typeì— ë”°ë¥¸ load ë¶„ê¸° update, delete ë¶„ê¸° ë“±ë“± ì¡°ì •
      */
-    public abstract class BaseManager : ILogger
+    public abstract class BaseManager
     {
-        // dataÀÇ load ÇÃ·Î¿ìµéÀ» Á¤ÀÇ
+        // dataì˜ load í”Œë¡œìš°ë“¤ì„ ì •ì˜
         public abstract void Load(Define.GameMode _gameMode);
-        // dataÀÇ ÀúÀå µîµî Á¤ÀÇ
+        // dataì˜ ì €ì¥ ë“±ë“± ì •ì˜
         public abstract void Update();
-        // dataÀÇ unload ÇÃ·Î¿ìµéÀ» Á¤ÀÇ
+        // dataì˜ unload í”Œë¡œìš°ë“¤ì„ ì •ì˜
         public abstract void Delete();
-        public virtual void Logger()
-        {
-            UnityEngine.Debug.LogWarningFormat("BaseManager");
-        }
     }
 }

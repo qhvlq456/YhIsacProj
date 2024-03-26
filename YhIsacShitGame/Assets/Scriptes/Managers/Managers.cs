@@ -2,129 +2,303 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using YhProj;
-using static UnityEngine.GraphicsBuffer;
 using TMPro;
+using YhProj.Game.Map;
+using YhProj.Game.UI;
+using YhProj.Game.GameInput;
+using YhProj.Game.Player;
+using Newtonsoft.Json;
+using System.IO;
+
+using System.Text;
+
+
 
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-public class Managers : Singleton<Managers>, YhProj.ILogger
+namespace YhProj.Game
 {
-    public event Action<Transform> OnLookTargetChanged;
+    public class Managers : Singleton<Managers>, ILogger
+    {
+        public event Action<Transform> OnLookTargetChanged;
 
 #if UNITY_EDITOR
-    ExecutionData executionData;
+        ExecutionData executionData;
 #endif
-    public Define.GameMode gameMode { private set; get; }
-    Define.DebugLogeer logType;
+        public Define.GameMode gameMode { private set; get; }
+        Define.DebugLogeer logType;
 
-    List<BaseManager> baseManagerList = new List<BaseManager>();
+        List<BaseManager> baseManagerList = new List<BaseManager>();
 
 
-    // maptool modeÀÏ ¶§ µ¥ÀÌÅÍ?¸¦ ÀúÀå ÇÒ °÷ÀÌ ÇÊ¿äÇÏ±ä ÇÑµ¥.. ÀÓ½Ã·Î ¿©±æ »ç¿ëÇÒ±î?
-    // ÀÏ´Ü ´ë±â
-    public Transform lookTarget;
-    // ³ªÁß¿¡ »ó¼Ó ±¸Á¶ ¸¸µé¾î¼­ »ç¿ë
-    // baseCamera -> fieldcamera/ uicamera / testcamera
-    public TestCamera testCamera;
+        // maptool modeì¼ ë•Œ ë°ì´í„°?ë¥¼ ì €ì¥ í•  ê³³ì´ í•„ìš”í•˜ê¸´ í•œë°.. ì„ì‹œë¡œ ì—¬ê¸¸ ì‚¬ìš©í• ê¹Œ?
+        // ì¼ë‹¨ ëŒ€ê¸°
+        public Transform lookTarget;
+        // ë‚˜ì¤‘ì— ìƒì† êµ¬ì¡° ë§Œë“¤ì–´ì„œ ì‚¬ìš©
+        // baseCamera -> fieldcamera/ uicamera / testcamera
+        public TestCamera testCamera;
 
-    protected override void Awake()
-    {
-        base.Awake();
+        protected override void Awake()
+        {
+            base.Awake();
 
 #if UNITY_EDITOR
-        if (executionData == null)
-        {
-            executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset");
-        }
-
-        gameMode = executionData.gameMode;
-        logType = executionData.logType;
-#endif
-        // manager set and define
-        // load¿¡¼­ ¼ø¼­¿Í »ó°ü¾øÀÌ µ¿ÀÛÇØ¾ß ÇÔ // Áï data¸¸ ¼ÂÆÃ? ±×·³ ijsonÀÌ ÇÊ¿äÇÒÁöµµ?
-        // lazy·Î ÇÏ¿© ÇÊ¿äÇÒ ¶§¸¸ È£Ãâ ÇÏ°Ú²û ÇØ¾ß°Ú´Ù getÇÔ¼ö¸¦ ¸¸µé¾î »ç¿ëÇÒ °Í!!
-
-        lookTarget = Util.AttachObj<Transform>("LookTarget");
-        // Ä«¸Ş¶óµµ °ÔÀÓ¸ğµå¿¡ µû¶ó º¯°æ ½Ãµµ ÇÒ °Í¤·¹Ì
-        testCamera = Util.AttachObj<TestCamera>("Main Camera");
-        testCamera.target = lookTarget;
-        lookTarget.transform.position = StaticDefine.START_POSITION;
-
-        RegisterManager(new PlayerManager(new PlayerInfo()));
-        RegisterManager(new ObjectPoolManager());
-        RegisterManager(new InputManager(lookTarget));
-        RegisterManager(new MapManager()); // ³ªÁß¿¡ ¼ø¼­¿¡ »ó°ü¾øÀÌ loadµÇ°Ô ²û º¯°æÇØ¾ß µÊ
-        RegisterManager(new UIManager());
-        RegisterManager(new LogManager());
-    }
-    private void Start()
-    {
-        LoadAllManagers();
-        // EventMediator.Instance.LoadSequnceEvent(GetManager<PlayerManager>().playerInfo);
-    }
-    private void Update()
-    {
-        foreach(var manager in baseManagerList)
-        {
-            manager.Update();
-        }
-    }
-    public void RegisterManager(BaseManager _baseManager)
-    {
-        if (!baseManagerList.Contains(_baseManager))
-        {
-            baseManagerList.Add(_baseManager);
-        }
-    }
-    public void LoadAllManagers()
-    {
-        foreach(var manager in baseManagerList)
-        {
-            manager.Load(gameMode);
-        }
-    }
-    public void UpdateAllManagers()
-    {
-        // ³ªÁß¿¡ ¾÷µ¥ÀÌÆ®¸¸ °¡´ÉÇÑ ¸Å´ÏÃ³¸¦ Ãß·Á¼­ ¼º´ÉÀ» Çâ»ó ½ÃÅ°ÀÚ
-        foreach (var manager in baseManagerList)
-        {
-            manager.Update();
-        }
-    }
-    public void DeleteAllManagers()
-    {
-        foreach (var manager in baseManagerList)
-        {
-            manager.Delete();
-        }
-    }
-    public T GetManager<T>() where T : BaseManager, new()
-    {
-        T ret = null;
-
-        for(int i = 0; i < baseManagerList.Count; i++)
-        {
-            if(baseManagerList[i].GetType() == typeof(T))
+            if (executionData == null)
             {
-                ret = baseManagerList[i] as T;
+                executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset");
+            }
+
+            gameMode = executionData.gameMode;
+            logType = executionData.logType;
+#endif
+            // manager set and define
+            // loadì—ì„œ ìˆœì„œì™€ ìƒê´€ì—†ì´ ë™ì‘í•´ì•¼ í•¨ // ì¦‰ dataë§Œ ì…‹íŒ…? ê·¸ëŸ¼ ijsonì´ í•„ìš”í• ì§€ë„?
+            // lazyë¡œ í•˜ì—¬ í•„ìš”í•  ë•Œë§Œ í˜¸ì¶œ í•˜ê² ë” í•´ì•¼ê² ë‹¤ getí•¨ìˆ˜ë¥¼ ë§Œë“¤ì–´ ì‚¬ìš©í•  ê²ƒ!!
+
+            lookTarget = GameUtil.AttachObj<Transform>("LookTarget");
+            // ì¹´ë©”ë¼ë„ ê²Œì„ëª¨ë“œì— ë”°ë¼ ë³€ê²½ ì‹œë„ í•  ê²ƒã…‡ë¯¸
+            testCamera = GameUtil.AttachObj<TestCamera>("Main Camera");
+            testCamera.target = lookTarget;
+            lookTarget.transform.position = StaticDefine.START_POSITION;
+
+            RegisterManager(new PlayerManager(new PlayerInfo()));
+            RegisterManager(new ObjectPoolManager());
+            RegisterManager(new InputManager(lookTarget));
+            RegisterManager(new MapManager()); // ë‚˜ì¤‘ì— ìˆœì„œì— ìƒê´€ì—†ì´ loadë˜ê²Œ ë” ë³€ê²½í•´ì•¼ ë¨
+            RegisterManager(new UIManager());
+            RegisterManager(new LogManager());
+        }
+        private void Start()
+        {
+            LoadAllManagers();
+            // EventMediator.Instance.LoadSequnceEvent(GetManager<PlayerManager>().playerInfo);
+        }
+        private void Update()
+        {
+            foreach (var manager in baseManagerList)
+            {
+                manager.Update();
+            }
+        }
+        public void RegisterManager(BaseManager _baseManager)
+        {
+            if (!baseManagerList.Contains(_baseManager))
+            {
+                baseManagerList.Add(_baseManager);
+            }
+        }
+        public void LoadAllManagers()
+        {
+            foreach (var manager in baseManagerList)
+            {
+                manager.Load(gameMode);
+            }
+        }
+        public void UpdateAllManagers()
+        {
+            // ë‚˜ì¤‘ì— ì—…ë°ì´íŠ¸ë§Œ ê°€ëŠ¥í•œ ë§¤ë‹ˆì²˜ë¥¼ ì¶”ë ¤ì„œ ì„±ëŠ¥ì„ í–¥ìƒ ì‹œí‚¤ì
+            foreach (var manager in baseManagerList)
+            {
+                manager.Update();
+            }
+        }
+        public void DeleteAllManagers()
+        {
+            foreach (var manager in baseManagerList)
+            {
+                manager.Delete();
+            }
+        }
+        public T GetManager<T>() where T : BaseManager, new()
+        {
+            T ret = null;
+
+            for (int i = 0; i < baseManagerList.Count; i++)
+            {
+                if (baseManagerList[i].GetType() == typeof(T))
+                {
+                    ret = baseManagerList[i] as T;
+                }
+            }
+
+            if (ret == null)
+            {
+                ret = new T();
+                RegisterManager(ret);
+            }
+
+            return ret;
+        }
+
+        public void Logger()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public static class GameUtil
+    {
+        #region Json Util
+        static T JsonToData<T>(string _json)
+        {
+            return JsonConvert.DeserializeObject<T>(_json);
+        }
+        static string DataToJson(object _obj)
+        {
+            return JsonConvert.SerializeObject(_obj);
+        }
+        public static void CreateJsonFile(string _createPath, string _fileName, object _jsonData)
+        {
+            string jsonData = DataToJson(_jsonData);
+            string filePath = string.Format("{0}/{1}/{2}", Application.dataPath, _createPath, _fileName);
+
+            try
+            {
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    byte[] data = Encoding.UTF8.GetBytes(jsonData);
+                    fileStream.Write(data, 0, data.Length);
+                    fileStream.Close();
+                }
+
+                Debug.Log($"JSON file created successfully at: {filePath}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to create JSON file. Exception: {e.Message}");
+            }
+
+            // FileStream fileStream = new FileStream(Path.Combine(Application.dataPath + _createPath + _fileName), FileMode.Create);
+            //byte[] data = Encoding.UTF8.GetBytes(jsonData);
+            //fileStream.Write(data, 0, data.Length);
+            //fileStream.Close();
+        }
+        public static T LoadJson<T>(string _loadPath, string _fileName)
+        {
+            string filePath = string.Format("{0}/{1}/{2}", Application.dataPath, _loadPath, _fileName);
+
+            if (File.Exists(filePath))
+            {
+                FileStream fileStream = new FileStream(Path.Combine(Application.dataPath + _loadPath + _fileName), FileMode.Open);
+                byte[] data = new byte[fileStream.Length];
+                fileStream.Read(data, 0, data.Length);
+                fileStream.Close();
+                string jsonData = Encoding.UTF8.GetString(data);
+                return JsonToData<T>(jsonData);
+            }
+            else
+            {
+                Debug.LogWarningFormat("Utile LoadJson Warning \n filePath : {0}, _loadPath : {1}, _fileName : {2}}", filePath, _loadPath, _fileName);
+                return default;
             }
         }
 
-        if(ret == null)
+        public static List<T> LoadJsonArray<T>(string _loadPath, string _fileName)
         {
-            ret = new T();
-            RegisterManager(ret);
+            string filePath = string.Format("{0}/{1}/{2}", Application.dataPath, _loadPath, _fileName);
+
+            if (File.Exists(filePath))
+            {
+                FileStream fileStream = new FileStream(filePath, FileMode.Open);
+                byte[] data = new byte[fileStream.Length];
+                fileStream.Read(data, 0, data.Length);
+                fileStream.Close();
+                string jsonData = Encoding.UTF8.GetString(data);
+                return JsonToData<List<T>>(jsonData);
+            }
+            else
+            {
+                Debug.LogWarningFormat("Util LoadJsonArray Warning \n {0}", filePath);
+                return new List<T>(); // ë˜ëŠ” ì˜ˆì™¸ ì²˜ë¦¬ë¥¼ ì¶”ê°€í•˜ì—¬ ë°˜í™˜ê°’ì„ ì„ íƒí•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
+            }
+        }
+        #endregion
+
+        #region Resource Util
+        public static T InstantiateResource<T>(string _path) where T : UnityEngine.Object
+        {
+            GameObject resObj = Resources.Load<GameObject>(_path);
+
+            if (resObj == null)
+            {
+                Debug.LogWarningFormat("Util GetResource resobj Warning \n resobj : {0}, path : {1}", resObj, _path);
+                return null;
+            }
+
+            T copyObj = UnityEngine.Object.Instantiate(resObj).GetComponent<T>();
+
+            return copyObj;
+        }
+        #endregion
+
+        #region Load BundleData
+        public static void LoadBunlde()
+        {
+            // ì •ì˜ í•„ìš”
+        }
+        #endregion
+
+        #region Attach Obj
+        // í›„ì— find ì´ë¦„ì„ ì°¾ëŠ” ë²•ë„ ë§Œë“¤ì–´ì•¼ í•  ë“¯?
+        public static T AttachObj<T>(string _name = null) where T : Component
+        {
+            T ret = null;
+
+            string name = _name;
+
+            if (string.IsNullOrEmpty(name))
+            {
+                name = typeof(T).Name;
+            }
+
+            GameObject _target = GameObject.Find(name);
+
+            if (_target == null)
+            {
+                GameObject container = new GameObject(name);
+                _target = container;
+            }
+
+            ret = _target.GetComponent<T>();
+
+            if (ret == null)
+            {
+                ret = _target.AddComponent<T>();
+            }
+
+            return ret;
         }
 
-        return ret;
-    }
+        public static T AttachObj<T>(GameObject _go, string _name = null) where T : Component
+        {
+            string name = _name;
 
-    public void Logger()
-    {
-        throw new NotImplementedException();
+            if (string.IsNullOrEmpty(name))
+            {
+                name = typeof(T).Name;
+            }
+
+            _go = GameObject.Find(name);
+
+            if (_go == null)
+            {
+                GameObject container = new GameObject(name);
+                _go = container;
+            }
+
+            T component = _go.GetComponent<T>();
+
+            if (component == null)
+            {
+                component = _go.AddComponent<T>();
+            }
+
+            return component;
+        }
+
+        #endregion Attach Obj
     }
 }

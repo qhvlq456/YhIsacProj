@@ -7,6 +7,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using YhProj.Game;
+using YhProj.Game.Map;
+using YhProj.Game.UI;
+
 
 public class MapToolMainUI : MainUI
 {

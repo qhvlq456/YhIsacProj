@@ -1,4 +1,4 @@
-namespace YhProj
+namespace YhProj.Game.State
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -8,7 +8,7 @@ namespace YhProj
     {
         float moveSpeed;
 
-        // ¾Æ·¡ targetposion »©°í ´Ù¸¥ °ªµéÀÌ zero·Î setµÇ¾î ÀÖ¾î¼­ ±×·³
+        // ì•„ë˜ targetposion ë¹¼ê³  ë‹¤ë¥¸ ê°’ë“¤ì´ zeroë¡œ setë˜ì–´ ìˆì–´ì„œ ê·¸ëŸ¼
         Vector3 targetPosition = Vector3.zero;
         Vector3 downPosition = Vector3.zero;
         Vector3 dragPosition = Vector3.zero;
@@ -19,7 +19,7 @@ namespace YhProj
             target = _taget;
             moveSpeed = _moveSpeed;
         }
-        // ÆÑÅä¸® ¸Ş¼­µå
+        // íŒ©í† ë¦¬ ë©”ì„œë“œ
         public static DragState Create(Transform _taget, float _moveSpeed)
         {
             return new DragState(_taget, _moveSpeed);
@@ -53,12 +53,12 @@ namespace YhProj
                 Vector3 distance = dragPosition - downPosition;
                 targetPosition = target.position - distance;
 
-                // ÀÏ´Ü ÀÌ°Ç ¿Ö ÀÖ´ÂÁö Àß ¸ğ¸£°Ú¾î¼­ ÁÖ¼®
+                // ì¼ë‹¨ ì´ê±´ ì™œ ìˆëŠ”ì§€ ì˜ ëª¨ë¥´ê² ì–´ì„œ ì£¼ì„
                 //downPosition = dragPosition - distance;
             }
 
             target.position = Vector3.Lerp(target.transform.position, targetPosition, moveSpeed);
-            // ¹Ø¿¡ºÎºĞÀº ÃßÈÄ¿¡ ¼öÁ¤
+            // ë°‘ì—ë¶€ë¶„ì€ ì¶”í›„ì— ìˆ˜ì •
             // Update target position based on drag movement
 
             targetPosition = new Vector3(target.transform.position.x, 0, target.transform.position.z);

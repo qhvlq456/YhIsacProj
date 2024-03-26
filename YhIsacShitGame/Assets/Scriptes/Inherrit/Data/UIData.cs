@@ -1,22 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class UIData : ScriptableObject
+namespace YhProj.Game.UI
 {
-    public string resourceUIPath;
-    public string mapToolUIPath;
-    // ³ªÁß¿¡ µ¥ÀÌÅÍ°¡ Àß µé¾î°¬´ÂÁö º¸°í½ÍÀ½ ÁÖ¼® Çª¼À
-    //[HideInInspector]
-    public List<UIInfo> mainUIDataList = new List<UIInfo>();
-    //[HideInInspector]
-    public List<UIInfo> popupUIDataList = new List<UIInfo>();
-    //[HideInInspector]
-    public List<UIInfo> tooltipUIDataList = new List<UIInfo>();
-    //[HideInInspector]
-    public List<UIInfo> contextualUIDataList = new List<UIInfo>();
-    //[HideInInspector]
-    public List<UIInfo> testUIDataList = new List<UIInfo>();
+    [System.Serializable]
+    public class UIData : ScriptableObject
+    {
+        public string resourceUIPath;
+        public string mapToolUIPath;
+        // ë‚˜ì¤‘ì— ë°ì´í„°ê°€ ì˜ ë“¤ì–´ê°”ëŠ”ì§€ ë³´ê³ ì‹¶ìŒ ì£¼ì„ í‘¸ì…ˆ
+        //[HideInInspector]
+        public List<UIInfo> mainUIDataList = new List<UIInfo>();
+        //[HideInInspector]
+        public List<UIInfo> popupUIDataList = new List<UIInfo>();
+        //[HideInInspector]
+        public List<UIInfo> tooltipUIDataList = new List<UIInfo>();
+        //[HideInInspector]
+        public List<UIInfo> contextualUIDataList = new List<UIInfo>();
+        //[HideInInspector]
+        public List<UIInfo> testUIDataList = new List<UIInfo>();
+    }
 }
 
 

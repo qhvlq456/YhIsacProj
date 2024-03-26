@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace YhProj
+namespace YhProj.Game
 {
     public abstract class BaseObject : MonoBehaviour
     {

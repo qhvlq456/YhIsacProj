@@ -1,4 +1,4 @@
-namespace YhProj
+namespace YhProj.Game.State
 {
     public abstract class StateController
     {

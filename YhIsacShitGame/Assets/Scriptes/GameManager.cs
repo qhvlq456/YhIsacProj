@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using YhProj;
+using YhProj.Game.Map;
+using YhProj.Game.UI;
+using YhProj.Game.Character;
+using YhProj.Game;
 
 public class GameManager : MonoBehaviour
 {
