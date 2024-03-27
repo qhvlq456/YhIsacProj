@@ -9,7 +9,7 @@ namespace YhProj.Game.Character
         public int range;
         public Define.ElementType elementType;
 
-        public override void Update(BaseData _baseData)
+        public override void Update()
         {
 
         }

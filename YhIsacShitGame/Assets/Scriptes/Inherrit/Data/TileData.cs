@@ -26,7 +26,7 @@ namespace YhProj.Game.Map
             // 이니셜라이즈 또는 null처리
         }
 
-        public override void Update(BaseData _baesData)
+        public override void Update()
         {
             // 변경 상항들을 재 정의
         }

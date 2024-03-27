@@ -11,7 +11,7 @@ namespace YhProj.Game
 
         }
 
-        public abstract void Update(BaseData _baseData);
+        public abstract void Update();
         public abstract void Delete();
     }
 }
