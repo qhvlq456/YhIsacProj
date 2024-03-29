@@ -1,7 +1,3 @@
-
-using System.Diagnostics;
-using UnityEditor.MemoryProfiler;
-
 namespace YhProj.Game.Map
 {
     public class TileObject : BaseObject
@@ -20,7 +16,7 @@ namespace YhProj.Game.Map
         }
         public override void Delete()
         {
-            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.TILE, transform);
+            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(BaseType.TILE, transform);
         }
     }
 }

@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using System.IO;
 
 using System.Text;
+using System.Linq;
+
 
 
 
@@ -71,6 +73,7 @@ namespace YhProj.Game
         }
         private void Start()
         {
+            
             LoadAllManagers();
             // EventMediator.Instance.LoadSequnceEvent(GetManager<PlayerManager>().playerInfo);
         }
@@ -168,11 +171,6 @@ namespace YhProj.Game
             {
                 Debug.LogError($"Failed to create JSON file. Exception: {e.Message}");
             }
-
-            // FileStream fileStream = new FileStream(Path.Combine(Application.dataPath + _createPath + _fileName), FileMode.Create);
-            //byte[] data = Encoding.UTF8.GetBytes(jsonData);
-            //fileStream.Write(data, 0, data.Length);
-            //fileStream.Close();
         }
         public static T LoadJson<T>(string _loadPath, string _fileName)
         {

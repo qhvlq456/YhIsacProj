@@ -1,26 +1,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
 
 namespace YhProj.Game.Map
 {
     // 기본적인 map에대한 게임 구현
-    public class MapController : IMapController
+    public abstract class MapController<T> : IController where T : TileObject
     {
         protected MapManager manager;
-        protected List<TileObject> tileObjectList = new List<TileObject>();
-        protected IFactory factory;
-        public List<TileObject> TileObjectList => tileObjectList;
 
-        public MapController(MapManager _manager)
+        protected List<T> tileObjectList = new List<T>();
+        protected IFactory factory;
+
+        // 합쳐서 tileobjectlist에 넣어서 생성하면 됨
+        public MapController(MapManager _manager, IFactory _factory)
         {
             manager = _manager;
+            factory = _factory;
+
+            Initialize();
         }
         public virtual void Initialize()
         {
-            throw new NotImplementedException();
+            
         }
         public void Update() { }
         public void Dispose()
@@ -34,87 +37,56 @@ namespace YhProj.Game.Map
 
             tileObjectList.Clear();
         }
-        public virtual void LoadTile(StageData _stageData)
+        public abstract T LoadTile(TileData _tileData);
+        public abstract void DeleteTile(TileData _tileData);
+    }
+    public sealed class HeroTileController : MapController<HeroTileObject>
+    {
+        public HeroTileController(MapManager _manager, IFactory _factory) : base(_manager, _factory) { }
+
+        public override void DeleteTile(TileData _tileData)
         {
-            // 기본적인 게임 로직
-            string log = "";
-
-            for (int i = 0; i < _stageData.Row; i++)
-            {
-                for (int j = 0; j < _stageData.Col; j++)
-                {
-                    TileData tileData = _stageData.tileArr[i, j];
-
-                    tileData.index = i * _stageData.Col + j;
-
-                    int z = tileData.index / _stageData.Row;
-                    int x = tileData.index % _stageData.Col;
-
-                    EditorTileObject editorTileObject = factory.Create<EditorTileObject>(tileData, manager.root, new Vector3(x, 0, z));
-
-                    tileObjectList.Add(editorTileObject);
-                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
-                }
-                log += '\n';
-            }
-            Debug.LogError(log);
-        }
-        public virtual void DeleteTile(StageData _stageData)
-        {
-            // 기본적인 게임 로직
             throw new NotImplementedException();
         }
+
+        public override HeroTileObject LoadTile(TileData _tileData)
+        {
+            HeroTileObject heroTileObj = factory.Create<HeroTileObject>(_tileData);
+            tileObjectList.Add(heroTileObj);
+
+            return heroTileObj;
+        }
     }
-    public sealed class EditorMapController : MapController
+    public sealed class EnemyTileController : MapController<EnemyTileObject>
     {
-        public EditorMapController(MapManager _manager) : base(_manager) { }
-        public override void Initialize()
+        public EnemyTileController(MapManager _manager, IFactory _factory) : base(_manager, _factory) { }
+        public override void DeleteTile(TileData _tileData)
         {
-            BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
-            bottomColider.size = new Vector3(100, 0, 100);
-
-            factory = new TileFactory();
+            throw new NotImplementedException();
         }
-        
-        public override void LoadTile(StageData _stageData)
+
+        public override EnemyTileObject LoadTile(TileData _tileData)
         {
-            string log = "";
+            EnemyTileObject enemyTileObj = factory.Create<EnemyTileObject>(_tileData);
+            tileObjectList.Add(enemyTileObj);
 
-            for (int i = 0; i < _stageData.Row; i++)
-            {
-                for (int j = 0; j < _stageData.Col; j++)
-                {
-                    TileData tileData = new TileData();
-
-                    if (_stageData.tileArr[i, j] != null)
-                    {
-                        tileData = _stageData.tileArr[i, j];
-                    }
-                    else
-                    {
-                        tileData.type = Define.BaseType.TILE;
-                        tileData.elementType = Define.ElementType.ENEMY;
-                    }
-
-                    tileData.index = i * _stageData.Col + j;
-                    tileData.resName = "EditorTileObject";
-
-                    int z = tileData.index / _stageData.Row;
-                    int x = tileData.index % _stageData.Col;
-
-                    EditorTileObject editorTileObject = factory.Create<EditorTileObject>(tileData, manager.root, new Vector3(x, 0, z));
-
-                    tileObjectList.Add(editorTileObject);
-                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
-                }
-                log += '\n';
-            }
-            Debug.LogError(log);
+            return enemyTileObj;
         }
-        public override void DeleteTile(StageData _stageData)
+    }
+    public sealed class DecoTileController : MapController<DecoTileObject>
+    {
+        public DecoTileController(MapManager _manager, IFactory _factory) : base(_manager, _factory) { }
+        public override void DeleteTile(TileData _tileData)
         {
-            // 일단 이거긴 한데.. 나중에 추가 작업 필요 할 수 있음
-            Dispose();
+            throw new NotImplementedException();
+        }
+
+        public override DecoTileObject LoadTile(TileData _tileData)
+        {
+            DecoTileObject decoTileObj = factory.Create<DecoTileObject>(_tileData);
+            tileObjectList.Add(decoTileObj);
+
+            return decoTileObj;
         }
     }
 }

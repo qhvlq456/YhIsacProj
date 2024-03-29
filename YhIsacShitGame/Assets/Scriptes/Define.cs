@@ -9,19 +9,7 @@ namespace YhProj
         public enum GameMode
         {
             TEST,
-            EDITOR,
-            MAPTOOL,
-            BUILDTOOL
-        }
-        // 모든 게임 데이터의 베이스의 타입 // base type -> subType 으로 간다, 필드 오브젝트만
-        public enum BaseType
-        {
-            NONE,
-            TILE,
-            CHARACTER,
-            BUILD,
-            ITEM,
-            COUNT
+            Build,
         }
         // log를 보이게 할 것인지 안보이게 할 것인지
         public enum DebugLogeer
@@ -65,13 +53,6 @@ namespace YhProj
             LEFT_BOTTOM, // 좌하
             RIGHT_BOTTOM, // 우하
         }
-
-        public enum ElementType
-        {
-            MINE,
-            ENEMY,
-            DECO
-        }
     }
 
     // 나중에 경로에 대한 지정이 다시 필요할듯
@@ -88,11 +69,11 @@ namespace YhProj
 
         public static string JSON_MAP_FILE_NAME = "StageData.json";
 
-        // json 위치 
-        public static string JSON_MAP_DATA_PATH = "StreamingAssets";
+        public static string json_character_file_name = "hero.json";
+        public static string json_enemy_file_name = "Enemy.json";
 
-        // 리소스 위치
-        public static string TILE_PATH = "Map/Tool";
+        // json 위치 
+        public static string json_data_path = "StreamingAssets";
 
         // 임시 일단 넣을거
         public static float TILE_YPOSITION = 0f;

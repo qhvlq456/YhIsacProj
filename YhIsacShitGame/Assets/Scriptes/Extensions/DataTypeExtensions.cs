@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static YhProj.Define;
+using YhProj;
+using YhProj.Game;
 
 public static class DataTypeExtensions
 {
     #region Convert Enum(DataType) to String Valeus
     public static List<string> GetDropdownOptions(this Type _type)
     {
-        if (_type == typeof(Direction))
+        if (_type == typeof(Define.Direction))
         {
-            return Enum.GetNames(typeof(Direction)).ToList();
+            return Enum.GetNames(typeof(Define.Direction)).ToList();
         }
         else if (_type == typeof(BaseType))
         {

@@ -8,92 +8,48 @@ using YhProj.Game.Player;
 
 namespace YhProj.Game.Map
 {
-    // ijson으로 이것들도 load해야 함
     /// <summary>
     /// Map에 대한 데이터를 총괄
     /// map을 create, update, delete를 한다
     /// 후에 모드 컨트롤러를 생성하여 다른 모드들에 대한 클래스를 정의 후 모드에 따라 분류하여 로직을 만들어 사용하자 아마 inputmanager보면 알듯?
     /// </summary>
-    /// 
-    // 지금은 생각이 안나지만 추후에 datahandler를 제외하여 생각해봐야 함
-    public class MapManager : BaseManager, IDataHandler
+    public class MapManager : BaseManager
     {
-        private Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
-        public void AddStageData(StageData _stageData)
-        {
-            if (IsConstainsStage(_stageData.stage))
-            {
-                stageDataDic[_stageData.stage] = _stageData;
-            }
-            else
-            {
-                stageDataDic.Add(_stageData.stage, _stageData);
-            }
-        }
-        public StageData GetStageData(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage] : null;
-        public TileData[,] GetTileArrByStage(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage].tileArr : null;
-        public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
-        public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();
+        private StageHandler stageHandler;
+        public void AddStageData(StageData _stageData) => stageHandler.AddStageData(_stageData);
+        public StageData GetStageData(int _stage) => stageHandler.GetStageData(_stage);
+        public TileData[,] GetTileArrByStage(int _stage) => stageHandler.GetTileArrByStage(_stage);
+        public bool IsConstainsStage(int _stage) => stageHandler.IsConstainsStage(_stage);
+        public List<StageData> GetStageDataList() => stageHandler.GetStageDataList();
 
         public Transform root { get; private set; }
 
-        private IMapController controller;
-        public void DataLoad()
-        {
-            // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
-            List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
+        private HeroTileController heroTileController;
+        private EnemyTileController enemyTileController;
+        private DecoTileController decoTileController;
 
-            stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
-        }
-        public void DataSave<T>(params T[] _params) where T : BaseData
-        {
-            EditorMapController editorConroller = controller as EditorMapController;
-
-            string log = "";
-
-            StageData stageData = _params[0] as StageData;
-
-            TileData[,] tileDataArr = new TileData[stageData.Row, stageData.Col];
-
-            for (int i = 0; i < stageData.Row; i++)
-            {
-                for (int j = 0; j < stageData.Col; j++)
-                {
-                    int idx = i * stageData.Col + j;
-                    TileData tileData = editorConroller.TileObjectList[idx].tileData;
-                    // builder든 뭐든간에 데이터를 넣어야 함
-                    tileDataArr[i, j] = tileData;
-                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
-                }
-                log += '\n';
-            }
-
-            stageData.tileArr = tileDataArr;
-
-            AddStageData(stageData);
-            Debug.LogError(log);
-
-            GameUtil.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME, GetStageDataList());
-        }
         public override void Load(Define.GameMode _gameMode)
         {
+            stageHandler = new StageHandler();
+            stageHandler.DataLoad();
+
             if (root == null)
             {
-                root = GameUtil.AttachObj<Transform>("Map");
+                root = GameUtil.AttachObj<Transform>("MapRoot");
                 root.transform.position = Vector3.zero;
             }
 
             switch (_gameMode)
             {
                 case Define.GameMode.EDITOR:
-                    controller = new EditorMapController(this);
+                    BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
+                    bottomColider.size = new Vector3(100, 0, 100);
+
+                    heroTileController = new HeroTileController(this, new TileFactory());
+                    enemyTileController = new EnemyTileController(this, new TileFactory());
+                    decoTileController = new DecoTileController(this, new TileFactory());
                     break;
             }
-
-            controller.Initialize();
-
-            // 이 load부분은 나중에 manasgers에서 다같이 호출하는걸로 해야 할 듯?
-            DataLoad();
         }
         // 타일에 대한 delete, update라고 생각하면 안되긴 함...
         public override void Delete()
@@ -101,7 +57,9 @@ namespace YhProj.Game.Map
             EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
             EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
 
-            controller.Dispose();
+            heroTileController.Dispose();
+            enemyTileController.Dispose();
+            decoTileController.Dispose();
         }
 
         /// <summary>
@@ -111,19 +69,45 @@ namespace YhProj.Game.Map
         /// </summary>
         public override void Update()
         {
-            controller.Update();
+            heroTileController.Update();
+            enemyTileController.Update();
+            decoTileController.Update();
         }
         // 후에 ui데이터를 넘겨준다면!?
 
         #region Tile Load and Delete and Save
-        public void LoadTile(StageData _stageData)
+        public void LoadStage(int _stage)
         {
-            controller.LoadTile(_stageData);
+            StageData stageData = stageHandler.GetStageData(_stage);
+
+            if (stageData == null) 
+            {
+                return;
+            }
+
+            foreach (var tileData in stageData.tileArr)
+            {
+                TileObject tileObject = new TileObject();
+
+                switch(tileData.elementType)
+                {
+                    case ElementType.MINE:
+                        tileObject = heroTileController.LoadTile(tileData);
+                        break;
+                    case ElementType.ENEMY:
+                        tileObject = enemyTileController.LoadTile(tileData);
+                        break;
+                    case ElementType.DECO:
+                        tileObject = decoTileController.LoadTile(tileData);
+                        break;
+                }
+
+                // 위치값 초기화 해야 함
+            }
         }
-        public void DeleteTile(int _stage)
+        public void DeleteStage(int _stage)
         {
-            StageData stageData = GetStageData(_stage);
-            controller.DeleteTile(stageData);
+            stageHandler.DeleteStageData(_stage);
         }
         #endregion
         #region MapManager Event
@@ -143,6 +127,57 @@ namespace YhProj.Game.Map
             // Managers.Instance.lookTarget.transform.position = targetPos;
         }
         #endregion
+    }
+
+    public sealed class StageHandler : IDataHandler
+    {
+        private Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
+        public void AddStageData(StageData _stageData)
+        {
+            if (IsConstainsStage(_stageData.stage))
+            {
+                stageDataDic[_stageData.stage] = _stageData;
+            }
+            else
+            {
+                stageDataDic.Add(_stageData.stage, _stageData);
+            }
+        }
+        public void DeleteStageData(int _stage)
+        {
+            if (IsConstainsStage(_stage))
+            {
+                stageDataDic.Remove(_stage);
+            }
+        }
+        public void DeleteStageData(StageData _stageData)
+        {
+            DeleteStageData(_stageData.stage);
+        }
+
+        public StageData GetStageData(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage] : null;
+        public TileData[,] GetTileArrByStage(int _stage) => stageDataDic.ContainsKey(_stage) ? stageDataDic[_stage].tileArr : null;
+        public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
+        public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();        
+        public void DataLoad()
+        {
+            // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
+            List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME);
+
+            stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
+        }
+
+        public void DataSave<T>(params T[] _params) where T : BaseData
+        {
+            List<StageData> stageList = _params.Select(x => x as StageData).ToList();
+
+            foreach(var stage in stageList)
+            {
+                AddStageData(stage);
+            }
+
+            GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetStageDataList());
+        }
     }
 }
 

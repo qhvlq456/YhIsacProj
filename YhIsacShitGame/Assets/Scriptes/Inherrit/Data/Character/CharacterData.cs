@@ -1,5 +1,15 @@
+using System.Collections.Generic;
+
 namespace YhProj.Game.Character
 {
+    public enum AttributeType
+    {
+        water, // 물
+        land, // 땅
+        fire, // 불
+        lightning, // 번개
+        grass // 풀
+    }
     [System.Serializable]
     public class CharacterData : BaseData
     {
@@ -7,6 +17,20 @@ namespace YhProj.Game.Character
         public int armor;
         public int power;
         public int range;
-        public Define.ElementType elementType;
+        public float moveSpeed;
+        public ElementType elementType;
+        public AttributeType attribute;
+    }
+
+    [System.Serializable]
+    public class HeroData : CharacterData
+    {
+
+    }
+
+    [System.Serializable]
+    public class EnemyData : CharacterData
+    {
+        
     }
 }

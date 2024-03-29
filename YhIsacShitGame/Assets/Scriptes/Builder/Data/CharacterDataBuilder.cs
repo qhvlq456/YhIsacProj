@@ -1,5 +1,4 @@
-using System;
-using static YhProj.Define;
+using YhProj.Game.Map;
 
 namespace YhProj.Game.Character
 {
