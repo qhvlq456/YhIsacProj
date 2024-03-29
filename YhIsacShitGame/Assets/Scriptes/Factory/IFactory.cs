@@ -2,9 +2,10 @@ namespace YhProj.Game
 {
     public interface IFactory
     {
-        V Create<T, V>(T _data)
-            where T : BaseData
-            where V : BaseObject;
+        T Create<T>(BaseData _data) where T : BaseObject;
+        T Create<T>(BaseData _data, UnityEngine.Vector3 _position) where T : BaseObject;
+        T Create<T>(BaseData _data, UnityEngine.Transform _parent) where T : BaseObject;
+        T Create<T>(BaseData _data, UnityEngine.Transform _parent, UnityEngine.Vector3 _position) where T : BaseObject;
     }
 }
 

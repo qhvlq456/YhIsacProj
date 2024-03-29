@@ -6,6 +6,7 @@ namespace YhProj.Game
         public int index;
         public Define.BaseType type;
         public string name;
+        public string resName;
     }
 }
 

@@ -7,12 +7,9 @@ namespace YhProj.Game.Character
 {
     public class CharacterFactory : IFactory
     {
-        public V Create<T, V>(T _value) where T : BaseData where V : BaseObject
+        public T Create<T>(BaseData _value) where T : BaseObject
         {
-            // Enum 타입인 경우 Enum의 이름을 문자열로 가져오기
-            string typeName = Enum.GetName(typeof(Define.BaseType), _value.type);
-
-            Transform trf = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(_value.type, typeName);
+            Transform trf = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(_value.type, _value.name);
 
             if (trf == null)
             {
@@ -20,16 +17,38 @@ namespace YhProj.Game.Character
                 return null;
             }
 
-            V ret = trf.GetComponent<V>();
+            T ret = trf.GetComponent<T>();
 
             if (ret == null)
             {
-                ret = trf.gameObject.AddComponent<V>();
+                ret = trf.gameObject.AddComponent<T>();
             }
 
             // Load 메서드의 구현에 따라서 실제 로딩 방식이 달라질 수 있음
             ret.Create(_value);
 
+            return ret;
+        }
+
+        public T Create<T>(BaseData _data, Vector3 _position) where T : BaseObject
+        {
+            T ret = Create<T>(_data);
+            ret.transform.position = _position;
+            return ret;
+        }
+
+        public T Create<T>(BaseData _data, Transform _parent) where T : BaseObject
+        {
+            T ret = Create<T>(_data);
+            ret.transform.SetParent(_parent);
+            return ret;
+        }
+
+        public T Create<T>(BaseData _data, Transform _parent, Vector3 _position) where T : BaseObject
+        {
+            T ret = Create<T>(_data);
+            ret.transform.SetParent(_parent);
+            ret.transform.localPosition = _position;
             return ret;
         }
     }

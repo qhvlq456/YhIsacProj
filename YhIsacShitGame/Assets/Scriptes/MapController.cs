@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
 using UnityEngine;
 
 namespace YhProj.Game.Map
@@ -36,7 +37,27 @@ namespace YhProj.Game.Map
         public virtual void LoadTile(StageData _stageData)
         {
             // 기본적인 게임 로직
-            throw new NotImplementedException();
+            string log = "";
+
+            for (int i = 0; i < _stageData.Row; i++)
+            {
+                for (int j = 0; j < _stageData.Col; j++)
+                {
+                    TileData tileData = _stageData.tileArr[i, j];
+
+                    tileData.index = i * _stageData.Col + j;
+
+                    int z = tileData.index / _stageData.Row;
+                    int x = tileData.index % _stageData.Col;
+
+                    EditorTileObject editorTileObject = factory.Create<EditorTileObject>(tileData, manager.root, new Vector3(x, 0, z));
+
+                    tileObjectList.Add(editorTileObject);
+                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
+                }
+                log += '\n';
+            }
+            Debug.LogError(log);
         }
         public virtual void DeleteTile(StageData _stageData)
         {
@@ -51,6 +72,8 @@ namespace YhProj.Game.Map
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
             bottomColider.size = new Vector3(100, 0, 100);
+
+            factory = new TileFactory();
         }
         
         public override void LoadTile(StageData _stageData)
@@ -74,14 +97,13 @@ namespace YhProj.Game.Map
                     }
 
                     tileData.index = i * _stageData.Col + j;
+                    tileData.resName = "EditorTileObject";
 
-                    EditorTileObject editorTileObject = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(Define.BaseType.TILE, "EditorTileObject").GetComponent<EditorTileObject>();
                     int z = tileData.index / _stageData.Row;
                     int x = tileData.index % _stageData.Col;
 
-                    editorTileObject.transform.position = new Vector3(x, 0, z);
-                    editorTileObject.transform.parent = manager.root;
-                    editorTileObject.Create(tileData);
+                    EditorTileObject editorTileObject = factory.Create<EditorTileObject>(tileData, manager.root, new Vector3(x, 0, z));
+
                     tileObjectList.Add(editorTileObject);
                     log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
                 }
