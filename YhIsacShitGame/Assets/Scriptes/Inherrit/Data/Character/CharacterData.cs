@@ -8,15 +8,5 @@ namespace YhProj.Game.Character
         public int power;
         public int range;
         public Define.ElementType elementType;
-
-        public override void Update()
-        {
-
-        }
-
-        public override void Delete()
-        {
-
-        }
     }
 }

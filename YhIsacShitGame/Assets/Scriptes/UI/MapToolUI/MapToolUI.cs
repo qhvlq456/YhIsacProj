@@ -108,7 +108,7 @@ public class MapToolUI : BaseUI
                 .Build();
 
 
-            editorTileObject.Load(newTileData);
+            editorTileObject.Create(newTileData);
         }
 
         InfoText();

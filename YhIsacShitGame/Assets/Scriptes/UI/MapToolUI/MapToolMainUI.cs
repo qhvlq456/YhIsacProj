@@ -2,7 +2,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Transactions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -131,6 +130,20 @@ public class MapToolMainUI : MainUI
     {
         base.Show(_uiInfo);
         UpdateDropDown();
+
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
+        if (stageDropDown.options.Count > 0)
+        {
+            int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
+            StageData stageData = Managers.Instance.GetManager<MapManager>().GetStageData(idx);
+
+            currentStageData = stageData;
+
+            for (int i = 0; i < textInputList.Count; i++)
+            {
+                textInputList[i].inputField.text = GetPropertyValue(currentStageData, textInputList[i].inputType).ToString();
+            }
+        }
     }
 
     /// <summary>
@@ -147,7 +160,7 @@ public class MapToolMainUI : MainUI
         else
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
-            Managers.Instance.GetManager<MapManager>().SaveMapJson(currentStageData);
+            Managers.Instance.GetManager<MapManager>().DataSave(currentStageData);
             UpdateDropDown();
         }
 
@@ -162,7 +175,7 @@ public class MapToolMainUI : MainUI
     {
         if(currentStageData != null)
         {
-            Managers.Instance.GetManager<MapManager>().DeleteTile();
+            Managers.Instance.GetManager<MapManager>().DeleteTile(currentStageData.stage);
         }
 
         int row = GetInputFieldToType<int>(InputType.row);
@@ -193,11 +206,25 @@ public class MapToolMainUI : MainUI
     /// </summary>
     public void DeleteBtnClick() 
     {
+        Managers.Instance.GetManager<MapManager>().DeleteTile(currentStageData.stage);
         logText.text = "Stage : Empty";
         currentStageData = null;
-
-        Managers.Instance.GetManager<MapManager>().DeleteTile();
         textInputList.ForEach(ui => ui.inputField.text = "");
+
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).dropdown;
+        if (stageDropDown.options.Count > 0)
+        {
+            int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
+            StageData stageData = Managers.Instance.GetManager<MapManager>().GetStageData(idx);
+
+            currentStageData = stageData;
+
+            for (int i = 0; i < textInputList.Count; i++)
+            {
+                textInputList[i].inputField.text = GetPropertyValue(currentStageData, textInputList[i].inputType).ToString();
+            }
+        }
+
     }
     
     /// <summary>
@@ -209,7 +236,7 @@ public class MapToolMainUI : MainUI
 
         if(Managers.Instance.GetManager<MapManager>().IsConstainsStage(stage))
         {
-            Managers.Instance.GetManager<MapManager>().DeleteMapTool(stage);
+            Managers.Instance.GetManager<MapManager>().DeleteTile(stage);
             logText.text = "Delete Stage Success!!";
         }
         else

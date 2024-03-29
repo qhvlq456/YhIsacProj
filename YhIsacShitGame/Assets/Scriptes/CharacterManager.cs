@@ -1,22 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace YhProj.Game.Character
 {
-    public class CharacterManager : BaseManager
+    public class CharacterManager : BaseManager, IDataHandler
     {
-        private List<CharacterObject> characterObjectList = new List<CharacterObject>();
-        private CharacterController characterController;
+        public Transform root;
+
+        private IController controller;
         private IFactory factory;
 
-        public void SwitchFactory<T>() where T : IFactory, new()
+        private void SwitchFactory<T>() where T : IFactory, new()
         {
             factory = new T();
         }
         public override void Load(Define.GameMode _gameMode)
         {
+            if (root == null)
+            {
+                root = GameUtil.AttachObj<Transform>("Charater");
+                root.transform.position = Vector3.zero;
+            }
 
+            switch(_gameMode) 
+            {
+                case Define.GameMode.EDITOR:
+                    controller = new EditorCharacterController(this);
+                    //dataHandler = characterController;
+                    break;
+            }
         }
         public override void Update()
         {
@@ -24,10 +38,17 @@ namespace YhProj.Game.Character
         }
         public override void Delete()
         {
-            foreach (CharacterObject characterObject in characterObjectList)
-            {
-                characterObject.Delete();
-            }
+            //characterController.Save();
+        }
+
+        public void DataLoad()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void DataSave<T>(params T[] _params) where T : BaseData
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

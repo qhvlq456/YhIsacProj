@@ -24,12 +24,12 @@ namespace YhProj.Game.GameInput
         {
             switch (_gameMode)
             {
-                case Define.GameMode.EDITOR:
+                case Define.GameMode.MAPTOOL:
                     break;
                 case Define.GameMode.TEST:
                     // 여기서 target attach를 set하여 순서를 정할 것임
                     break;
-                case Define.GameMode.MAPTOOL:
+                case Define.GameMode.EDITOR:
                     EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
                     EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
                     // 여기서 target attach를 set하여 순서를 정할 것임

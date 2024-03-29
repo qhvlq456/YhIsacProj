@@ -29,7 +29,7 @@ namespace YhProj.Game.State
             // 초기화 설정
             if (editorTileObject != null)
             {
-                editorTileObject.Load(editorTileObject.tileData);
+                editorTileObject.Create(editorTileObject.tileData);
                 Managers.Instance.GetManager<UIManager>().ShowUI<MapToolUI, EditorTileObject>("MapToolUI", editorTileObject);
             }
             else

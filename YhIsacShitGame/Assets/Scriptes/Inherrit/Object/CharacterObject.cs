@@ -11,11 +11,15 @@ namespace YhProj.Game.Character
         private NavMeshAgent agent;
         protected CharacterData characterData;
 
-        public override void Load<T>(T _baseData)
+        public override void Create<T>(T _data)
         {
-            characterData = _baseData as CharacterData;
+            characterData = _data as CharacterData;
         }
 
+        public override void Update()
+        {
+
+        }
         public override void Delete()
         {
             Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(Define.BaseType.CHARACTER, transform);

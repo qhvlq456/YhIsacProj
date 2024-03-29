@@ -28,7 +28,7 @@ namespace YhProj.Game.Character
             }
 
             // Load 메서드의 구현에 따라서 실제 로딩 방식이 달라질 수 있음
-            ret.Load(_value);
+            ret.Create(_value);
 
             return ret;
         }

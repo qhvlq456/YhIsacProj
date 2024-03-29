@@ -29,7 +29,6 @@ namespace YhProj.Game
         ExecutionData executionData;
 #endif
         public Define.GameMode gameMode { private set; get; }
-        Define.DebugLogeer logType;
 
         List<BaseManager> baseManagerList = new List<BaseManager>();
 
@@ -52,7 +51,6 @@ namespace YhProj.Game
             }
 
             gameMode = executionData.gameMode;
-            logType = executionData.logType;
 #endif
             // manager set and define
             // load에서 순서와 상관없이 동작해야 함 // 즉 data만 셋팅? 그럼 ijson이 필요할지도?

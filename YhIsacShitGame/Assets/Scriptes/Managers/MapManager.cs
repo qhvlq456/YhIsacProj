@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using YhProj.Game.Player;
 
@@ -13,14 +14,10 @@ namespace YhProj.Game.Map
     /// map을 create, update, delete를 한다
     /// 후에 모드 컨트롤러를 생성하여 다른 모드들에 대한 클래스를 정의 후 모드에 따라 분류하여 로직을 만들어 사용하자 아마 inputmanager보면 알듯?
     /// </summary>
-    public class MapManager : BaseManager
+    /// 
+    // 지금은 생각이 안나지만 추후에 datahandler를 제외하여 생각해봐야 함
+    public class MapManager : BaseManager, IDataHandler
     {
-        public Transform root { get; private set; }
-
-        private MapController mapController;
-
-        private IJson json;
-
         private Dictionary<int, StageData> stageDataDic = new Dictionary<int, StageData>();
         public void AddStageData(StageData _stageData)
         {
@@ -38,7 +35,46 @@ namespace YhProj.Game.Map
         public bool IsConstainsStage(int _stage) => stageDataDic.ContainsKey(_stage);
         public List<StageData> GetStageDataList() => stageDataDic.Values.ToList();
 
+        public Transform root { get; private set; }
 
+        private IMapController controller;
+        public void DataLoad()
+        {
+            // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
+            List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
+
+            stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
+        }
+        public void DataSave<T>(params T[] _params) where T : BaseData
+        {
+            EditorMapController editorConroller = controller as EditorMapController;
+
+            string log = "";
+
+            StageData stageData = _params[0] as StageData;
+
+            TileData[,] tileDataArr = new TileData[stageData.Row, stageData.Col];
+
+            for (int i = 0; i < stageData.Row; i++)
+            {
+                for (int j = 0; j < stageData.Col; j++)
+                {
+                    int idx = i * stageData.Col + j;
+                    TileData tileData = editorConroller.TileObjectList[idx].tileData;
+                    // builder든 뭐든간에 데이터를 넣어야 함
+                    tileDataArr[i, j] = tileData;
+                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
+                }
+                log += '\n';
+            }
+
+            stageData.tileArr = tileDataArr;
+
+            AddStageData(stageData);
+            Debug.LogError(log);
+
+            GameUtil.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME, GetStageDataList());
+        }
         public override void Load(Define.GameMode _gameMode)
         {
             if (root == null)
@@ -47,20 +83,17 @@ namespace YhProj.Game.Map
                 root.transform.position = Vector3.zero;
             }
 
-            // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
-            List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.JSON_MAP_DATA_PATH, StaticDefine.JSON_MAP_FILE_NAME);
-
-            stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
-
             switch (_gameMode)
             {
-                case Define.GameMode.MAPTOOL:
-                    mapController = new EditorMapController(this);
-                    json = mapController as IJson;
+                case Define.GameMode.EDITOR:
+                    controller = new EditorMapController(this);
                     break;
             }
 
-            mapController.Load();
+            controller.Initialize();
+
+            // 이 load부분은 나중에 manasgers에서 다같이 호출하는걸로 해야 할 듯?
+            DataLoad();
         }
         // 타일에 대한 delete, update라고 생각하면 안되긴 함...
         public override void Delete()
@@ -68,7 +101,7 @@ namespace YhProj.Game.Map
             EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
             EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
 
-            mapController.Delete();
+            controller.Dispose();
         }
 
         /// <summary>
@@ -78,42 +111,21 @@ namespace YhProj.Game.Map
         /// </summary>
         public override void Update()
         {
-            mapController.Update();
+            controller.Update();
         }
-
-        // 말이 안되긴 함 편집이면 편집 , 생성이면 생성을 따로 구별 할 필요가 있음
+        // 후에 ui데이터를 넘겨준다면!?
 
         #region Tile Load and Delete and Save
         public void LoadTile(StageData _stageData)
         {
-            mapController.LoadTile(_stageData);
+            controller.LoadTile(_stageData);
         }
-        public void DeleteTile()
+        public void DeleteTile(int _stage)
         {
-            mapController.DeleteTile();
+            StageData stageData = GetStageData(_stage);
+            controller.DeleteTile(stageData);
         }
         #endregion
-
-        public void SaveMapJson<T>(T _data)
-        {
-            // controller에 따라 변경하기 매개변수 변경
-            json.SaveJson(_data);
-
-        }
-
-        public void DeleteMapTool(int _stage)
-        {
-            if (IsConstainsStage(_stage))
-            {
-                stageDataDic.Remove(_stage);
-                GameUtil.CreateJsonFile(StaticDefine.JSON_MAP_DATA_PATH, "StageData", stageDataDic.Values.ToList());
-            }
-            else
-            {
-
-            }
-        }
-
         #region MapManager Event
         // player가 레벨업을 할 때마다 호출
         public void OnPlayerLevelChange(int _level)

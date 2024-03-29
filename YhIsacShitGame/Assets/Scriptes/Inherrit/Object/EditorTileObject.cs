@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj;
 
 namespace YhProj.Game.Map
 {
@@ -49,9 +48,9 @@ namespace YhProj.Game.Map
         }
 
         #region On/Off
-        public override void Load<T>(T _baseData)
+        public override void Create<T>(T _baseData)
         {
-            base.Load(_baseData);
+            base.Create(_baseData);
 
             transform.localScale = Vector3.one * 0.8f;
 
@@ -68,25 +67,6 @@ namespace YhProj.Game.Map
                     break;
             }
         }
-        public override void Delete()
-        {
-
-        }
         #endregion
-
-        public override void IdleAnimation()
-        {
-            base.IdleAnimation();
-        }
-
-        public override void ActiveAnimation()
-        {
-            base.ActiveAnimation();
-        }
-
-        public override void EndAnimation()
-        {
-            base.EndAnimation();
-        }
     }
 }
