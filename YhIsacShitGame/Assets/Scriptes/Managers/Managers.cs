@@ -102,11 +102,11 @@ namespace YhProj.Game
                 manager.Update();
             }
         }
-        public void DeleteAllManagers()
+        public void DisposeAllManagers()
         {
             foreach (var manager in baseManagerList)
             {
-                manager.Delete();
+                manager.Dispose();
             }
         }
         public T GetManager<T>() where T : BaseManager, new()

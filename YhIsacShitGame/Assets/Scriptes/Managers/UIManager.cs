@@ -130,7 +130,7 @@ namespace YhProj.Game.UI
         {
 
         }
-        public override void Delete()
+        public override void Dispose()
         {
 
         }

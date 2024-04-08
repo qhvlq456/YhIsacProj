@@ -41,7 +41,7 @@ namespace YhProj.Game.Player
         {
 
         }
-        public override void Delete()
+        public override void Dispose()
         {
             EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
         }

@@ -9,6 +9,6 @@ namespace YhProj.Game.YhEditor
 
         public abstract void Delete(GameData _gameData);
         public abstract void Dispose();
-        
+        public abstract void Update();
     }
 }

@@ -15,6 +15,6 @@ namespace YhProj.Game
         // data의 저장 등등 정의
         public abstract void Update();
         // data의 unload 플로우들을 정의
-        public abstract void Delete();
+        public abstract void Dispose();
     }
 }

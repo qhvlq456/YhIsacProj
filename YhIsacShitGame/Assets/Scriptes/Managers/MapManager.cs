@@ -52,7 +52,7 @@ namespace YhProj.Game.Map
             }
         }
         // 타일에 대한 delete, update라고 생각하면 안되긴 함...
-        public override void Delete()
+        public override void Dispose()
         {
             EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
             EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;

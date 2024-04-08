@@ -3,7 +3,7 @@ using YhProj.Game.Map;
 
 namespace YhProj.Game.YhEditor
 {
-    public class MapEditor : BaseEditor
+    public class MapEditor : BaseEditor, IDataHandler
     {
         private Transform root;
         private StageHandler stageHandler;
@@ -12,7 +12,9 @@ namespace YhProj.Game.YhEditor
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
             bottomColider.size = new Vector3(100, 0, 100);
-
+        }
+        public void DataLoad()
+        {
             stageHandler.DataLoad();
         }
         public void DataSave<T>(params T[] _params) where T : BaseData
@@ -21,7 +23,10 @@ namespace YhProj.Game.YhEditor
         }
 
         #region Tile Load and Delete and Save
-        
+        public override void Update()
+        {
+            
+        }
 
         public override void Create(GameData _gameData)
         {

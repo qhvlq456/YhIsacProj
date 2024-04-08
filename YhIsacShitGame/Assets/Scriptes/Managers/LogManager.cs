@@ -11,7 +11,7 @@ namespace YhProj.Game
         {
 
         }
-        public override void Delete()
+        public override void Dispose()
         {
 
         }

@@ -1,39 +1,57 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using YhProj.Game;
+using YhProj.Game.Map;
 
 namespace YhProj.Game.YhEditor
 {
     public class EditorManager : BaseManager
     {
-        private BaseEditor baesEditor;
+        private BaseEditor baseEditor;
 
         public override void Load(Define.GameMode _gameMode)
         {
-            IDataHandler dataHandler = baesEditor as IDataHandler;
+            baseEditor.Initialize();
 
-            if(dataHandler != null) 
+            if (baseEditor is IDataHandler dataHandler)
             {
                 dataHandler.DataLoad();
             }
-        }
-        public void Save()
-        {
-            IDataHandler dataHandler = baesEditor as IDataHandler;
-
-            if (dataHandler != null)
+            else
             {
-                //dataHandler.DataSave();
+
             }
+        }
+        
+        public void Save<T>(params T[] _params) where T : Map.TileData
+        {
+            if(baseEditor is IDataHandler dataHandler)
+            {
+                dataHandler.DataSave<Map.TileData>(_params);
+            }
+            else
+            {
+
+            }
+            
+        }
+        public void Create(GameData _gameData)
+        {
+            baseEditor.Create(_gameData);
+        }
+        public void Delete(GameData _gameData)
+        {
+            baseEditor.Delete(_gameData);
         }
         public override void Update()
         {
-            throw new System.NotImplementedException();
+            baseEditor.Update();
         }
-        public override void Delete()
+        public override void Dispose()
         {
-            baesEditor.Dispose();
+            baseEditor.Dispose();
         }
     }
 }

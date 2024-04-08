@@ -38,7 +38,7 @@ namespace YhProj.Game.Character
         {
 
         }
-        public override void Delete()
+        public override void Dispose()
         {
             
         }

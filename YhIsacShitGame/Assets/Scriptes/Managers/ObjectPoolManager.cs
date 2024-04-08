@@ -37,7 +37,7 @@ namespace YhProj.Game
                     break;
             }
         }
-        public override void Delete()
+        public override void Dispose()
         {
 
         }
