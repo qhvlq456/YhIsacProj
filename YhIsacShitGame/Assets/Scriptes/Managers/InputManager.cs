@@ -24,8 +24,6 @@ namespace YhProj.Game.GameInput
         {
             switch (_gameMode)
             {
-                case Define.GameMode.MAPTOOL:
-                    break;
                 case Define.GameMode.TEST:
                     // 여기서 target attach를 set하여 순서를 정할 것임
                     break;

@@ -38,7 +38,12 @@ namespace YhProj.Game.Map
             tileObjectList.Clear();
         }
         public abstract T LoadTile(TileData _tileData);
-        public abstract void DeleteTile(TileData _tileData);
+        public virtual void DeleteTile(TileData _tileData)
+        {
+            // 안돼면 다른 방법? 인덱스 같은걸로 변경
+            TileObject tileObject = tileObjectList.Find(x => x.tileData == _tileData);
+            tileObject.Delete();
+        }
     }
     public sealed class HeroTileController : MapController<HeroTileObject>
     {
@@ -46,7 +51,7 @@ namespace YhProj.Game.Map
 
         public override void DeleteTile(TileData _tileData)
         {
-            throw new NotImplementedException();
+            base.DeleteTile(_tileData);
         }
 
         public override HeroTileObject LoadTile(TileData _tileData)
@@ -62,7 +67,7 @@ namespace YhProj.Game.Map
         public EnemyTileController(MapManager _manager, IFactory _factory) : base(_manager, _factory) { }
         public override void DeleteTile(TileData _tileData)
         {
-            throw new NotImplementedException();
+            base.DeleteTile(_tileData);
         }
 
         public override EnemyTileObject LoadTile(TileData _tileData)
@@ -78,7 +83,7 @@ namespace YhProj.Game.Map
         public DecoTileController(MapManager _manager, IFactory _factory) : base(_manager, _factory) { }
         public override void DeleteTile(TileData _tileData)
         {
-            throw new NotImplementedException();
+            base.DeleteTile(_tileData);
         }
 
         public override DecoTileObject LoadTile(TileData _tileData)
@@ -87,6 +92,24 @@ namespace YhProj.Game.Map
             tileObjectList.Add(decoTileObj);
 
             return decoTileObj;
+        }
+    }
+
+    public sealed class EditorTileController : MapController<EditorTileObject>
+    {
+        public EditorTileController(MapManager _manager, IFactory _factory) : base(_manager, _factory) { }
+
+        public override void DeleteTile(TileData _tileData)
+        {
+            base.DeleteTile(_tileData);
+        }
+
+        public override EditorTileObject LoadTile(TileData _tileData)
+        {
+            EditorTileObject editorTileObject = factory.Create<EditorTileObject>(_tileData);
+            tileObjectList.Add(editorTileObject);
+
+            return editorTileObject;
         }
     }
 }

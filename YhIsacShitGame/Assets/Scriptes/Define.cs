@@ -9,6 +9,7 @@ namespace YhProj
         public enum GameMode
         {
             TEST,
+            EDITOR,
             Build,
         }
         // log를 보이게 할 것인지 안보이게 할 것인지
@@ -22,6 +23,7 @@ namespace YhProj
         {
             DEV,
             ALHPA,
+            beta,
             LIVE
         }
         // uiroot 하위 랜더링할 캔버스 종류들

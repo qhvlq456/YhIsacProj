@@ -45,7 +45,7 @@ namespace YhProj.Game.Map
                     BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
                     bottomColider.size = new Vector3(100, 0, 100);
 
-                    heroTileController = new HeroTileController(this, new TileFactory());
+                    heroTileController = new HeroTileController(this, new TileFactory()); // tilefactory부분도 수정이 필요
                     enemyTileController = new EnemyTileController(this, new TileFactory());
                     decoTileController = new DecoTileController(this, new TileFactory());
                     break;

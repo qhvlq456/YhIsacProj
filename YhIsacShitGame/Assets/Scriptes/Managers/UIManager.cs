@@ -110,8 +110,6 @@ namespace YhProj.Game.UI
             // 메인 UI 변경이 필요 그리고 loading 등등 조치가 필요하긴 함.. 씬전환등
             switch (Managers.Instance.gameMode)
             {
-                case Define.GameMode.MAPTOOL:
-                    break;
                 case Define.GameMode.TEST:
                 case Define.GameMode.EDITOR:
                     // 테스트 모드의 메인 UI를 셋팅함

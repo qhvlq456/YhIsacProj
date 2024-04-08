@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 namespace YhProj.Game.Map
 {
     [System.Serializable]
-    public class StageData : BaseData
+    public class StageData : GameData
     {
         public int lv;
         public int stage;

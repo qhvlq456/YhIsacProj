@@ -160,7 +160,7 @@ public class MapToolMainUI : MainUI
         else
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
-            Managers.Instance.GetManager<MapManager>().DataSave(currentStageData);
+            // Managers.Instance.GetManager<MapManager>().DataSave(currentStageData);
             UpdateDropDown();
         }
 
@@ -175,7 +175,7 @@ public class MapToolMainUI : MainUI
     {
         if(currentStageData != null)
         {
-            Managers.Instance.GetManager<MapManager>().DeleteTile(currentStageData.stage);
+            // Managers.Instance.GetManager<MapManager>().DeleteTile(currentStageData.stage);
         }
 
         int row = GetInputFieldToType<int>(InputType.row);
@@ -199,14 +199,14 @@ public class MapToolMainUI : MainUI
 
         currentStageData = stageData;
 
-        Managers.Instance.GetManager<MapManager>().LoadTile(currentStageData);
+        // Managers.Instance.GetManager<MapManager>().LoadTile(currentStageData);
     }
     /// <summary>
     /// Stage Data에 표시되어져 있는 모든 tile data 삭제하는 메서드
     /// </summary>
     public void DeleteBtnClick() 
     {
-        Managers.Instance.GetManager<MapManager>().DeleteTile(currentStageData.stage);
+        // Managers.Instance.GetManager<MapManager>().DeleteTile(currentStageData.stage);
         logText.text = "Stage : Empty";
         currentStageData = null;
         textInputList.ForEach(ui => ui.inputField.text = "");
@@ -236,7 +236,7 @@ public class MapToolMainUI : MainUI
 
         if(Managers.Instance.GetManager<MapManager>().IsConstainsStage(stage))
         {
-            Managers.Instance.GetManager<MapManager>().DeleteTile(stage);
+            // Managers.Instance.GetManager<MapManager>().DeleteTile(stage);
             logText.text = "Delete Stage Success!!";
         }
         else

@@ -35,8 +35,6 @@ namespace YhProj.Game
                     break;
                 case Define.GameMode.TEST:
                     break;
-                case Define.GameMode.MAPTOOL:
-                    break;
             }
         }
         public override void Delete()

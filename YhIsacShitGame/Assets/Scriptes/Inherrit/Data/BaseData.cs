@@ -7,6 +7,7 @@ namespace YhProj.Game
         TILE,
         character,
         BUILD,
+        accessory,
         ITEM,
         COUNT
     }

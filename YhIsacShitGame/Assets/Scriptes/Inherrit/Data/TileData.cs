@@ -1,7 +1,7 @@
 namespace YhProj.Game.Map
 {
     [System.Serializable]
-    public class TileData : BaseData
+    public class TileData : GameData
     {
         public Define.Direction direction;
 
@@ -13,7 +13,7 @@ namespace YhProj.Game.Map
     }
 
     [System.Serializable]
-    public class HeroTileData : BaseData
+    public class HeroTileData : GameData
     {
         public HeroTileData() { }
         public HeroTileData(TileData _tileData) 
@@ -22,7 +22,7 @@ namespace YhProj.Game.Map
     }
 
     [System.Serializable]
-    public class EnemyTileData : BaseData
+    public class EnemyTileData : GameData
     {
         public EnemyTileData() { }
         public EnemyTileData(TileData _tileData)
@@ -31,7 +31,7 @@ namespace YhProj.Game.Map
     }
 
     [System.Serializable]
-    public class DecoTileData : BaseData
+    public class DecoTileData : GameData
     {
         public DecoTileData() { }
         public DecoTileData(TileData _tileData)
