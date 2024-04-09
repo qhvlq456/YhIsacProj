@@ -20,20 +20,12 @@ namespace YhProj.Game.GameInput
             // 보류 
             target = _target;
         }
-        public override void Load(Define.GameMode _gameMode)
+        public override void Load()
         {
-            switch (_gameMode)
-            {
-                case Define.GameMode.TEST:
-                    // 여기서 target attach를 set하여 순서를 정할 것임
-                    break;
-                case Define.GameMode.EDITOR:
-                    EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
-                    EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
-                    // 여기서 target attach를 set하여 순서를 정할 것임
-                    stateController = new EditStateController(target);
-                    break;
-            }
+            EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+            EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
+            // 여기서 target attach를 set하여 순서를 정할 것임
+            stateController = new EditStateController(target);
         }
         public override void Update()
         {

@@ -24,11 +24,9 @@ namespace YhProj.Game.Map
 
         public Transform root { get; private set; }
 
-        private HeroTileController heroTileController;
-        private EnemyTileController enemyTileController;
-        private DecoTileController decoTileController;
+        private TileFactory factory;
 
-        public override void Load(Define.GameMode _gameMode)
+        public override void Load()
         {
             stageHandler = new StageHandler();
             stageHandler.DataLoad();
@@ -38,28 +36,12 @@ namespace YhProj.Game.Map
                 root = GameUtil.AttachObj<Transform>("MapRoot");
                 root.transform.position = Vector3.zero;
             }
-
-            switch (_gameMode)
-            {
-                case Define.GameMode.EDITOR:
-                    BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
-                    bottomColider.size = new Vector3(100, 0, 100);
-
-                    heroTileController = new HeroTileController(this, new TileFactory()); // tilefactory부분도 수정이 필요
-                    enemyTileController = new EnemyTileController(this, new TileFactory());
-                    decoTileController = new DecoTileController(this, new TileFactory());
-                    break;
-            }
         }
         // 타일에 대한 delete, update라고 생각하면 안되긴 함...
         public override void Dispose()
         {
             EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
             EventMediator.OnPlayerLevelChange -= OnPlayerLevelChange;
-
-            heroTileController.Dispose();
-            enemyTileController.Dispose();
-            decoTileController.Dispose();
         }
 
         /// <summary>
@@ -69,9 +51,7 @@ namespace YhProj.Game.Map
         /// </summary>
         public override void Update()
         {
-            heroTileController.Update();
-            enemyTileController.Update();
-            decoTileController.Update();
+
         }
         // 후에 ui데이터를 넘겨준다면!?
 
@@ -92,13 +72,13 @@ namespace YhProj.Game.Map
                 switch(tileData.elementType)
                 {
                     case ElementType.MINE:
-                        tileObject = heroTileController.LoadTile(tileData);
+                        tileObject = factory.Create<HeroTileObject>(tileData);
                         break;
                     case ElementType.ENEMY:
-                        tileObject = enemyTileController.LoadTile(tileData);
+                        tileObject = factory.Create<EnemyTileObject>(tileData);
                         break;
                     case ElementType.DECO:
-                        tileObject = decoTileController.LoadTile(tileData);
+                        tileObject = factory.Create<DecoTileObject>(tileData);
                         break;
                 }
 

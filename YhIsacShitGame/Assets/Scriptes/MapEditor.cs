@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using YhProj.Game.Map;
 
@@ -6,8 +7,18 @@ namespace YhProj.Game.YhEditor
     public class MapEditor : BaseEditor, IDataHandler
     {
         private Transform root;
+
         private StageHandler stageHandler;
-        private EditorTileController editorTileController;
+        private TileFactory tileFactory;
+
+        private List<TileObject> tileObjectList = new List<TileObject>();
+
+        public MapEditor()
+        {
+            // 후에 인터페이스를 이용한 다향성으로 스위칭
+            tileFactory = new TileFactory();
+            stageHandler = new StageHandler();
+        }
         public override void Initialize()
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
@@ -21,12 +32,12 @@ namespace YhProj.Game.YhEditor
         {
             stageHandler.DataSave(_params);
         }
-
-        #region Tile Load and Delete and Save
         public override void Update()
         {
             
         }
+
+        #region Tile Load and Delete and Save
 
         public override void Create(GameData _gameData)
         {
@@ -55,9 +66,10 @@ namespace YhProj.Game.YhEditor
                     int z = tileData.index / stageData.Row;
                     int x = tileData.index % stageData.Col;
 
-                    EditorTileObject editorTileObject = editorTileController.LoadTile(tileData);
+                    EditorTileObject editorTileObject = tileFactory.Create<EditorTileObject>(tileData);
                     editorTileObject.transform.SetParent(root);
                     editorTileObject.transform.localPosition = new Vector3(x, 0, z);
+                    tileObjectList.Add(editorTileObject);
                     log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
                 }
                 log += '\n';
@@ -70,7 +82,8 @@ namespace YhProj.Game.YhEditor
         {
             if(_gameData is TileData tileData)
             {
-                editorTileController.DeleteTile(tileData);
+                TileObject tileObject = tileObjectList.Find(x => x.tileData == tileData);
+                tileObject?.Delete();
             }
             else
             {
@@ -81,7 +94,12 @@ namespace YhProj.Game.YhEditor
 
         public override void Dispose()
         {
-            
+            foreach(var tile in tileObjectList)
+            {
+                tile.Delete();
+            }
+
+            tileObjectList.Clear();
         }
     }
 }

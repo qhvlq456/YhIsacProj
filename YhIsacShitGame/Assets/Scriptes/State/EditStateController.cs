@@ -24,7 +24,10 @@ namespace YhProj.Game.State
             currentState = GetState<NoneState>();
             target = _target;
         }
-
+        public override void Initialize()
+        {
+            
+        }
         /// <summary>
         /// state 를 리턴하는 함수
         /// </summary>

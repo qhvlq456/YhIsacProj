@@ -1,19 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using YhProj.Game;
 using YhProj.Game.Map;
+using YhProj.Game.State;
 
 namespace YhProj.Game.YhEditor
 {
     public class EditorManager : BaseManager
     {
-        private BaseEditor baseEditor;
+        [SerializeField]
+        private Transform root;
 
-        public override void Load(Define.GameMode _gameMode)
+        [SerializeField]
+        private Transform lookTrf;
+
+        [SerializeField]
+        private enum EditorType
         {
-            baseEditor.Initialize();
+            Map,
+            Character,
+        }
+
+        [SerializeField]
+        private EditorType editorType;
+
+        private BaseEditor baseEditor;
+        private StateController stateController;
+        public override void Load()
+        {
+            stateController.Initialize();
 
             if (baseEditor is IDataHandler dataHandler)
             {
@@ -25,17 +41,39 @@ namespace YhProj.Game.YhEditor
             }
         }
         
-        public void Save<T>(params T[] _params) where T : Map.TileData
+        public void Save<T>(params T[] _params) where T : TileData
         {
-            if(baseEditor is IDataHandler dataHandler)
+            if (baseEditor is IDataHandler dataHandler)
             {
-                dataHandler.DataSave<Map.TileData>(_params);
+                dataHandler.DataSave<TileData>(_params);
             }
             else
             {
 
             }
-            
+
+        }
+        public void ChangeEditor()
+        {
+            switch (editorType) 
+            {
+                case EditorType.Map:
+                    baseEditor = new MapEditor();
+                    break;
+                case EditorType.Character:
+                    break;
+            }
+        }
+        public void ChangeState()
+        {
+            switch (editorType)
+            {
+                case EditorType.Map:
+                    stateController = new EditStateController(lookTrf);
+                    break;
+                case EditorType.Character:
+                    break;
+            }
         }
         public void Create(GameData _gameData)
         {
@@ -45,13 +83,17 @@ namespace YhProj.Game.YhEditor
         {
             baseEditor.Delete(_gameData);
         }
+
         public override void Update()
         {
-            baseEditor.Update();
+            baseEditor?.Update();
+            stateController?.Update();
         }
+
         public override void Dispose()
         {
-            baseEditor.Dispose();
+            baseEditor?.Dispose();
+            stateController?.Dispose();
         }
     }
 }

@@ -31,7 +31,7 @@ namespace YhProj.Game.Player
             playerInfo = _playerInfo;
         }
 
-        public override void Load(Define.GameMode _gameMode)
+        public override void Load()
         {
             EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
             EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;

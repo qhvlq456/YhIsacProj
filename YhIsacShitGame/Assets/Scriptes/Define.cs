@@ -5,13 +5,6 @@ namespace YhProj
     [Serializable]
     public class Define
     {
-        // 게임 실행시 어떤 모드로 선택 할지의 타입
-        public enum GameMode
-        {
-            TEST,
-            EDITOR,
-            Build,
-        }
         // log를 보이게 할 것인지 안보이게 할 것인지
         public enum DebugLogeer
         {

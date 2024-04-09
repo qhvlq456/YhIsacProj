@@ -11,7 +11,7 @@ namespace YhProj.Game
     public abstract class BaseManager
     {
         // data의 load 플로우들을 정의
-        public abstract void Load(Define.GameMode _gameMode);
+        public abstract void Load();
         // data의 저장 등등 정의
         public abstract void Update();
         // data의 unload 플로우들을 정의

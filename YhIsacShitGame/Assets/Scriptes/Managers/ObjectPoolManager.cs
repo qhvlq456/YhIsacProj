@@ -12,7 +12,7 @@ namespace YhProj.Game
         // object pool 상위 부모 자식들의 갯수에 따라 생성 가능과 회수를 결정한다
         private Dictionary<BaseType, Transform> parentTrfDic = new Dictionary<BaseType, Transform>();
         
-        public override void Load(Define.GameMode _gameMode)
+        public override void Load()
         {
             root = GameUtil.AttachObj<Transform>("ObjectPoolRoot");
             root.position = Vector3.back * 100f;
@@ -27,14 +27,6 @@ namespace YhProj.Game
                 go.transform.localPosition = Vector3.zero;
 
                 parentTrfDic.Add(baseType, go.transform);
-            }
-
-            switch (_gameMode)
-            {
-                case Define.GameMode.EDITOR:
-                    break;
-                case Define.GameMode.TEST:
-                    break;
             }
         }
         public override void Dispose()

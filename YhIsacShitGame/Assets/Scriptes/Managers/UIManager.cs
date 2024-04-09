@@ -53,7 +53,7 @@ namespace YhProj.Game.UI
                 return ret;
             }
         }
-        public override void Load(Define.GameMode _gameMode)
+        public override void Load()
         {
             root = GameUtil.AttachObj<Transform>(uiRootName);
 
@@ -108,19 +108,6 @@ namespace YhProj.Game.UI
             string mainUIName = "";
 
             // 메인 UI 변경이 필요 그리고 loading 등등 조치가 필요하긴 함.. 씬전환등
-            switch (Managers.Instance.gameMode)
-            {
-                case Define.GameMode.TEST:
-                case Define.GameMode.EDITOR:
-                    // 테스트 모드의 메인 UI를 셋팅함
-                    foreach (var trf in rootTrfDic)
-                    {
-                        bool isActive = trf.Key == Define.UIRootType.TEST_UI;
-                        trf.Value.gameObject.SetActive(isActive);
-                    }
-                    mainUIName = "MapToolMainUI";
-                    break;
-            }
 
             rootTrfDic[Define.UIRootType.MAIN_UI].gameObject.SetActive(true);
             mainUI = ShowUI<MapToolMainUI>(mainUIName);
