@@ -7,7 +7,8 @@ using YhProj.Game.State;
 
 namespace YhProj.Game.YhEditor
 {
-    public class EditorManager : BaseManager
+    // 에디터 주체 클래스
+    public class EditorManager : Singleton<EditorManager>
     {
         [SerializeField]
         private Transform root;
@@ -27,7 +28,14 @@ namespace YhProj.Game.YhEditor
 
         private BaseEditor baseEditor;
         private StateController stateController;
-        public override void Load()
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            Load();
+        }
+        public void Load()
         {
             stateController.Initialize();
 
@@ -84,13 +92,13 @@ namespace YhProj.Game.YhEditor
             baseEditor.Delete(_gameData);
         }
 
-        public override void Update()
+        public void Update()
         {
             baseEditor?.Update();
             stateController?.Update();
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             baseEditor?.Dispose();
             stateController?.Dispose();

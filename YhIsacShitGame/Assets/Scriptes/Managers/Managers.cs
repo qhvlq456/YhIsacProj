@@ -19,15 +19,13 @@ using UnityEditor;
 
 namespace YhProj.Game
 {
-    public class Managers : Singleton<Managers>, ILogger
+    public class Managers : Singleton<Managers>
     {
         public event Action<Transform> OnLookTargetChanged;
 
 #if UNITY_EDITOR
         ExecutionData executionData;
 #endif
-        public Define.GameMode gameMode { private set; get; }
-
         List<BaseManager> baseManagerList = new List<BaseManager>();
 
 
@@ -47,8 +45,6 @@ namespace YhProj.Game
             {
                 executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset");
             }
-
-            gameMode = executionData.gameMode;
 #endif
             // manager set and define
             // load에서 순서와 상관없이 동작해야 함 // 즉 data만 셋팅? 그럼 ijson이 필요할지도?
@@ -91,7 +87,7 @@ namespace YhProj.Game
         {
             foreach (var manager in baseManagerList)
             {
-                manager.Load(gameMode);
+                manager.Load();
             }
         }
         public void UpdateAllManagers()
@@ -128,11 +124,6 @@ namespace YhProj.Game
             }
 
             return ret;
-        }
-
-        public void Logger()
-        {
-            throw new NotImplementedException();
         }
     }
 
