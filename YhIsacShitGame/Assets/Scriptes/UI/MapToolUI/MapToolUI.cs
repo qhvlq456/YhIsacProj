@@ -154,6 +154,7 @@ public class MapToolUI : EditorUI
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
 
+            EditorManager.Instance.Save(currentStageData);
             TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
             UpdateDropDown(stageDropDown);
         }
@@ -204,7 +205,6 @@ public class MapToolUI : EditorUI
         currentStageData = stageData;
 
         EditorManager.Instance.Create(currentStageData);
-        // Managers.Instance.GetManager<MapManager>().LoadTile(currentStageData);
     }
     /// <summary>
     /// Stage Data에 표시되어져 있는 모든 tile data 삭제하는 메서드

@@ -67,7 +67,7 @@ namespace YhProj.Game.YhEditor
         {
             stateController.Initialize();
 
-            if (baseEditor is IDataHandler dataHandler)
+            if (stageHandler is IDataHandler dataHandler)
             {
                 dataHandler.DataLoad();
             }
@@ -77,9 +77,9 @@ namespace YhProj.Game.YhEditor
             }
         }
         
-        public void Save<T>(params T[] _params) where T : TileData
+        public void Save<T>(params T[] _params) where T : StageData
         {
-            if (baseEditor is IDataHandler dataHandler)
+            if (stageHandler is IDataHandler dataHandler)
             {
                 dataHandler.DataSave<TileData>(_params);
             }

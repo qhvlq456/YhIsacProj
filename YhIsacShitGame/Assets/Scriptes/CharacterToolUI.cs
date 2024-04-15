@@ -6,6 +6,7 @@ using TMPro;
 using YhProj.Game.UI;
 using YhProj.Game.Character;
 using YhProj.Game.YhEditor;
+using System.Net.NetworkInformation;
 
 public class CharacterToolUI : EditorUI
 {
@@ -36,22 +37,48 @@ public class CharacterToolUI : EditorUI
 
         public TextMeshProUGUI Text => textDropDown.titleText;
     }
+    [System.Serializable]
+    public struct sCharInputButton
+    {
+        public InputType inputType;
+        public sInputButtonUI inputBtn;
+
+        public Button Button => inputBtn.button;
+        public TextMeshProUGUI ButtonText => inputBtn.buttonText;
+        public TMP_InputField InputField => inputBtn.inputField;
+
+    }
 
     public enum InputType
     {
-        row,
-        col,
-        stage,
-        lv,
-        tileSize,
-        xOffset,
-        zOffset
+        index,
+        name,
+        resName,
+        health,
+        armor,
+        power,
+        range,
+        moveSpeed
     }
     public enum DropDownType
     {
-        stage,
+        baseType,
+        elementType,
+        attributeType,
     }
 
     private CharacterObject characterObject;
 
+
+    [SerializeField]
+    private List<sCharToolBtn> charToolBtnList = new List<sCharToolBtn>();
+
+    [SerializeField]
+    private List<sCharTextDropDown> charTextDropDownList = new List<sCharTextDropDown>();
+
+    [SerializeField]
+    private List<sCharTextInput> charTextInputList = new List<sCharTextInput>();
+
+    [SerializeField]
+    private List<sCharInputButton> charInputBtnList = new List<sCharInputButton>();
 }

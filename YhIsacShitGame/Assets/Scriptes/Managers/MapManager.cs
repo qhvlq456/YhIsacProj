@@ -146,7 +146,10 @@ namespace YhProj.Game.Map
 
             stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
         }
-
+        public void DataSave()
+        {
+            GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetStageDataList());
+        }
         public void DataSave<T>(params T[] _params) where T : GameData
         {
             List<StageData> stageList = _params.Select(x => x as StageData).ToList();

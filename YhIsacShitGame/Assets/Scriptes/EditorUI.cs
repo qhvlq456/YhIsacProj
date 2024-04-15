@@ -19,6 +19,14 @@ namespace YhProj.Game.YhEditor
         }
 
         [Serializable]
+        public struct sInputButtonUI
+        {
+            public TMP_InputField inputField;
+            public Button button;
+            public TextMeshProUGUI buttonText;
+        }
+
+        [Serializable]
         public struct sTextInputUI
         {
             public TextMeshProUGUI titleText;
