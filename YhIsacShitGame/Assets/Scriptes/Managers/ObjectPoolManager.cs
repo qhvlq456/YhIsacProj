@@ -59,7 +59,7 @@ namespace YhProj.Game
                 case BaseType.BUILD:
                     path = string.Format("{0}/{1}", DefinePath.tile_path, _objName);
                     break;
-                case BaseType.ITEM:
+                case BaseType.item:
                     path = string.Format("{0}/{1}", DefinePath.tile_path, _objName);
                     break;
             }

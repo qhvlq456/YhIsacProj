@@ -1,15 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj.Game;
 using YhProj.Game.Map;
 using YhProj.Game.State;
+using YhProj.Game.UI;
 
 namespace YhProj.Game.YhEditor
 {
+    [SerializeField]
+    public enum EditorType
+    {
+        Map,
+        Character,
+    }
+
     // 에디터 주체 클래스
     public class EditorManager : Singleton<EditorManager>
     {
+        public readonly Dictionary<EditorType, string> uiNameDic = new Dictionary<EditorType, string>()
+        {
+            { EditorType.Map, "MapToolMainUI"},
+            { EditorType.Character, "CharacterToolMainUI"}
+        };
+
         [SerializeField]
         private Transform root;
 
@@ -17,14 +30,29 @@ namespace YhProj.Game.YhEditor
         private Transform lookTrf;
 
         [SerializeField]
-        private enum EditorType
+        private EditorType editorType;
+
+        private StageHandler stageHandler;
+        public StageHandler StageHandler
         {
-            Map,
-            Character,
+            get
+            {
+                return stageHandler;
+            }
         }
 
-        [SerializeField]
-        private EditorType editorType;
+        private UIManager uiManager;
+
+        public UIManager UIManager
+        {
+            get
+            {
+                uiManager = Managers.Instance.GetManager<UIManager>();
+                uiManager.Load();
+                return uiManager;
+            }
+        }
+
 
         private BaseEditor baseEditor;
         private StateController stateController;
@@ -67,6 +95,7 @@ namespace YhProj.Game.YhEditor
             {
                 case EditorType.Map:
                     baseEditor = new MapEditor();
+                    stageHandler = new StageHandler();
                     break;
                 case EditorType.Character:
                     break;

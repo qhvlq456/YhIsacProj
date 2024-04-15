@@ -17,8 +17,6 @@ namespace YhProj.Game.UI
         public List<UIInfo> tooltipUIDataList = new List<UIInfo>();
         //[HideInInspector]
         public List<UIInfo> contextualUIDataList = new List<UIInfo>();
-        //[HideInInspector]
-        public List<UIInfo> testUIDataList = new List<UIInfo>();
     }
 }
 

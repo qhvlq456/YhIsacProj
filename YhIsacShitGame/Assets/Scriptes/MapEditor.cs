@@ -4,11 +4,10 @@ using YhProj.Game.Map;
 
 namespace YhProj.Game.YhEditor
 {
-    public class MapEditor : BaseEditor, IDataHandler
+    public class MapEditor : BaseEditor
     {
         private Transform root;
 
-        private StageHandler stageHandler;
         private TileFactory tileFactory;
 
         private List<TileObject> tileObjectList = new List<TileObject>();
@@ -17,20 +16,11 @@ namespace YhProj.Game.YhEditor
         {
             // 후에 인터페이스를 이용한 다향성으로 스위칭
             tileFactory = new TileFactory();
-            stageHandler = new StageHandler();
         }
         public override void Initialize()
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
             bottomColider.size = new Vector3(100, 0, 100);
-        }
-        public void DataLoad()
-        {
-            stageHandler.DataLoad();
-        }
-        public void DataSave<T>(params T[] _params) where T : BaseData
-        {
-            stageHandler.DataSave(_params);
         }
         public override void Update()
         {
@@ -41,7 +31,8 @@ namespace YhProj.Game.YhEditor
 
         public override void Create(GameData _gameData)
         {
-            StageData stageData = stageHandler.GetStageData(_gameData.index);
+            StageData stageData = _gameData as StageData;
+
             string log = "";
 
             for (int i = 0; i < stageData.Row; i++)

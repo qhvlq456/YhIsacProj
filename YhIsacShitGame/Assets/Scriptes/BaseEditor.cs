@@ -1,4 +1,3 @@
-using System.Collections;
 namespace YhProj.Game.YhEditor
 {
     public abstract class BaseEditor

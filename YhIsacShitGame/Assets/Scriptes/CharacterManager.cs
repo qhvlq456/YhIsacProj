@@ -40,7 +40,7 @@ namespace YhProj.Game.Character
             enemyDataDic = enemyDataList.ToDictionary(k => k.index, v => v);
         }
 
-        public void DataSave<T>(params T[] _params) where T : BaseData
+        public void DataSave<T>(params T[] _params) where T : GameData
         {
             
         }

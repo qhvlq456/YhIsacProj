@@ -8,6 +8,6 @@ namespace YhProj.Game
     public interface IDataHandler
     {
         void DataLoad();
-        void DataSave<T>(params T[] _params) where T : BaseData;
+        void DataSave<T>(params T[] _params) where T : GameData;
     }
 }

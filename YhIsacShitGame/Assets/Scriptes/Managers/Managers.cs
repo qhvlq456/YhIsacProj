@@ -26,6 +26,7 @@ namespace YhProj.Game
 #if UNITY_EDITOR
         ExecutionData executionData;
 #endif
+        // 후에 lazy로 매니저 클래스를 변경할지 생각해 봐야 함
         List<BaseManager> baseManagerList = new List<BaseManager>();
 
 

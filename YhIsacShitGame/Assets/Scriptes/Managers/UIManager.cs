@@ -3,9 +3,20 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using System;
+using System.Security.Cryptography;
 
 namespace YhProj.Game.UI
 {
+    // uiroot 하위 랜더링할 캔버스 종류들
+    public enum UIRootType
+    {
+        MAIN_UI, // 항상 고정값이 되어야 함
+        POPUP_UI,
+        TOOLTIP_UI,
+        CONTEXTUAL_UI,
+        COUNT
+    }
+
     /*
      * main ui
      * popup ui
@@ -18,16 +29,23 @@ namespace YhProj.Game.UI
      */
     public class UIManager : BaseManager
     {
+        //internal static readonly Lazy<UIManager> Lazy = new Lazy<UIManager>(() =>
+        //{
+        //    if (!NeonSdkService.IsInitialized)
+        //        throw new NeonException("NeonSdk is not initialized.");
+        //    return new NeonAuth();
+        //});
+
         [SerializeField]
-        string uiRootName = "UIRoot";
+        private string uiRootName = "UIRoot";
 
-        List<UIInfo> uiInfoList = new List<UIInfo>();
+        private List<UIInfo> uiInfoList = new List<UIInfo>();
 
-        Transform root;
+        private Transform root;
 
         // main ui만 따로 
-        MainUI mainUI;
-        Dictionary<Define.UIRootType, Transform> rootTrfDic = new Dictionary<Define.UIRootType, Transform>();
+        private MainUI mainUI;
+        private Dictionary<UIRootType, Transform> rootTrfDic = new Dictionary<UIRootType, Transform>();
         public bool IsActiveUI
         {
             get
@@ -36,7 +54,7 @@ namespace YhProj.Game.UI
 
                 foreach (var ui in rootTrfDic)
                 {
-                    if (ui.Key == Define.UIRootType.MAIN_UI)
+                    if (ui.Key == UIRootType.MAIN_UI)
                     {
                         continue;
                     }
@@ -76,12 +94,11 @@ namespace YhProj.Game.UI
             uiInfoList.AddRange(uiData.popupUIDataList);
             uiInfoList.AddRange(uiData.tooltipUIDataList);
             uiInfoList.AddRange(uiData.contextualUIDataList);
-            uiInfoList.AddRange(uiData.testUIDataList);
 
             // 1은 main ui이기 때문에 제외
-            for (int i = 0; i < (int)Define.UIRootType.COUNT; i++)
+            for (int i = 0; i < (int)UIRootType.COUNT; i++)
             {
-                string name = string.Format("{0}", (Define.UIRootType)i);
+                string name = string.Format("{0}", (UIRootType)i);
                 GameObject child = new GameObject(name);
 
                 RectTransform childRect = child.AddComponent<RectTransform>();
@@ -99,9 +116,9 @@ namespace YhProj.Game.UI
                 child.transform.localPosition = Vector3.zero;
                 child.transform.localScale = Vector3.one;
 
-                if (!rootTrfDic.ContainsKey((Define.UIRootType)i))
+                if (!rootTrfDic.ContainsKey((UIRootType)i))
                 {
-                    rootTrfDic.Add((Define.UIRootType)i, child.transform);
+                    rootTrfDic.Add((UIRootType)i, child.transform);
                 }
             }
 
@@ -109,8 +126,8 @@ namespace YhProj.Game.UI
 
             // 메인 UI 변경이 필요 그리고 loading 등등 조치가 필요하긴 함.. 씬전환등
 
-            rootTrfDic[Define.UIRootType.MAIN_UI].gameObject.SetActive(true);
-            mainUI = ShowUI<MapToolMainUI>(mainUIName);
+            rootTrfDic[UIRootType.MAIN_UI].gameObject.SetActive(true);
+            // mainUI = ShowUI<MapToolMainUI>(mainUIName);
         }
 
         public override void Update()
@@ -187,7 +204,7 @@ namespace YhProj.Game.UI
 
             if (uiInfo == null)
             {
-                Debug.LogError("Not UIInfo Set Please Check your uidata.asset");
+                Debug.LogError("Show UI Not UIInfo Set Please Check your uidata.asset");
                 return default(T);
             }
 
@@ -203,7 +220,7 @@ namespace YhProj.Game.UI
 
             if (uiInfo == null)
             {
-                Debug.LogError("Not UIInfo Set Please Check your uidata.asset");
+                Debug.LogError("Show UI Not UIInfo Set Please Check your uidata.asset");
                 return default(T);
             }
 
@@ -212,6 +229,20 @@ namespace YhProj.Game.UI
             baseUI.Show(uiInfo);
 
             return baseUI.GetComponent<T>();
+        }
+
+        public void ShowUI(string _uiName)
+        {
+            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
+
+            if (uiInfo == null)
+            {
+                Debug.LogError("Show UI Not UIInfo Set Please Check your uidata.asset");
+            }
+
+            BaseUI baseUI = GetUI(uiInfo);
+
+            baseUI.Show(uiInfo);
         }
 
         public void HideUI(UIInfo _uiInfo)
@@ -252,9 +283,31 @@ namespace YhProj.Game.UI
                 baseUI.Hide();
             }
         }
-        public void HideUI(string _name)
+
+        public void HideUI(string _uiName)
         {
-            // name은 방식을 바꾸어야 할 듯?
+            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
+
+            if (uiInfo == null)
+            {
+                Debug.LogError("Hide UI Not UIInfo Set Please Check your uidata.asset");
+            }
+
+            HideUI(uiInfo);
+        }
+        /// <summary>
+        /// 코루틴으로 패널을 닫는 경우가 있음 그래서 닫고나서 열린다는 보장을 할 수 없다.
+        /// 그래서 방법을 생각해야 한다
+        /// </summary>
+        public void AllHide()
+        {
+            for(int i = 0; i < uiInfoList.Count; i++) 
+            {
+                if (uiInfoList[i].uiRootType != UIRootType.MAIN_UI)
+                {
+                    HideUI(uiInfoList[i]);
+                }
+            }
         }
     }
 

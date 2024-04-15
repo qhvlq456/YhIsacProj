@@ -7,7 +7,7 @@ namespace YhProj.Game.Map
 {
     public class TileFactory : IFactory
     {
-        public T Create<T>(BaseData _value) where T : BaseObject 
+        public T Create<T>(GameData _value) where T : BaseObject 
         {
             // res이름도 넣어야 할 듯?
             Transform trf = Managers.Instance.GetManager<ObjectPoolManager>().Pooling(_value.type, _value.resName);
@@ -31,21 +31,21 @@ namespace YhProj.Game.Map
             return ret;
         }
 
-        public T Create<T>(BaseData _data, Vector3 _position) where T : BaseObject
+        public T Create<T>(GameData _data, Vector3 _position) where T : BaseObject
         {
             T ret = Create<T>(_data);
             ret.transform.position = _position;
             return ret;
         }
 
-        public T Create<T>(BaseData _data, Transform _parent) where T : BaseObject
+        public T Create<T>(GameData _data, Transform _parent) where T : BaseObject
         {
             T ret = Create<T>(_data);
             ret.transform.SetParent(_parent);
             return ret;
         }
 
-        public T Create<T>(BaseData _data, Transform _parent, Vector3 _position) where T : BaseObject
+        public T Create<T>(GameData _data, Transform _parent, Vector3 _position) where T : BaseObject
         {
             T ret = Create<T>(_data);
             ret.transform.SetParent(_parent);

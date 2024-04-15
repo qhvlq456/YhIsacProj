@@ -3,7 +3,7 @@ using static YhProj.Define;
 
 namespace YhProj.Game.Map
 {
-    public class TileDataBuilder : BaseDataBuilder<TileData>
+    public class TileDataBuilder : GameDataBuilder<TileData>
     {
         public TileDataBuilder SetDirection(Direction _direction)
         {

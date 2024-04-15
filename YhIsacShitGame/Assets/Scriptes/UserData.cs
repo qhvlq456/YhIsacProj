@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace YhProj.Game.User
 {
-    public class UserData : BaseData
+    public class UserData
     {
 
     }

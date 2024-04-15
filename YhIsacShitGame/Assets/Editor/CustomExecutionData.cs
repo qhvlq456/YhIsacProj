@@ -48,7 +48,7 @@ namespace YhProj.Game.YhEditor
             // Game Mode
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Game Mode");
-            EditorGUILayout.TextArea(executionData.gameMode.ToString(), textFiledOptions);
+            //EditorGUILayout.TextArea(executionData.gameMode.ToString(), textFiledOptions);
             EditorGUILayout.EndHorizontal();
 
             // Game Server

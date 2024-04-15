@@ -147,7 +147,7 @@ namespace YhProj.Game.Map
             stageDataDic = stageDataList.ToDictionary(k => k.stage, v => v);
         }
 
-        public void DataSave<T>(params T[] _params) where T : BaseData
+        public void DataSave<T>(params T[] _params) where T : GameData
         {
             List<StageData> stageList = _params.Select(x => x as StageData).ToList();
 

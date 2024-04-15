@@ -11,7 +11,7 @@ namespace YhProj.Game.Character
         grass // 풀
     }
     [System.Serializable]
-    public class CharacterData : BaseData
+    public class CharacterData : GameData
     {
         public int health;
         public int armor;

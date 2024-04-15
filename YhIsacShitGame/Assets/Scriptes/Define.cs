@@ -19,16 +19,6 @@ namespace YhProj
             beta,
             LIVE
         }
-        // uiroot 하위 랜더링할 캔버스 종류들
-        public enum UIRootType
-        {
-            MAIN_UI, // 항상 고정값이 되어야 함
-            POPUP_UI,
-            TOOLTIP_UI,
-            CONTEXTUAL_UI,
-            TEST_UI, // 테스트는 항상 아래 (솔직히 순서 상관없음)
-            COUNT
-        }
 
         // define symbol 들 enum처리
         public enum DefineSymbol

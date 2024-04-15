@@ -5,7 +5,6 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using YhProj.Game.UI;
-using static YhProj.Define;
 
 namespace YhProj.Game.YhEditor
 {
@@ -18,7 +17,7 @@ namespace YhProj.Game.YhEditor
         ReorderableList popupUIList;
         ReorderableList tooltipUIList;
         ReorderableList contextualUIList;
-        ReorderableList testUIList;
+        //ReorderableList testUIList;
 
         private void OnEnable()
         {
@@ -26,7 +25,7 @@ namespace YhProj.Game.YhEditor
             popupUIList = new ReorderableList(serializedObject, serializedObject.FindProperty("popupUIDataList"), true, true, true, true);
             tooltipUIList = new ReorderableList(serializedObject, serializedObject.FindProperty("tooltipUIDataList"), true, true, true, true);
             contextualUIList = new ReorderableList(serializedObject, serializedObject.FindProperty("contextualUIDataList"), true, true, true, true);
-            testUIList = new ReorderableList(serializedObject, serializedObject.FindProperty("testUIDataList"), true, true, true, true);
+            // testUIList = new ReorderableList(serializedObject, serializedObject.FindProperty("testUIDataList"), true, true, true, true);
 
             // main ui
             DrawHeaderCallback(UIRootType.MAIN_UI, mainUIList);
@@ -57,11 +56,11 @@ namespace YhProj.Game.YhEditor
             OnAddCallback(UIRootType.CONTEXTUAL_UI, contextualUIList);
 
             // test ui
-            DrawHeaderCallback(UIRootType.TEST_UI, testUIList);
-            DrawElementCallback(testUIList);
-            OnSelectCallback(testUIList);
-            OnRemoveCallback(testUIList);
-            OnAddCallback(UIRootType.TEST_UI, testUIList);
+            //DrawHeaderCallback(UIRootType.TEST_UI, testUIList);
+            //DrawElementCallback(testUIList);
+            //OnSelectCallback(testUIList);
+            //OnRemoveCallback(testUIList);
+            //OnAddCallback(UIRootType.TEST_UI, testUIList);
         }
         public override void OnInspectorGUI()
         {
@@ -78,7 +77,7 @@ namespace YhProj.Game.YhEditor
             popupUIList.DoLayoutList();
             tooltipUIList.DoLayoutList();
             contextualUIList.DoLayoutList();
-            testUIList.DoLayoutList();
+            // testUIList.DoLayoutList();
 
             serializedObject.ApplyModifiedProperties();
 
@@ -98,9 +97,9 @@ namespace YhProj.Game.YhEditor
                 case UIRootType.POPUP_UI:
                     header = "Popup UI";
                     break;
-                case UIRootType.TEST_UI:
-                    header = "Test UI";
-                    break;
+                //case UIRootType.TEST_UI:
+                //    header = "Test UI";
+                //break;
                 case UIRootType.TOOLTIP_UI:
                     header = "Tooltip UI";
                     break;

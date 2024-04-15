@@ -1,28 +1,25 @@
-using YhProj;
-using static YhProj.Define;
-
 namespace YhProj.Game
 {
-    public class BaseDataBuilder<T> : IBuilder<T> where T : BaseData, new()
+    public class GameDataBuilder<T> : IBuilder<T> where T : GameData, new ()
     {
         protected T data;
 
-        public BaseDataBuilder()
+        public GameDataBuilder()
         {
             data = new T();
         }
 
-        public BaseDataBuilder<T> SetIndex(int _idx)
+        public GameDataBuilder<T> SetIndex(int _idx)
         {
             data.index = _idx;
             return this;
         }
-        public BaseDataBuilder<T> SetType(BaseType _type)
+        public GameDataBuilder<T> SetType(BaseType _type)
         {
             data.type = _type;
             return this;
         }
-        public BaseDataBuilder<T> SetType(object _type)
+        public GameDataBuilder<T> SetType(object _type)
         {
             if (int.TryParse(_type.ToString(), out int type))
             {
@@ -32,7 +29,7 @@ namespace YhProj.Game
             return this;
         }
 
-        public BaseDataBuilder<T> SetName(string _name)
+        public GameDataBuilder<T> SetName(string _name)
         {
             data.name = _name;
             return this;
@@ -44,3 +41,4 @@ namespace YhProj.Game
         }
     }
 }
+

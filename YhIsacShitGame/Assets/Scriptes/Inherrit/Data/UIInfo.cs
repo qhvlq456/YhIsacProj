@@ -5,6 +5,6 @@ namespace YhProj.Game.UI
     {
         public string name;
         public string prefabName;
-        public Define.UIRootType uiRootType;
+        public UIRootType uiRootType;
     }
 }

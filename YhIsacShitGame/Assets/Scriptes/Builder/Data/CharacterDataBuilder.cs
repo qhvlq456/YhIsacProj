@@ -2,7 +2,7 @@ using YhProj.Game.Map;
 
 namespace YhProj.Game.Character
 {
-    public class CharacterDataBuilder : BaseDataBuilder<CharacterData>
+    public class CharacterDataBuilder : GameDataBuilder<CharacterData>
     {
         public CharacterDataBuilder SetHealth(int _health)
         {
