@@ -32,31 +32,24 @@ namespace YhProj.Game.YhEditor
             GUILayout.Label("Enter StageData:", EditorStyles.boldLabel);
             stageData.lv = EditorGUILayout.IntField("Level", stageData.lv);
             stageData.stage = EditorGUILayout.IntField("Stage", stageData.stage);
-            stageData.xOffset = EditorGUILayout.FloatField("X Offset", stageData.xOffset);
-            stageData.zOffset = EditorGUILayout.FloatField("Z Offset", stageData.zOffset);
+            stageData.row = EditorGUILayout.IntField("Row", stageData.row);
+            stageData.col = EditorGUILayout.IntField("Col", stageData.col);
             EditorGUILayout.Space(50);
             // 타일 배열 입력 필드
-            stageData.tileArr = new TileData[stageData.Row, stageData.Col];
+            stageData.tileIdxList = new List<int>();
 
             // 스크롤 뷰
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-            for (int i = 0; i < stageData.Row; i++)
+            List<int> tileIdxList = EditorManager.Instance.GetDataHandler<StageData>().GetData(stageData.stage).tileIdxList;
+            tileIdxList = tileIdxList == null ? new List<int>() : tileIdxList;
+            int tileCount = stageData.row * stageData.col;
+
+            for (int i = 0; i < tileCount; i++)
             {
-                for (int j = 0; j < stageData.Col; j++)
+                if (i > tileIdxList.Count)
                 {
-                    if (stageData.tileArr[i, j] == null)
-                    {
-                        stageData.tileArr[i, j] = new TileData();
-                    }
-
-                    GUILayout.Label($"Tile ({i}, {j}):", EditorStyles.boldLabel);
-
-                    stageData.tileArr[i, j].name = EditorGUILayout.TextField("Name", stageData.tileArr[i, j].name);
-                    stageData.tileArr[i, j].index = EditorGUILayout.IntField("Value", stageData.tileArr[i, j].index);
-                    stageData.tileArr[i, j].direction = (Define.Direction)EditorGUILayout.EnumPopup("Direction", stageData.tileArr[i, j].direction);
-
-                    EditorGUILayout.Space(5);
+                    tileIdxList.Add(0);
                 }
             }
 

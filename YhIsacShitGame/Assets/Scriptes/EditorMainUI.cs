@@ -50,10 +50,6 @@ namespace YhProj.Game.YhEditor
 
             base.Show(_uiInfo);
         }
-        public override void Hide()
-        {
-            base.Hide();
-        }
         private void EditorBtnClick(int _idx)
         {
             string uiName = EditorManager.Instance.uiNameDic[curEditorType];
@@ -67,6 +63,8 @@ namespace YhProj.Game.YhEditor
             uiName = EditorManager.Instance.uiNameDic[curEditorType];
 
             EditorManager.Instance.UIManager.ShowUI(uiName);
+
+            EditorManager.Instance.ChangeEditor(curEditorType);
         }
 
     }

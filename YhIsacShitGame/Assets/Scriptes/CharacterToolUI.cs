@@ -6,7 +6,7 @@ using TMPro;
 using YhProj.Game.UI;
 using YhProj.Game.Character;
 using YhProj.Game.YhEditor;
-using System.Net.NetworkInformation;
+using UnityEngine.Events;
 
 public class CharacterToolUI : EditorUI
 {
@@ -81,4 +81,57 @@ public class CharacterToolUI : EditorUI
 
     [SerializeField]
     private List<sCharInputButton> charInputBtnList = new List<sCharInputButton>();
+
+    public override void Show(UIInfo _uiInfo)
+    {
+        foreach (var btn in charToolBtnList)
+        {
+            btn.Btn.onClick.RemoveAllListeners();
+
+            UnityAction btnCallback = null;
+
+            switch (btn.btnType)
+            {
+                case ButtonType.save:
+                    btnCallback = SaveBtnClick;
+                    break;
+                case ButtonType.load:
+                    btnCallback = LoadBtnClick;
+                    break;
+                case ButtonType.delete:
+                    btnCallback = DeleteBtnClick;
+                    break;
+            }
+
+            if (btnCallback != null)
+            {
+                btn.Btn.onClick.AddListener(btnCallback);
+                btn.Text.text = btn.btnType.ToString();
+            }
+        }
+
+        base.Show(_uiInfo);
+    }
+
+    public override void Hide()
+    {
+        base.Hide();
+    }
+
+    public void SaveBtnClick()
+    {
+
+    }
+    public void LoadBtnClick()
+    {
+
+    }
+    public void DeleteBtnClick()
+    {
+
+    }
+    public void RemoveBtnClick()
+    {
+
+    }
 }

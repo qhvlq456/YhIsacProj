@@ -1,26 +1,46 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using YhProj.Game.Map;
 
 namespace YhProj.Game.YhEditor
 {
+    // 여기서 타일과 stage 두개를 생각하면 될듯..?
+    // 또 두개 다 분리 stagedata라고 생각해야 함
     public class MapEditor : BaseEditor
     {
-        private Transform root;
+        private StageHandler stageHandler;
+        public StageHandler StageHandler => stageHandler;
+        private TileHandler tileHandler;
+        public TileHandler TileHandler => tileHandler;
 
-        private TileFactory tileFactory;
-
-        private List<TileObject> tileObjectList = new List<TileObject>();
-
+        public override IDataHandler<T> GetHandler<T>()
+        {
+            if(typeof(T) == typeof(StageHandler))
+            {
+                return stageHandler as IDataHandler<T>;
+            }
+            else if (typeof(T) == typeof(TileData))
+            {
+                return tileHandler as IDataHandler<T>;
+            }
+            else
+            {
+                // 다른 타입에 대한 핸들러를 반환하거나 예외 처리
+                throw new System.NotSupportedException($"Handler for type {typeof(T)} is not supported.");
+            }
+        }
         public MapEditor()
         {
             // 후에 인터페이스를 이용한 다향성으로 스위칭
-            tileFactory = new TileFactory();
+            
         }
         public override void Initialize()
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
             bottomColider.size = new Vector3(100, 0, 100);
+
+
         }
         public override void Update()
         {
@@ -28,42 +48,49 @@ namespace YhProj.Game.YhEditor
         }
 
         #region Tile Load and Delete and Save
-
+        /// <summary>
+        /// row와 col은 무조건 존재해야 한다
+        /// </summary>
+        /// <param name="_gameData">stage data </param>
         public override void Create(GameData _gameData)
         {
             StageData stageData = _gameData as StageData;
 
             string log = "";
 
-            for (int i = 0; i < stageData.Row; i++)
+            List<int> list = stageData.tileIdxList;
+
+            int tileCount = stageData.row * stageData.col;
+            
+            for (int i = 0; i < tileCount; i++)
             {
-                for (int j = 0; j < stageData.Col; j++)
+                // 이거 생각해봐야 함
+                int z = i / stageData.row;
+                int x = i % stageData.col;
+
+                TileObject tileObject = null;
+                TileData tileData = tileHandler.GetData(list[i]);
+
+                switch (tileData.elementType)
                 {
-                    TileData tileData = new TileData();
-
-                    if (stageData.tileArr[i, j] != null)
-                    {
-                        tileData = stageData.tileArr[i, j];
-                    }
-                    else
-                    {
-                        tileData.type = BaseType.TILE;
-                        tileData.elementType = ElementType.ENEMY;
-                    }
-
-                    tileData.index = i * stageData.Col + j;
-                    tileData.resName = "EditorTileObject";
-
-                    int z = tileData.index / stageData.Row;
-                    int x = tileData.index % stageData.Col;
-
-                    EditorTileObject editorTileObject = tileFactory.Create<EditorTileObject>(tileData);
-                    editorTileObject.transform.SetParent(root);
-                    editorTileObject.transform.localPosition = new Vector3(x, 0, z);
-                    tileObjectList.Add(editorTileObject);
-                    log += $"idx = {tileData.index}, road type = {tileData.elementType}, ";
+                    case ElementType.mine:
+                        tileObject = factory.Create<HeroTileObject>(tileData);
+                        break;
+                    case ElementType.enemy:
+                        tileObject = factory.Create<EnemyTileObject>(tileData);
+                        break;
+                    case ElementType.deco:
+                        tileObject = factory.Create<DecoTileObject>(tileData);
+                        break;
+                    default:
+                        tileObject = factory.Create<EditorTileObject>(tileData);
+                        break;
                 }
-                log += '\n';
+
+                tileObject.transform.SetParent(root);
+                tileObject.transform.localPosition = new Vector3(x, 0, z);
+                objectList.Add(tileObject);
+                log += $"idx = {tileData.index}, road type = {tileData.elementType}, \n";
             }
 
             Debug.LogError(log);
@@ -73,7 +100,7 @@ namespace YhProj.Game.YhEditor
         {
             if(_gameData is TileData tileData)
             {
-                TileObject tileObject = tileObjectList.Find(x => x.tileData == tileData);
+                TileObject tileObject = objectList.Select(x => x as TileObject).Where(x => x.tileData.index == _gameData.index).First();
                 tileObject?.Delete();
             }
             else
@@ -85,12 +112,13 @@ namespace YhProj.Game.YhEditor
 
         public override void Dispose()
         {
-            foreach(var tile in tileObjectList)
+            foreach(var obj in  objectList) 
             {
-                tile.Delete();
+                obj.Delete();
             }
 
-            tileObjectList.Clear();
+            objectList.Clear();
         }
+
     }
 }

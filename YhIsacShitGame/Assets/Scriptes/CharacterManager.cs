@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using YhProj.Game.Map;
+using Unity.VisualScripting;
 
 namespace YhProj.Game.Character
 {
-    public class CharacterManager : BaseManager, IDataHandler
+    public class CharacterManager : BaseManager
     {
         private Dictionary<int, HeroData> heroDataDic = new Dictionary<int, HeroData>();
         private Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
@@ -30,19 +32,34 @@ namespace YhProj.Game.Character
         {
             
         }
+    }
 
-        public void DataLoad()
+    // Data류 클래스들은 idatahandler를 통해 재구현하고 클래스로 데이터 보관
+    public sealed class CharDataHandler : BaseDataHandler<CharacterData>
+    {
+        public static string json_char_hero_file_name = "StageData.json";
+        public static string json_enemy_hero_file_name = "StageData.json";
+        public override void LoadData()
         {
-            List<HeroData> heroDataList = GameUtil.LoadJsonArray<HeroData>(StaticDefine.json_data_path, StaticDefine.json_character_file_name);
-            heroDataDic = heroDataList.ToDictionary(k => k.index, v => v);
+            List<CharacterData> list = new List<CharacterData>();
 
-            List<EnemyData> enemyDataList = GameUtil.LoadJsonArray<EnemyData>(StaticDefine.json_data_path, StaticDefine.json_enemy_file_name);
-            enemyDataDic = enemyDataList.ToDictionary(k => k.index, v => v);
+            List<HeroTileData> heroTileDataList = GameUtil.LoadJsonArray<HeroTileData>(StaticDefine.json_data_path, json_char_hero_file_name);
+            List<EnemyTileData> enemyTileDataList = GameUtil.LoadJsonArray<EnemyTileData>(StaticDefine.json_data_path, json_enemy_hero_file_name);
+
+            list.AddRange(heroTileDataList);
+            list.AddRange(enemyTileDataList);
+
+            dataDic = list.ToDictionary(k => k.index, v => v);
         }
 
-        public void DataSave<T>(params T[] _params) where T : GameData
+        public override void SaveData()
         {
-            
+            // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());
+        }
+
+        public override void SaveData(params CharacterData[] _params)
+        {
+            List<CharacterData> stageList = _params.ToList();
         }
     }
 }

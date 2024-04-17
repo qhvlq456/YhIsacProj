@@ -16,7 +16,7 @@ namespace YhProj.Game.Map
         }
         public override void Delete()
         {
-            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(BaseType.TILE, transform);
+            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(BaseType.tile, transform);
         }
     }
 }

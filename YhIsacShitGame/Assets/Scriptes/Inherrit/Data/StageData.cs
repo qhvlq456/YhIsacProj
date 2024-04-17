@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace YhProj.Game.Map
 {
@@ -7,24 +7,18 @@ namespace YhProj.Game.Map
     {
         public int lv;
         public int stage;
-        public TileData[,] tileArr { get; set; }
+        public int row;
+        public int col;
 
-        public float tileSize;
-        public float xOffset;
-        public float zOffset;
+        // 이거 변경 필요
+        public List<int> tileIdxList;
         public StageData() { }
 
-        public StageData(int _stage, int _lv, TileData[,] _tileArr)
+        public StageData(int _stage, int _lv, List<int> _tileIdxList)
         {
             stage = _stage;
             lv = _lv;
-            tileArr = _tileArr;
+            tileIdxList = _tileIdxList;
         }
-
-        // 직렬화로인한 함수처리
-        [JsonIgnore]
-        public int Row => tileArr.GetLength(0);
-        [JsonIgnore]
-        public int Col => tileArr.GetLength(1);
     }
 }

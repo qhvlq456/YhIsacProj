@@ -17,7 +17,7 @@ namespace YhProj.Game
             root = GameUtil.AttachObj<Transform>("ObjectPoolRoot");
             root.position = Vector3.back * 100f;
 
-            for (int i = 0; i < (int)BaseType.COUNT; i++)
+            for (int i = 0; i < (int)BaseType.count; i++)
             {
                 BaseType baseType = (BaseType)i;
                 string objName = baseType.ToString();
@@ -50,13 +50,13 @@ namespace YhProj.Game
 
             switch (_type)
             {
-                case BaseType.TILE:
+                case BaseType.tile:
                     path = string.Format("{0}/{1}", DefinePath.tile_path, _objName);
                     break;
                 case BaseType.character:
                     path = string.Format("{0}/{1}", DefinePath.character_path, _objName);
                     break;
-                case BaseType.BUILD:
+                case BaseType.build:
                     path = string.Format("{0}/{1}", DefinePath.tile_path, _objName);
                     break;
                 case BaseType.item:

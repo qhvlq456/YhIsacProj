@@ -7,6 +7,7 @@ using TMPro;
 using YhProj.Game.Map;
 using YhProj.Game.UI;
 using YhProj.Game.YhEditor;
+using YhProj.Game;
 
 public class MapToolUI : EditorUI
 {
@@ -43,9 +44,6 @@ public class MapToolUI : EditorUI
         col,
         stage,
         lv,
-        tileSize,
-        xOffset,
-        zOffset
     }
     public enum DropDownType
     {
@@ -128,7 +126,7 @@ public class MapToolUI : EditorUI
         if (stageDropDown.options.Count > 0)
         {
             int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
-            StageData stageData = EditorManager.Instance.StageHandler.GetStageData(idx);
+            StageData stageData = EditorManager.Instance.GetDataHandler<StageData>().GetData(idx);
 
             currentStageData = stageData;
 
@@ -188,19 +186,21 @@ public class MapToolUI : EditorUI
         int stage = GetInputFieldToType<int>(dic[InputType.stage]);
         int lv = GetInputFieldToType<int>(dic[InputType.lv]);
 
-        float tileSize = GetInputFieldToType<float>(dic[InputType.tileSize]);
-        float xOffset = GetInputFieldToType<float>(dic[InputType.xOffset]);
-        float zOffset = GetInputFieldToType<float>(dic[InputType.zOffset]);
-
         logText.text = "Stage : " + stage.ToString();
 
-        TileData[,] copyTileArr = EditorManager.Instance.StageHandler.GetTileArrByStage(stage);
+        List<int> tileIdxList = EditorManager.Instance.GetDataHandler<StageData>().GetData(stage).tileIdxList;
+        tileIdxList = tileIdxList == null ? new List<int>() : tileIdxList;
+        int tileCount = row * col;
 
-        StageData stageData = new StageData(stage, lv, copyTileArr == null ? new TileData[row, col] : copyTileArr);
+        for (int i = 0; i < tileCount; i++)
+        {
+            if (i > list.Count)
+            {
+                tileIdxList.Add(0);
+            }
+        }
 
-        stageData.tileSize = tileSize;
-        stageData.xOffset = xOffset;
-        stageData.zOffset = zOffset;
+        StageData stageData = new StageData(stage, lv, tileIdxList);
 
         currentStageData = stageData;
 
@@ -221,7 +221,7 @@ public class MapToolUI : EditorUI
         if (stageDropDown.options.Count > 0)
         {
             int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
-            StageData stageData = EditorManager.Instance.StageHandler.GetStageData(idx);
+            StageData stageData = EditorManager.Instance.GetDataHandler<StageData>().GetData(idx);
 
             currentStageData = stageData;
 
@@ -242,11 +242,11 @@ public class MapToolUI : EditorUI
 
         int stage = GetInputFieldToType<int>(inputField);
 
-        StageHandler stageHandler = EditorManager.Instance.StageHandler;
+        StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageData>() as StageHandler;
 
-        if (stageHandler.IsConstainsStage(stage))
+        if (stageHandler.ContainsData(stage))
         {
-            StageData stageData = stageHandler.GetStageData(stage);
+            StageData stageData = stageHandler.GetData(stage);
             EditorManager.Instance.Delete(stageData);
             logText.text = "Delete Stage Success!!";
         }
@@ -260,7 +260,7 @@ public class MapToolUI : EditorUI
         TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
         int idx = int.Parse(stageDropDown.options[_value].text);
 
-        StageData stageData = EditorManager.Instance.StageHandler.GetStageData(idx);
+        StageData stageData = EditorManager.Instance.GetDataHandler<StageData>().GetData(idx);
 
         if (stageData != null)
         {
@@ -280,13 +280,10 @@ public class MapToolUI : EditorUI
     {
         return _inputType switch
         {
-            InputType.row => _stageData.Row,
-            InputType.col => _stageData.Col,
+            InputType.row => _stageData.row,
+            InputType.col => _stageData.col,
             InputType.stage => _stageData.stage,
             InputType.lv => _stageData.lv,
-            InputType.tileSize => _stageData.tileSize,
-            InputType.xOffset => _stageData.xOffset,
-            InputType.zOffset => _stageData.zOffset,
             _ => null
         };
     }

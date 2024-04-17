@@ -3,19 +3,19 @@ namespace YhProj.Game
     // 모든 게임 데이터의 베이스의 타입 // base type -> subType 으로 간다, 필드 오브젝트만
     public enum BaseType
     {
-        NONE,
-        TILE,
+        none,
+        tile,
         character,
-        BUILD,
+        build,
         accessory,
         item,
-        COUNT
+        count
     }
     public enum ElementType
     {
-        MINE,
-        ENEMY,
-        DECO
+        mine = 1,
+        enemy,
+        deco
     }
     public class GameData
     {

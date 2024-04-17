@@ -16,6 +16,10 @@ namespace YhProj.Game.UI
         CONTEXTUAL_UI,
         COUNT
     }
+    /// <summary>
+    /// ui가 닫히고 다른 ui를 띄우는경우
+    /// ui가 모두 닫혀야 하는 경우도 생각하여야 함
+    /// </summary>
 
     /*
      * main ui

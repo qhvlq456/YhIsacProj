@@ -52,11 +52,6 @@ namespace YhProj
 
         public static int MAX_CREATE_TILE_NUM = 12;
 
-        public static string JSON_MAP_FILE_NAME = "StageData.json";
-
-        public static string json_character_file_name = "hero.json";
-        public static string json_enemy_file_name = "Enemy.json";
-
         // json 위치 
         public static string json_data_path = "StreamingAssets";
 

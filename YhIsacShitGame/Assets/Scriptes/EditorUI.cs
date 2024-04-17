@@ -84,7 +84,9 @@ namespace YhProj.Game.YhEditor
             TMP_Dropdown stageDropDown = _dropDown;
             stageDropDown.ClearOptions();
 
-            List<string> dropDownOptionList = Managers.Instance.GetManager<MapManager>().GetStageDataList().Select(x => x.stage.ToString()).ToList();
+            var stageList = EditorManager.Instance.GetDataHandler<StageData>().GetDataList();
+            List<string> dropDownOptionList = stageList.Select(x => x.stage.ToString()).ToList();
+
             stageDropDown.AddOptions(dropDownOptionList);
         }
 

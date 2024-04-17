@@ -1,26 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj.Game.Map;
 using YhProj.Game.State;
 using YhProj.Game.UI;
 
 namespace YhProj.Game.YhEditor
 {
-    [SerializeField]
     public enum EditorType
     {
+        None = 0,
         Map,
         Character,
     }
 
-    // 에디터 주체 클래스
+    // 에디터 주체 클래스 현제 mapTool, characterTool 관련 기능을 담당한다 .. stagetool도 만들어야 되나? maptool이랑 다른게 뭐지?
+    // stage map을 두개를 나누어야 하는데 (stage,tile) 너무 깊숙히 와버렸고 stage는 감도 안잡히네
     public class EditorManager : Singleton<EditorManager>
     {
         public readonly Dictionary<EditorType, string> uiNameDic = new Dictionary<EditorType, string>()
         {
-            { EditorType.Map, "MapToolMainUI"},
-            { EditorType.Character, "CharacterToolMainUI"}
+            { EditorType.Map, "MapToolUI"},
+            { EditorType.Character, "CharacterToolUI"}
         };
 
         [SerializeField]
@@ -32,80 +32,44 @@ namespace YhProj.Game.YhEditor
         [SerializeField]
         private EditorType editorType;
 
-        private StageHandler stageHandler;
-        public StageHandler StageHandler
-        {
-            get
-            {
-                return stageHandler;
-            }
-        }
-
         private UIManager uiManager;
 
         public UIManager UIManager
         {
             get
             {
-                uiManager = Managers.Instance.GetManager<UIManager>();
-                uiManager.Load();
+                if(uiManager == null) 
+                {
+                    uiManager = Managers.Instance.GetManager<UIManager>();
+                    uiManager.Load();
+                }
+
                 return uiManager;
             }
         }
 
-
         private BaseEditor baseEditor;
         private StateController stateController;
-
+        
+        public IDataHandler<T> GetDataHandler<T>() where T : GameData
+        {
+            return baseEditor.GetHandler<T>();
+        }
         protected override void Awake()
         {
             base.Awake();
 
-            Load();
-        }
-        public void Load()
-        {
-            stateController.Initialize();
-
-            if (stageHandler is IDataHandler dataHandler)
-            {
-                dataHandler.DataLoad();
-            }
-            else
-            {
-
-            }
+            stateController?.Initialize();
         }
         
-        public void Save<T>(params T[] _params) where T : StageData
+        public void ChangeEditor(EditorType _editorType)
         {
-            if (stageHandler is IDataHandler dataHandler)
-            {
-                dataHandler.DataSave<TileData>(_params);
-            }
-            else
-            {
+            editorType = _editorType;
 
-            }
-
-        }
-        public void ChangeEditor()
-        {
             switch (editorType) 
             {
                 case EditorType.Map:
                     baseEditor = new MapEditor();
-                    stageHandler = new StageHandler();
-                    break;
-                case EditorType.Character:
-                    break;
-            }
-        }
-        public void ChangeState()
-        {
-            switch (editorType)
-            {
-                case EditorType.Map:
                     stateController = new EditStateController(lookTrf);
                     break;
                 case EditorType.Character:
@@ -114,11 +78,11 @@ namespace YhProj.Game.YhEditor
         }
         public void Create(GameData _gameData)
         {
-            baseEditor.Create(_gameData);
+            baseEditor?.Create(_gameData);
         }
         public void Delete(GameData _gameData)
         {
-            baseEditor.Delete(_gameData);
+            baseEditor?.Delete(_gameData);
         }
 
         public void Update()
@@ -126,11 +90,16 @@ namespace YhProj.Game.YhEditor
             baseEditor?.Update();
             stateController?.Update();
         }
-
         public void Dispose()
         {
             baseEditor?.Dispose();
             stateController?.Dispose();
+        }
+
+        public void Save<T>(params T[] data) where T : GameData
+        {
+            IDataHandler<T> handler = GetDataHandler<T>();
+            handler?.SaveData(data);
         }
     }
 }

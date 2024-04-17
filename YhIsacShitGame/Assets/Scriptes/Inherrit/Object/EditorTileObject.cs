@@ -56,13 +56,13 @@ namespace YhProj.Game.Map
 
             switch (tileData.elementType)
             {
-                case ElementType.MINE:
+                case ElementType.mine:
                     meshRenderer.material.color = mineRoadColor;
                     break;
-                case ElementType.ENEMY:
+                case ElementType.enemy:
                     meshRenderer.material.color = enemyRoadColor;
                     break;
-                case ElementType.DECO:
+                case ElementType.deco:
                     meshRenderer.material.color = decoRoadColor;
                     break;
             }
