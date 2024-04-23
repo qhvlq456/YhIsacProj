@@ -64,7 +64,17 @@ namespace YhProj.Game.YhEditor
 
             EditorManager.Instance.UIManager.ShowUI(uiName);
 
-            EditorManager.Instance.ChangeEditor(curEditorType);
+            switch(curEditorType)
+            {
+                case EditorType.Map:
+                    EditorManager.Instance.ChangeEditor(new MapEditor());
+                    break;
+                case EditorType.Character:
+                    EditorManager.Instance.ChangeEditor(new CharacterEditor());
+                    break;
+                default:
+                    break;
+            }
         }
 
     }

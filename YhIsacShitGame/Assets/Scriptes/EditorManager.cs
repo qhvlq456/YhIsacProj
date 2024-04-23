@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UI;
 using UnityEngine;
 using YhProj.Game.State;
 using YhProj.Game.UI;
@@ -50,11 +52,10 @@ namespace YhProj.Game.YhEditor
 
         private BaseEditor baseEditor;
         private StateController stateController;
-        
-        public IDataHandler<T> GetDataHandler<T>() where T : GameData
-        {
-            return baseEditor.GetHandler<T>();
-        }
+
+        public T GetDataHandler<T>() where T : BaseDataHandler, new() => baseEditor.GetDataHandler<T>();
+
+
         protected override void Awake()
         {
             base.Awake();
@@ -62,19 +63,9 @@ namespace YhProj.Game.YhEditor
             stateController?.Initialize();
         }
         
-        public void ChangeEditor(EditorType _editorType)
+        public void ChangeEditor(BaseEditor _baseEditor)
         {
-            editorType = _editorType;
-
-            switch (editorType) 
-            {
-                case EditorType.Map:
-                    baseEditor = new MapEditor();
-                    stateController = new EditStateController(lookTrf);
-                    break;
-                case EditorType.Character:
-                    break;
-            }
+            baseEditor = _baseEditor;
         }
         public void Create(GameData _gameData)
         {
@@ -96,10 +87,12 @@ namespace YhProj.Game.YhEditor
             stateController?.Dispose();
         }
 
-        public void Save<T>(params T[] data) where T : GameData
+        public void Save<T>(IDataHandler _dataHandler, params T[] _params) where T : GameData
         {
-            IDataHandler<T> handler = GetDataHandler<T>();
-            handler?.SaveData(data);
+            if(_dataHandler != null)
+            {
+                _dataHandler.SaveData(_params);
+            }
         }
     }
 }

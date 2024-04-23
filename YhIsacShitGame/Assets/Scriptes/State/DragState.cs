@@ -1,9 +1,7 @@
+using UnityEngine;
+
 namespace YhProj.Game.State
 {
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public class DragState : State
     {
         float moveSpeed;

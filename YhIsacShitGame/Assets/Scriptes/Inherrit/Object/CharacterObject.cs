@@ -9,7 +9,7 @@ namespace YhProj.Game.Character
     {
         [SerializeField]
         protected NavMeshAgent agent;
-        protected CharacterData characterData;
+        public CharacterData characterData;
 
         public override void Create<T>(T _data)
         {

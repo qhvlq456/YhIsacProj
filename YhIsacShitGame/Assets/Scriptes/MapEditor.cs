@@ -1,3 +1,4 @@
+using OpenCover.Framework.Model;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,38 +10,19 @@ namespace YhProj.Game.YhEditor
     // 또 두개 다 분리 stagedata라고 생각해야 함
     public class MapEditor : BaseEditor
     {
-        private StageHandler stageHandler;
-        public StageHandler StageHandler => stageHandler;
-        private TileHandler tileHandler;
-        public TileHandler TileHandler => tileHandler;
-
-        public override IDataHandler<T> GetHandler<T>()
-        {
-            if(typeof(T) == typeof(StageHandler))
-            {
-                return stageHandler as IDataHandler<T>;
-            }
-            else if (typeof(T) == typeof(TileData))
-            {
-                return tileHandler as IDataHandler<T>;
-            }
-            else
-            {
-                // 다른 타입에 대한 핸들러를 반환하거나 예외 처리
-                throw new System.NotSupportedException($"Handler for type {typeof(T)} is not supported.");
-            }
-        }
         public MapEditor()
         {
             // 후에 인터페이스를 이용한 다향성으로 스위칭
-            
+            factory = new TileFactory();
+
+            dataHandlerMap.Add(typeof(StageHandler), new StageHandler());
+            dataHandlerMap.Add(typeof(TileHandler), new TileHandler());
         }
+        
         public override void Initialize()
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
             bottomColider.size = new Vector3(100, 0, 100);
-
-
         }
         public override void Update()
         {
@@ -54,6 +36,8 @@ namespace YhProj.Game.YhEditor
         /// <param name="_gameData">stage data </param>
         public override void Create(GameData _gameData)
         {
+            TileHandler handler = GetDataHandler<TileHandler>();
+
             StageData stageData = _gameData as StageData;
 
             string log = "";
@@ -69,7 +53,7 @@ namespace YhProj.Game.YhEditor
                 int x = i % stageData.col;
 
                 TileObject tileObject = null;
-                TileData tileData = tileHandler.GetData(list[i]);
+                TileData tileData = handler.GetData<TileData>(list[i]);
 
                 switch (tileData.elementType)
                 {
@@ -112,12 +96,7 @@ namespace YhProj.Game.YhEditor
 
         public override void Dispose()
         {
-            foreach(var obj in  objectList) 
-            {
-                obj.Delete();
-            }
-
-            objectList.Clear();
+            base.Dispose();
         }
 
     }

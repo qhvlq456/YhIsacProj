@@ -1,10 +1,13 @@
+using OpenCover.Framework.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using Unity.VisualScripting;
-
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.AI;
 using YhProj.Game.Player;
 
 namespace YhProj.Game.Map
@@ -17,30 +20,14 @@ namespace YhProj.Game.Map
     /// 여기서 tile과 stage 두개를 분리하여 관리
     public class MapManager : BaseManager
     {
-        private StageHandler stageHandler;
-        private TileHandler tileHandler;
-
-
         // 여기서 combine해서 결과물 도출하여야 함
         //public void AddStageData(StageData _stageData) => stageHandler.AddStageData(_stageData);
         //public StageData GetStageData(int _stage) => stageHandler.GetStageData(_stage);
         //public List<int> GetTileArrByStage(int _stage) => stageHandler.GetTileArrByStage(_stage);
         //public bool IsConstainsStage(int _stage) => stageHandler.IsConstainsStage(_stage);
         //public List<StageData> GetStageDataList() => stageHandler.GetStageDataList();
-
-        public Transform root { get; private set; }
-
-        private TileFactory factory;
-
-        private List<TileObject> tileObjectList = new List<TileObject>();
         public override void Load()
         {
-            stageHandler = new StageHandler();
-            tileHandler = new TileHandler();
-
-            tileHandler.LoadData();
-            stageHandler.LoadData();
-
             if (root == null)
             {
                 root = GameUtil.AttachObj<Transform>("MapRoot");
@@ -61,48 +48,9 @@ namespace YhProj.Game.Map
         /// </summary>
         public override void Update()
         {
-
+            
         }
-        // 후에 ui데이터를 넘겨준다면!?
 
-        #region Tile Load and Delete and Save
-        public void LoadStage(int _stage)
-        {
-            StageData stageData = stageHandler.GetData(_stage);
-
-            if (stageData == null) 
-            {
-                return;
-            }
-
-            List<int> stageIdxList = stageData.tileIdxList;
-
-            for (int i = 0; i < stageIdxList.Count; i++)
-            {
-                TileData tileData = tileHandler.GetData(stageIdxList[i]);
-
-                TileObject tileObject = new TileObject();
-                switch (tileData.elementType)
-                {
-                    case ElementType.mine:
-                        tileObject = factory.Create<HeroTileObject>(tileData);
-                        break;
-                    case ElementType.enemy:
-                        tileObject = factory.Create<EnemyTileObject>(tileData);
-                        break;
-                    case ElementType.deco:
-                        tileObject = factory.Create<DecoTileObject>(tileData);
-                        break;
-                }
-
-                tileObjectList.Add(tileObject);
-            }
-        }
-        public void DeleteStage(int _stage)
-        {
-            stageHandler.DeleteData(_stage);
-        }
-        #endregion
         #region MapManager Event
         // player가 레벨업을 할 때마다 호출
         public void OnPlayerLevelChange(int _level)
@@ -121,7 +69,7 @@ namespace YhProj.Game.Map
         }
         #endregion
     }
-    public sealed class TileHandler : BaseDataHandler<TileData>
+    public sealed class TileHandler : BaseDataHandler
     {
         public static string json_hero_tile_file_name = "StageData.json";
         public static string json_enemy_tile_file_name = "StageData.json";
@@ -138,7 +86,17 @@ namespace YhProj.Game.Map
             list.AddRange(enemyTileDataList);
             list.AddRange(decoTileDataList);
 
-            dataDic = list.ToDictionary(k => k.index, v => v);
+            foreach(var data in list) 
+            { 
+                if(!dataDic.ContainsKey(data.index)) 
+                {
+                    dataDic.Add(data.index, data);
+                }
+                else
+                {
+                    Debug.LogError($"[TileHandler] Already is constains key : {data.index}!!");
+                }
+            }
         }
 
         public override void SaveData()
@@ -147,11 +105,12 @@ namespace YhProj.Game.Map
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, JSON_MAP_FILE_NAME, GetDataList());
         }
 
-        public override void SaveData(params TileData[] _params)
+
+        public override void SaveData<T>(params T[] _params)
         {
             // 각 tiledata 클래스 별로 나누어 저장을 해야 할지 아님 한번에 tiledata로 저장해야 할지 알아보긴 해야 함
 
-            List<TileData> tileDataList = _params.ToList();
+            List<TileData> tileDataList = _params.OfType<TileData>().ToList();
 
             foreach (var tileData in tileDataList)
             {
@@ -160,11 +119,10 @@ namespace YhProj.Game.Map
 
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());
         }
-
     }
 
     // Data류 클래스들은 idatahandler를 통해 재구현하고 클래스로 데이터 보관
-    public sealed class StageHandler : BaseDataHandler<StageData>
+    public sealed class StageHandler : BaseDataHandler
     {
         public static string json_stage_file_name = "StageData.json";
 
@@ -173,25 +131,37 @@ namespace YhProj.Game.Map
             // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
             List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.json_data_path, json_stage_file_name);
 
-            dataDic = stageDataList.ToDictionary(k => k.stage, v => v);
+
+            foreach (var data in stageDataList)
+            {
+                if (!dataDic.ContainsKey(data.index))
+                {
+                    dataDic.Add(data.index, data);
+                }
+                else
+                {
+                    Debug.LogError($"[StageHandler] Already is constains key : {data.index}!!");
+                }
+            }
         }
 
         public override void SaveData()
         {
-            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList());
+            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
         }
 
-        public override void SaveData(params StageData[] _params)
+        public override void SaveData<T>(params T[] _params)
         {
-            List<StageData> stageList = _params.ToList();
+            List<StageData> stageList = _params.OfType<StageData>().ToList();
 
             foreach (var stage in stageList)
             {
                 AddData(stage);
             }
 
-            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList());
+            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
         }
     }
+
 }
 

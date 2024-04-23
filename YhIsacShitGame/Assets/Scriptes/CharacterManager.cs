@@ -9,15 +9,12 @@ namespace YhProj.Game.Character
 {
     public class CharacterManager : BaseManager
     {
-        private Dictionary<int, HeroData> heroDataDic = new Dictionary<int, HeroData>();
-        private Dictionary<int, EnemyData> enemyDataDic = new Dictionary<int, EnemyData>();
-
-        private CharacterFactory characterFactory;
-        public Transform root { get; private set; }
-
+        private CharDataHandler charDataHandler;
 
         public override void Load()
         {
+            charDataHandler = new CharDataHandler();
+
             if (root == null)
             {
                 root = GameUtil.AttachObj<Transform>("CharaterRoot");
@@ -26,7 +23,7 @@ namespace YhProj.Game.Character
         }
         public override void Update()
         {
-
+            
         }
         public override void Dispose()
         {
@@ -35,7 +32,7 @@ namespace YhProj.Game.Character
     }
 
     // Data류 클래스들은 idatahandler를 통해 재구현하고 클래스로 데이터 보관
-    public sealed class CharDataHandler : BaseDataHandler<CharacterData>
+    public sealed class CharDataHandler : BaseDataHandler
     {
         public static string json_char_hero_file_name = "StageData.json";
         public static string json_enemy_hero_file_name = "StageData.json";
@@ -49,7 +46,17 @@ namespace YhProj.Game.Character
             list.AddRange(heroTileDataList);
             list.AddRange(enemyTileDataList);
 
-            dataDic = list.ToDictionary(k => k.index, v => v);
+            foreach (var data in list)
+            {
+                if (!dataDic.ContainsKey(data.index))
+                {
+                    dataDic.Add(data.index, data);
+                }
+                else
+                {
+                    Debug.LogError($"[CharDataHandler] Already is constains key : {data.index}!!");
+                }
+            }
         }
 
         public override void SaveData()
@@ -57,9 +64,9 @@ namespace YhProj.Game.Character
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());
         }
 
-        public override void SaveData(params CharacterData[] _params)
+        public override void SaveData<T>(params T[] _params)
         {
-            List<CharacterData> stageList = _params.ToList();
+            List<CharacterData> charList = _params.OfType<CharacterData>().ToList();
         }
     }
 }

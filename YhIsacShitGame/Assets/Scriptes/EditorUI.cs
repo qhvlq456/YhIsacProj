@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using YhProj.Game.UI;
 using YhProj.Game.Map;
 using System.Linq;
+using Unity.VisualScripting;
 
 namespace YhProj.Game.YhEditor
 {
@@ -77,17 +78,6 @@ namespace YhProj.Game.YhEditor
             }
 
             return false;
-        }
-
-        protected void UpdateDropDown(TMP_Dropdown _dropDown)
-        {
-            TMP_Dropdown stageDropDown = _dropDown;
-            stageDropDown.ClearOptions();
-
-            var stageList = EditorManager.Instance.GetDataHandler<StageData>().GetDataList();
-            List<string> dropDownOptionList = stageList.Select(x => x.stage.ToString()).ToList();
-
-            stageDropDown.AddOptions(dropDownOptionList);
         }
 
         protected List<T> GetEnumValues<T>() 

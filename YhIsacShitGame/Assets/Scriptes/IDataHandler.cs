@@ -1,29 +1,23 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace YhProj.Game
 {
+    public interface IDataHandler
+    {
+        void LoadData();
+        void SaveData();
+        void SaveData<T>(params T[] _params) where T : GameData;
+    }
     /// <summary>
     /// controller에 따라 데이터 저장 여부가 나뉨
     /// </summary>
-    public interface IDataHandler<T>
+    public abstract class BaseDataHandler : IDataHandler
     {
-        void AddData(T _data);
-        void DeleteData(int _index);
-        T GetData(int _index);
-        bool ContainsData(int _index);
-        List<T> GetDataList();
-        void LoadData();
-        void SaveData();
-
-        void SaveData(params T[] _params);
-    }
-
-    public abstract class BaseDataHandler<T> : IDataHandler<T> where T : GameData
-    {
-        protected Dictionary<int, T> dataDic = new Dictionary<int, T>();
-
-        public virtual void AddData(T _data)
+        // key : index, value : gamedata
+        protected Dictionary<int, GameData> dataDic = new Dictionary<int, GameData>();
+        public virtual void AddData<T>(T _data) where T : GameData
         {
             if (ContainsData(_data.index))
             {
@@ -43,9 +37,9 @@ namespace YhProj.Game
             }
         }
 
-        public virtual T GetData(int _index)
+        public virtual T GetData<T>(int _index) where T : GameData
         {
-            return ContainsData(_index) ? dataDic[_index] : null;
+            return ContainsData(_index) ? dataDic[_index] as T: null;
         }
 
         public virtual bool ContainsData(int _index)
@@ -53,13 +47,18 @@ namespace YhProj.Game
             return dataDic.ContainsKey(_index);
         }
 
-        public virtual List<T> GetDataList()
+        public virtual List<T> GetDataList<T>() where T : GameData
         {
-            return dataDic.Values.ToList();
+            return dataDic.Values.OfType<T>().ToList();
         }
         public abstract void LoadData();
         public abstract void SaveData();
 
-        public abstract void SaveData(params T[] _params);
+        public abstract void SaveData<T>(params T[] _params) where T : GameData;
     }
 }
+
+
+
+
+

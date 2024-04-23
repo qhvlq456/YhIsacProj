@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
@@ -7,7 +8,7 @@ using TMPro;
 using YhProj.Game.Map;
 using YhProj.Game.UI;
 using YhProj.Game.YhEditor;
-using YhProj.Game;
+
 
 public class MapToolUI : EditorUI
 {
@@ -62,11 +63,16 @@ public class MapToolUI : EditorUI
     [SerializeField]
     private TextMeshProUGUI logText;
 
+    // 일단 캐싱하여 사용 후에 받아와서 사용할 것인지 고려할 필요가 존재함 (editor부분은 수정을 할 수 있음으로)
+    private StageHandler stageHandler;
+
     [SerializeField]
     private StageData currentStageData = null;
 
     public override void Show(UIInfo _uiInfo)
     {
+        stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
         foreach (var dropDown in textDropDownList)
         {
             UnityAction<int> valueCallback = null;
@@ -126,7 +132,9 @@ public class MapToolUI : EditorUI
         if (stageDropDown.options.Count > 0)
         {
             int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
-            StageData stageData = EditorManager.Instance.GetDataHandler<StageData>().GetData(idx);
+            //StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+            StageData stageData = stageHandler.GetData<StageData>(idx);
 
             currentStageData = stageData;
 
@@ -152,7 +160,9 @@ public class MapToolUI : EditorUI
         {
             text = $"Save Complete!! Stage : {currentStageData.stage}";
 
-            EditorManager.Instance.Save(currentStageData);
+            // IDataHandler dataHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+            EditorManager.Instance.Save(stageHandler, currentStageData);
             TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
             UpdateDropDown(stageDropDown);
         }
@@ -188,7 +198,9 @@ public class MapToolUI : EditorUI
 
         logText.text = "Stage : " + stage.ToString();
 
-        List<int> tileIdxList = EditorManager.Instance.GetDataHandler<StageData>().GetData(stage).tileIdxList;
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        List<int> tileIdxList = stageHandler.GetData<StageData>(stage).tileIdxList;
         tileIdxList = tileIdxList == null ? new List<int>() : tileIdxList;
         int tileCount = row * col;
 
@@ -217,11 +229,12 @@ public class MapToolUI : EditorUI
         textInputList.ForEach(ui => ui.InputField.text = "");
 
         TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
         if (stageDropDown.options.Count > 0)
         {
             int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
-            StageData stageData = EditorManager.Instance.GetDataHandler<StageData>().GetData(idx);
+            StageData stageData = stageHandler.GetData<StageData>(idx);
 
             currentStageData = stageData;
 
@@ -242,11 +255,11 @@ public class MapToolUI : EditorUI
 
         int stage = GetInputFieldToType<int>(inputField);
 
-        StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageData>() as StageHandler;
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
         if (stageHandler.ContainsData(stage))
         {
-            StageData stageData = stageHandler.GetData(stage);
+            StageData stageData = stageHandler.GetData<StageData>(stage);
             EditorManager.Instance.Delete(stageData);
             logText.text = "Delete Stage Success!!";
         }
@@ -260,7 +273,9 @@ public class MapToolUI : EditorUI
         TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
         int idx = int.Parse(stageDropDown.options[_value].text);
 
-        StageData stageData = EditorManager.Instance.GetDataHandler<StageData>().GetData(idx);
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        StageData stageData = stageHandler.GetData<StageData>(idx);
 
         if (stageData != null)
         {
@@ -276,7 +291,7 @@ public class MapToolUI : EditorUI
 
         }
     }
-    object GetPropertyValue(StageData _stageData, InputType _inputType)
+    private object GetPropertyValue(StageData _stageData, InputType _inputType)
     {
         return _inputType switch
         {
@@ -286,5 +301,16 @@ public class MapToolUI : EditorUI
             InputType.lv => _stageData.lv,
             _ => null
         };
+    }
+
+    protected void UpdateDropDown(TMP_Dropdown _dropDown)
+    {
+        TMP_Dropdown stageDropDown = _dropDown;
+        stageDropDown.ClearOptions();
+
+        var stageList = stageHandler.GetDataList<StageData>();
+        List<string> dropDownOptionList = stageList.Select(x => x.stage.ToString()).ToList();
+
+        stageDropDown.AddOptions(dropDownOptionList);
     }
 }

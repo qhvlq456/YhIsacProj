@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace YhProj.Game
 {
     /*
@@ -10,11 +14,33 @@ namespace YhProj.Game
      */
     public abstract class BaseManager
     {
+        private Dictionary<Type, BaseDataHandler> dataHandlerMap = new Dictionary<Type, BaseDataHandler>();
+        public T GetDataHandler<T>() where T : BaseDataHandler, new()
+        {
+            Type type = typeof(T);
+
+            if (dataHandlerMap.ContainsKey(type))
+            {
+                return dataHandlerMap[type] as T;
+            }
+            else
+            {
+                T newHandler = new T();
+                dataHandlerMap[type] = newHandler;
+                return newHandler;
+            }
+        }
+
+        public BaseDataHandler GetDataHandler(Type _type) => dataHandlerMap.TryGetValue(_type, out BaseDataHandler handler) ? handler : null;
+        protected IFactory factory;
+
+        public Transform root { get; protected set; }
         // data의 load 플로우들을 정의
         public abstract void Load();
         // data의 저장 등등 정의
         public abstract void Update();
         // data의 unload 플로우들을 정의
         public abstract void Dispose();
+
     }
 }
