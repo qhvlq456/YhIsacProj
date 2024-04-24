@@ -10,6 +10,7 @@ namespace YhProj.Game.Character
         lightning, // 번개
         grass // 풀
     }
+    // grid를 몇개 잡는지 선언해야되는데 이것만 있는게아니라..
     [System.Serializable]
     public class CharacterData : GameData
     {

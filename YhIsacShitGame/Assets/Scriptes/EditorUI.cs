@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using YhProj.Game.UI;
-using YhProj.Game.Map;
-using System.Linq;
-using Unity.VisualScripting;
+
 
 namespace YhProj.Game.YhEditor
 {
@@ -47,6 +45,9 @@ namespace YhProj.Game.YhEditor
             public TMP_Dropdown dropdown;
             public TextMeshProUGUI titleText;
         }
+        // 일단 캐싱하여 사용 후에 받아와서 사용할 것인지 고려할 필요가 존재함 (editor부분은 수정을 할 수 있음으로)
+        protected BaseDataHandler baseDataHandler;
+
 
         // 후에 타입별로 클래스로 나누어 다시 짤것임
         protected T GetInputFieldToType<T>(TMP_InputField _inputField)

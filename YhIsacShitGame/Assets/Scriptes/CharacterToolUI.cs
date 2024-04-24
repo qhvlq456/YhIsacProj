@@ -7,6 +7,7 @@ using YhProj.Game.UI;
 using YhProj.Game.Character;
 using YhProj.Game.YhEditor;
 using UnityEngine.Events;
+using YhProj.Game.Map;
 
 public class CharacterToolUI : EditorUI
 {
@@ -67,9 +68,7 @@ public class CharacterToolUI : EditorUI
         attributeType,
     }
 
-    private CharacterObject characterObject;
-
-
+    // index 기준으로 dropdonwlist
     [SerializeField]
     private List<sCharToolBtn> charToolBtnList = new List<sCharToolBtn>();
 
@@ -82,8 +81,13 @@ public class CharacterToolUI : EditorUI
     [SerializeField]
     private List<sCharInputButton> charInputBtnList = new List<sCharInputButton>();
 
+
+    private CharacterData curCharData = null;
+
     public override void Show(UIInfo _uiInfo)
     {
+        baseDataHandler = EditorManager.Instance.GetDataHandler<CharDataHandler>();
+
         foreach (var btn in charToolBtnList)
         {
             btn.Btn.onClick.RemoveAllListeners();
@@ -120,18 +124,69 @@ public class CharacterToolUI : EditorUI
 
     public void SaveBtnClick()
     {
-
+        EditorManager.Instance.Save(baseDataHandler, curCharData);
     }
     public void LoadBtnClick()
     {
+        if (curCharData != null)
+        {
+            EditorManager.Instance.Delete(curCharData);
+        }
 
+        var list = GetEnumValues<InputType>();
+        var dic = new Dictionary<InputType, TMP_InputField>();
+
+        foreach (var item in list)
+        {
+            TMP_InputField inputField = charTextInputList.Find(x => x.inputType == item).InputField;
+
+            dic.Add(item, inputField);
+        }
+
+        int index = GetInputFieldToType<int>(dic[InputType.index]);
+        string name = GetInputFieldToType<string>(dic[InputType.name]);
+        int health = GetInputFieldToType<int>(dic[InputType.health]);
+        int armor = GetInputFieldToType<int>(dic[InputType.armor]);
+        int power = GetInputFieldToType<int>(dic[InputType.power]);
+        int range = GetInputFieldToType<int>(dic[InputType.range]);
+        int moveSpeed = GetInputFieldToType<int>(dic[InputType.moveSpeed]);
+
+        CharacterData characterData = baseDataHandler.GetData<CharacterData>(index);
+        characterData = characterData == null ? new CharacterData() : characterData;
+        //logText.text = "Stage : " + stage.ToString();
+
+        curCharData = characterData;
+
+        EditorManager.Instance.Create(curCharData);
     }
     public void DeleteBtnClick()
     {
+        //if (baseDataHandler.ContainsData(stage))
+        //{
+        //    StageData stageData = baseDataHandler.GetData<StageData>(stage);
+        //    EditorManager.Instance.Delete(stageData);
+        //    logText.text = "Delete Stage Success!!";
+        //}
+        //else
+        //{
 
+        //}
     }
     public void RemoveBtnClick()
     {
+        TMP_InputField inputField = textInputList.Find(x => x.inputType == InputType.index).InputField;
 
+        int stage = GetInputFieldToType<int>(inputField);
+
+        if (baseDataHandler.ContainsData(stage))
+        {
+            StageData stageData = baseDataHandler.GetData<StageData>(stage);
+            EditorManager.Instance.Delete(stageData);
+            logText.text = "Delete Stage Success!!";
+        }
+        else
+        {
+
+        }
     }
 }
