@@ -63,6 +63,7 @@ public class CharacterToolUI : EditorUI
     }
     public enum DropDownType
     {
+        index,
         baseType,
         elementType,
         attributeType,
@@ -120,11 +121,15 @@ public class CharacterToolUI : EditorUI
     public override void Hide()
     {
         base.Hide();
+        curCharData = null;
     }
 
     public void SaveBtnClick()
     {
-        EditorManager.Instance.Save(baseDataHandler, curCharData);
+        if (curCharData != null) 
+        {
+            EditorManager.Instance.Save(baseDataHandler, curCharData);
+        }
     }
     public void LoadBtnClick()
     {
@@ -161,20 +166,29 @@ public class CharacterToolUI : EditorUI
     }
     public void DeleteBtnClick()
     {
-        //if (baseDataHandler.ContainsData(stage))
-        //{
-        //    StageData stageData = baseDataHandler.GetData<StageData>(stage);
-        //    EditorManager.Instance.Delete(stageData);
-        //    logText.text = "Delete Stage Success!!";
-        //}
-        //else
-        //{
+        // Managers.Instance.GetManager<MapManager>().DeleteTile(curStageData.stage);
+        curCharData = null;
+        charTextInputList.ForEach(ui => ui.InputField.text = "");
 
-        //}
+        TMP_Dropdown charDropDown = charTextDropDownList.Find(x => x.dropDownType == DropDownType.index).Dropdown;
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        if (charDropDown.options.Count > 0)
+        {
+            int idx = int.Parse(charDropDown.options[charDropDown.value].text);
+            CharacterData charData = baseDataHandler.GetData<CharacterData>(idx);
+
+            curCharData = charData;
+
+            for (int i = 0; i < charTextDropDownList.Count; i++)
+            {
+                charTextInputList[i].InputField.text = GetPropertyValue(charData, charTextInputList[i].inputType).ToString();
+            }
+        }
     }
     public void RemoveBtnClick()
     {
-        TMP_InputField inputField = textInputList.Find(x => x.inputType == InputType.index).InputField;
+        TMP_InputField inputField = charTextInputList.Find(x => x.inputType == InputType.index).InputField;
 
         int stage = GetInputFieldToType<int>(inputField);
 
@@ -182,11 +196,26 @@ public class CharacterToolUI : EditorUI
         {
             StageData stageData = baseDataHandler.GetData<StageData>(stage);
             EditorManager.Instance.Delete(stageData);
-            logText.text = "Delete Stage Success!!";
         }
         else
         {
 
         }
     }
+    private object GetPropertyValue(CharacterData _charData, InputType _inputType)
+    {
+        return _inputType switch
+        {
+            InputType.index => _charData.index,
+            InputType.name => _charData.name,
+            InputType.resName => _charData.resName,
+            InputType.health => _charData.health,
+            InputType.armor => _charData.armor,
+            InputType.power => _charData.power,
+            InputType.range => _charData.range,
+            InputType.moveSpeed => _charData.moveSpeed,
+            _ => null
+        };
+    }
+
 }

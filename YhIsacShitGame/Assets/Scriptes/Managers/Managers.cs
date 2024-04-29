@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using TMPro;
 using YhProj.Game.Map;
 using YhProj.Game.UI;
 using YhProj.Game.GameInput;
@@ -62,7 +61,6 @@ namespace YhProj.Game
             RegisterManager(new InputManager(lookTarget));
             RegisterManager(new MapManager()); // 나중에 순서에 상관없이 load되게 끔 변경해야 됨
             RegisterManager(new UIManager());
-            RegisterManager(new LogManager());
         }
         private void Start()
         {
