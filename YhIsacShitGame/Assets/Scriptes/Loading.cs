@@ -2,17 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Loading : MonoBehaviour
+namespace YhProj.Game.Play
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Loading : ScheduledTask
     {
-        
-    }
+        public Loading(float duration) : base(duration)
+        {
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public override void Execute()
+        {
+            Debug.Log("Loading 작업 수행");
+        }
     }
 }

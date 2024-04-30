@@ -4,9 +4,16 @@ using UnityEngine;
 
 namespace YhProj.Game.Play
 {
-    public static class Intro
+    public class Intro : ScheduledTask
     {
-        
+        public Intro(float duration) : base(duration)
+        {
+        }
+
+        public override void Execute()
+        {
+            Debug.Log("Intro 작업 수행");
+        }
     }
 }
 
