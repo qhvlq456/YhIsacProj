@@ -21,7 +21,6 @@ namespace YhProj.Game
     public class Managers : Singleton<Managers>
     {
         public event Action<Transform> OnLookTargetChanged;
-
 #if UNITY_EDITOR
         ExecutionData executionData;
 #endif

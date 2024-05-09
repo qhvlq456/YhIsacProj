@@ -45,8 +45,6 @@ namespace YhProj.Game.UI
 
         private List<UIInfo> uiInfoList = new List<UIInfo>();
 
-        private Transform root;
-
         // main ui만 따로 
         private MainUI mainUI;
         private Dictionary<UIRootType, Transform> rootTrfDic = new Dictionary<UIRootType, Transform>();

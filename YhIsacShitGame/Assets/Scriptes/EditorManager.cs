@@ -91,7 +91,7 @@ namespace YhProj.Game.YhEditor
         {
             if(_dataHandler != null)
             {
-                _dataHandler.SaveData(_params);
+                _dataHandler.SaveJsonData(_params);
             }
         }
     }

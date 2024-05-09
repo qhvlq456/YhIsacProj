@@ -1,22 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using YhProj.Game.User;
 
 namespace YhProj.Game
 {
     public interface IDataHandler
     {
-        void LoadData();
-        void SaveData();
-        void SaveData<T>(params T[] _params) where T : GameData;
+        void LoadJsonData();
+        void SaveJsonData();
+        void SaveJsonData<T>(params T[] _params) where T : GameData;
+    }
+    // 서버 통신을 위한 인터페이스
+    public interface IServerDataHandler
+    {
+        // void DBSend();
+        void DBSend<T>(params T[] _parameteres) where T : GameData;
+        // void DBCallback<T>(params T[] _params) where T : GameData;
+        void DBCallback(object _sender, ServerCallbackEventArgs _args);
     }
     /// <summary>
     /// controller에 따라 데이터 저장 여부가 나뉨
     /// </summary>
-    public abstract class BaseDataHandler : IDataHandler
+    public abstract class BaseDataHandler : IDataHandler, IServerDataHandler
     {
         // key : index, value : gamedata
         protected Dictionary<int, GameData> dataDic = new Dictionary<int, GameData>();
+        public BaseDataHandler()
+        {
+            ServerCommunicator.OnServerCallback += DBCallback;
+        }
         public virtual void AddData<T>(T _data) where T : GameData
         {
             if (ContainsData(_data.index))
@@ -51,14 +64,21 @@ namespace YhProj.Game
         {
             return dataDic.Values.OfType<T>().ToList();
         }
-        public abstract void LoadData();
-        public abstract void SaveData();
+        public abstract void LoadJsonData();
+        public abstract void SaveJsonData();
 
-        public abstract void SaveData<T>(params T[] _params) where T : GameData;
+        public abstract void SaveJsonData<T>(params T[] _params) where T : GameData;
+
+        public virtual void DBSend<T>(params T[] _parameteres) where T : GameData
+        {
+            ServerCommunicator.SendData(_parameteres);
+        }
+        public virtual void DBCallback(object _sender, ServerCallbackEventArgs _args)
+        {
+            //if (_params.Length > 0 && _params[0] is string response)
+            //{
+            //    // ... (서버 응답 데이터 처리)
+            //}
+        }
     }
 }
-
-
-
-
-

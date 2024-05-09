@@ -74,7 +74,7 @@ namespace YhProj.Game.Map
         public static string json_hero_tile_file_name = "StageData.json";
         public static string json_enemy_tile_file_name = "StageData.json";
         public static string json_deco_tile_file_name = "StageData.json";
-        public override void LoadData()
+        public override void LoadJsonData()
         {
             List<TileData> list = new List<TileData>();
 
@@ -99,14 +99,14 @@ namespace YhProj.Game.Map
             }
         }
 
-        public override void SaveData()
+        public override void SaveJsonData()
         {
             // 각 tiledata 클래스 별로 나누어 저장을 해야 할지 아님 한번에 tiledata로 저장해야 할지 알아보긴 해야 함
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, JSON_MAP_FILE_NAME, GetDataList());
         }
 
 
-        public override void SaveData<T>(params T[] _params)
+        public override void SaveJsonData<T>(params T[] _params)
         {
             // 각 tiledata 클래스 별로 나누어 저장을 해야 할지 아님 한번에 tiledata로 저장해야 할지 알아보긴 해야 함
 
@@ -126,7 +126,7 @@ namespace YhProj.Game.Map
     {
         public static string json_stage_file_name = "StageData.json";
 
-        public override void LoadData()
+        public override void LoadJsonData()
         {
             // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
             List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.json_data_path, json_stage_file_name);
@@ -145,12 +145,12 @@ namespace YhProj.Game.Map
             }
         }
 
-        public override void SaveData()
+        public override void SaveJsonData()
         {
             GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
         }
 
-        public override void SaveData<T>(params T[] _params)
+        public override void SaveJsonData<T>(params T[] _params)
         {
             List<StageData> stageList = _params.OfType<StageData>().ToList();
 

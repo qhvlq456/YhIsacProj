@@ -73,6 +73,7 @@ namespace YhProj.Game.Play
             }
         }
     }
+    // 이건 인터피에스가 좋을듯?
 
     public abstract class ScheduledTask
     {

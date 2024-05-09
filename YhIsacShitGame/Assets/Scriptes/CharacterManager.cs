@@ -36,7 +36,7 @@ namespace YhProj.Game.Character
     {
         public static string json_char_hero_file_name = "StageData.json";
         public static string json_enemy_hero_file_name = "StageData.json";
-        public override void LoadData()
+        public override void LoadJsonData()
         {
             List<CharacterData> list = new List<CharacterData>();
 
@@ -59,12 +59,12 @@ namespace YhProj.Game.Character
             }
         }
 
-        public override void SaveData()
+        public override void SaveJsonData()
         {
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());
         }
 
-        public override void SaveData<T>(params T[] _params)
+        public override void SaveJsonData<T>(params T[] _params)
         {
             List<CharacterData> charList = _params.OfType<CharacterData>().ToList();
         }
