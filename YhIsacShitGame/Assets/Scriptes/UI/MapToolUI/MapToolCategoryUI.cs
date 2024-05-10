@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using static YhProj.Define;
+using YhProj.Game;
+
 using System;
 using System.Reflection;
+using YhProj;
 
 public class MapToolCategoryUI : MonoBehaviour
 {
@@ -51,7 +53,7 @@ public class MapToolCategoryUI : MonoBehaviour
         Type type = _fieldInfo.FieldType;
         bool isDropDown = true;
 
-        if(type ==  typeof(Direction) || type == typeof(BaseType) 
+        if(type ==  typeof(Define.Direction) || type == typeof(BaseType) 
            || type == typeof(ElementType) || type == typeof(bool)) 
         {
             isDropDown = true;

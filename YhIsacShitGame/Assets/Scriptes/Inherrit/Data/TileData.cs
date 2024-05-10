@@ -1,48 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using YhProj;
-
-[System.Serializable]
-public class TileData : BaseData
+namespace YhProj.Game.Map
 {
-    public Define.Direction direction;
-
-    // server 에서 할 일
-    // 해당 타일이 적 길인지 아군 길인지, 데코인지 판단하는 값
-    public Define.ElementType elementType;
-    // 배치된 오브젝트 인덱스 후에 다른것들로 통합할 필요가 있다.
-    public int batchIdx;
-
-    public TileData() { }
-    public TileData(int _index, string _name, Define.BaseType _type, Define.Direction _direction) : base(_index, _type, _name)
+    [System.Serializable]
+    public class TileData : GameData
     {
-        direction = _direction;
-        batchIdx = 0;
-        elementType = Define.ElementType.ENEMY;
+        public Define.Direction direction;
+
+        // server 에서 할 일
+        // 해당 타일이 적 길인지 아군 길인지, 데코인지 판단하는 값
+        public ElementType elementType;
+        // 배치된 오브젝트 인덱스 후에 다른것들로 통합할 필요가 있다.
+        public int batchIdx;
     }
 
-    public bool IsCharacter()
+    [System.Serializable]
+    public class HeroTileData : GameData
     {
-        bool ret = false;
-        return ret;
-    }
-    public override void Load()
-    {
-        
-    }
-
-    public override void Delete()
-    {
-        
+        public HeroTileData() { }
+        public HeroTileData(TileData _tileData) 
+        {
+        }
     }
 
-    public override void Update()
+    [System.Serializable]
+    public class EnemyTileData : GameData
     {
-        
+        public EnemyTileData() { }
+        public EnemyTileData(TileData _tileData)
+        {
+        }
     }
-    public override void Logger()
+
+    [System.Serializable]
+    public class DecoTileData : GameData
     {
-        Debug.LogWarningFormat("Tile Data \n index : {0}, type : {1}", index, type);
+        public DecoTileData() { }
+        public DecoTileData(TileData _tileData)
+        {
+        }
     }
 }

@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace YhProj
+namespace YhProj.Game.State
 {
     public class State
     {

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ExecutionData
   m_EditorClassIdentifier: 
   serverType: 0
-  gameMode: 2
+  gameMode: 1
   logType: 0
   defineSymbolType: 0
   version: 0

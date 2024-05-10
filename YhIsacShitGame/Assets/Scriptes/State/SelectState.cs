@@ -1,11 +1,13 @@
-namespace YhProj
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using YhProj.Game.Map;
+using YhProj.Game.UI;
 
-    // ¼±ÅÃ¿¡ ´ëÇÑ Çàµ¿À» ±¸ÇöÇØ¾ß ÇÔ
+namespace YhProj.Game.State
+{
+    // ì„ íƒì— ëŒ€í•œ í–‰ë™ì„ êµ¬í˜„í•´ì•¼ í•¨
     public class SelectState : State
     {
         #region Factory Method
@@ -14,7 +16,7 @@ namespace YhProj
         { 
             
         }
-        // ÆÑÅä¸® ¸Ş¼­µå
+        // íŒ©í† ë¦¬ ë©”ì„œë“œ
         public static SelectState Create()
         {
             return new SelectState();
@@ -24,11 +26,11 @@ namespace YhProj
         public override void Enter(BaseObject _baseObject)
         {
             EditorTileObject editorTileObject = _baseObject as EditorTileObject;
-            // ÃÊ±âÈ­ ¼³Á¤
+            // ì´ˆê¸°í™” ì„¤ì •
             if (editorTileObject != null)
             {
-                editorTileObject.Load(editorTileObject.tileData);
-                Managers.Instance.GetManager<UIManager>().ShowUI<MapToolUI, EditorTileObject>("MapToolUI", editorTileObject);
+                editorTileObject.Create(editorTileObject.tileData);
+                Managers.Instance.GetManager<UIManager>().ShowUI<MapToolBodyUI, EditorTileObject>("MapToolUI", editorTileObject);
             }
             else
             {

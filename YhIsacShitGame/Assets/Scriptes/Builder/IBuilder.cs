@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace YhProj
+namespace YhProj.Game
 {
     public interface IBuilder<T>
     {

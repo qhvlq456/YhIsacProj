@@ -1,51 +1,53 @@
-using YhProj;
 using System;
 
-[Serializable]
-public class PlayerInfo
+namespace YhProj.Game.Player
 {
-    int lv;
-    public int Lv
+    [Serializable]
+    public class PlayerInfo
     {
-        get
+        int lv;
+        public int Lv
         {
-            return lv;
+            get
+            {
+                return lv;
+            }
+            set
+            {
+                lv = value;
+                EventMediator.RelayPlayerLevelChange(lv);
+            }
         }
-        set
+        public int gold;
+        public int cash;
+    }
+
+    public class PlayerManager : BaseManager
+    {
+        public PlayerInfo playerInfo { get; private set; }
+
+        public PlayerManager(PlayerInfo _playerInfo)
         {
-            lv = value;
-            EventMediator.RelayPlayerLevelChange(lv);
+            playerInfo = _playerInfo;
         }
-    }
-    public int gold;
-    public int cash;
-}
 
-public class PlayerManager : BaseManager
-{
-    public PlayerInfo playerInfo { get; private set; }
+        public override void Load()
+        {
+            EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+            EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
+        }
 
-    public PlayerManager(PlayerInfo _playerInfo)
-    {
-        playerInfo = _playerInfo;
-    }
+        public override void Update()
+        {
 
-    public override void Load(Define.GameMode _gameMode)
-    {
-        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
-        EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
-    }
-
-    public override void Update()
-    {
-        
-    }
-    public override void Delete()
-    {
-        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
-    }
-    public void LoadPlayerEvent(PlayerInfo _playerInfo)
-    {
-        UnityEngine.Debug.LogError("LoadPlayerEvent!!");
+        }
+        public override void Dispose()
+        {
+            EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+        }
+        public void LoadPlayerEvent(PlayerInfo _playerInfo)
+        {
+            UnityEngine.Debug.LogError("LoadPlayerEvent!!");
+        }
     }
 }

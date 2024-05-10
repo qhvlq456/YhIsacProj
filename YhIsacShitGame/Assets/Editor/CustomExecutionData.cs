@@ -4,155 +4,158 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-[CustomEditor(typeof(ExecutionData))]
-public class CustomExecutionData: Editor
+namespace YhProj.Game.YhEditor
 {
-    ExecutionData executionData;
+    [CustomEditor(typeof(ExecutionData))]
+    public class CustomExecutionData : Editor
+    {
+        ExecutionData executionData;
 
-    GUILayoutOption[] textFiledOptions = 
-    { 
-        GUILayout.Width(130), 
-        GUILayout.MaxWidth(600) 
+        GUILayoutOption[] textFiledOptions =
+        {
+        GUILayout.Width(130),
+        GUILayout.MaxWidth(600)
     };
 
-    // ³ªÁß¿¡ build iconµµ ¼³Á¤ ¸¸µéÀÚ
-    // build ÇÒ¶§ keystore¶óµçÁö ±âÅ¸µîµî ¼ÂÆÃµµ ³Ö¾î¾ß ÇÔ
-    public override void OnInspectorGUI()
-    {
-        base.OnInspectorGUI();
-
-        if (executionData == null)
+        // ë‚˜ì¤‘ì— build iconë„ ì„¤ì • ë§Œë“¤ì
+        // build í• ë•Œ keystoreë¼ë“ ì§€ ê¸°íƒ€ë“±ë“± ì…‹íŒ…ë„ ë„£ì–´ì•¼ í•¨
+        public override void OnInspectorGUI()
         {
-            executionData = target as ExecutionData; //AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.EXECUTIONDATA_PATH);
-        }
+            base.OnInspectorGUI();
 
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
+            if (executionData == null)
+            {
+                executionData = target as ExecutionData; //AssetDatabase.LoadAssetAtPath<ExecutionData>(StaticDefine.EXECUTIONDATA_PATH);
+            }
 
-        #region LabelField
-        EditorGUI.BeginDisabledGroup(true);
-        // Game Info
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Game Info");
-        EditorGUILayout.TextArea(executionData.gameInfo.ToString(), textFiledOptions);
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
-        // Game Version
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Game Version");
-        EditorGUILayout.TextArea(executionData.version.ToString(), textFiledOptions);
-        EditorGUILayout.EndHorizontal();
+            #region LabelField
+            EditorGUI.BeginDisabledGroup(true);
+            // Game Info
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Game Info");
+            EditorGUILayout.TextArea(executionData.gameInfo.ToString(), textFiledOptions);
+            EditorGUILayout.EndHorizontal();
 
-        // Game Mode
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Game Mode");
-        EditorGUILayout.TextArea(executionData.gameMode.ToString(), textFiledOptions);
-        EditorGUILayout.EndHorizontal();
+            // Game Version
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Game Version");
+            EditorGUILayout.TextArea(executionData.version.ToString(), textFiledOptions);
+            EditorGUILayout.EndHorizontal();
 
-        // Game Server
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Game Server");
-        EditorGUILayout.TextArea(executionData.serverType.ToString(), textFiledOptions);
-        EditorGUILayout.EndHorizontal();
+            // Game Mode
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Game Mode");
+            //EditorGUILayout.TextArea(executionData.gameMode.ToString(), textFiledOptions);
+            EditorGUILayout.EndHorizontal();
 
-        // Log Type
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Log Type");
-        EditorGUILayout.TextArea(executionData.logType.ToString(), textFiledOptions);
-        EditorGUILayout.EndHorizontal();
+            // Game Server
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Game Server");
+            EditorGUILayout.TextArea(executionData.serverType.ToString(), textFiledOptions);
+            EditorGUILayout.EndHorizontal();
 
-        // Define Symbols
+            // Log Type
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Log Type");
+            EditorGUILayout.TextArea(executionData.logType.ToString(), textFiledOptions);
+            EditorGUILayout.EndHorizontal();
+
+            // Define Symbols
 #if UNITY_IOS || UNITY_IPHONE
 		string symbols = string.Format("{0}",PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS));
 #elif UNITY_ANDROID
         string symbols = string.Format("{0}", PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android));
 #else
-		string symbols = string.Empty;
+            string symbols = string.Empty;
 #endif
-        symbols = Regex.Replace(symbols, @";+", ";");
+            symbols = Regex.Replace(symbols, @";+", ";");
 
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Define Symbols");
-        EditorGUILayout.TextArea(symbols, textFiledOptions);
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Define Symbols");
+            EditorGUILayout.TextArea(symbols, textFiledOptions);
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUI.EndDisabledGroup();
-        #endregion
+            EditorGUI.EndDisabledGroup();
+            #endregion
 
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
 
-        #region DefineSymbols button
-        // Start DefineSymbols button
-        if (GUILayout.Button("PlayerSetting Symbol Update", GUILayout.Height(50)))
-        {
-            List<string> defineList = symbols.Split(';').ToList();
-
-            // Áßº¹ Á¦°Å
-            defineList = defineList.Distinct().ToList();
-            
-            // ÇöÁ¦ ³ªÀÇ enum filed¿¡ Á¸Àç ÇÏÁö ¾Ê´Â´Ù¸é Ãß°¡ÇÑ´Ù.
-            if(!defineList.Contains(executionData.defineSymbolType.ToString()))
+            #region DefineSymbols button
+            // Start DefineSymbols button
+            if (GUILayout.Button("PlayerSetting Symbol Update", GUILayout.Height(50)))
             {
-                defineList.Add(executionData.defineSymbolType.ToString());
+                List<string> defineList = symbols.Split(';').ToList();
+
+                // ì¤‘ë³µ ì œê±°
+                defineList = defineList.Distinct().ToList();
+
+                // í˜„ì œ ë‚˜ì˜ enum filedì— ì¡´ì¬ í•˜ì§€ ì•ŠëŠ”ë‹¤ë©´ ì¶”ê°€í•œë‹¤.
+                if (!defineList.Contains(executionData.defineSymbolType.ToString()))
+                {
+                    defineList.Add(executionData.defineSymbolType.ToString());
+                }
+
+                //ë¬¸ìì—´ ë‹¤ì‹œ í•©ì¹œí›„ ì‹¬ë³¼(ë””íŒŒì¸) ì ìš© 
+#if UNITY_IOS || UNITY_IPHONE
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, string.Join(";", defineList.ToArray()));
+#elif UNITY_ANDROID
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, string.Join(";", defineList.ToArray()));
+#else
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defineList.ToArray()));
+#endif
+                AssetDatabase.SaveAssets();
             }
 
-            //¹®ÀÚ¿­ ´Ù½Ã ÇÕÄ£ÈÄ ½Éº¼(µğÆÄÀÎ) Àû¿ë 
+            EditorGUILayout.Space();
+
+            // ëª¨ë“  define clear í•˜ëŠ” ì‘ì—…
+            if (GUILayout.Button("PlayerSetting Symbol Clear", GUILayout.Height(50)))
+            {
+                //ê¸°ì¡´ PlayerSettings ì— scripting Define symbols ê°’ë“¤ ;ë¥¼ êµ¬ë¶„ìœ¼ë¡œ ì˜ë¼ì„œ ë³´ê´€ 
+                List<string> defineList = symbols.Split(';').ToList();
+                // í›„ì— ì´ìƒ ìˆì„ì‹œ ë³€ê²½
+                defineList.Clear();
+                //ë¬¸ìì—´ ë‹¤ì‹œ í•©ì¹œí›„ ì‹¬ë³¼(ë””íŒŒì¸) ì ìš© 
 #if UNITY_IOS || UNITY_IPHONE
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, string.Join(";", defineList.ToArray()));
 #elif UNITY_ANDROID
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, string.Join(";", defineList.ToArray()));
 #else
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defineList.ToArray()));
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defineList.ToArray()));
 #endif
-            AssetDatabase.SaveAssets();
+                AssetDatabase.SaveAssets();
+            }
+            // end DefineSymbols button
+            #endregion DefineSymbols button
+
+            EditorGUILayout.Space();
+
+            #region Save
+            if (GUILayout.Button("Save", GUILayout.Height(50)))
+            {
+                AssetDatabase.SaveAssets();
+            }
+            #endregion
+            EditorGUILayout.Space();
         }
+        /*
+         * menuitemë“±ì„ í†µí•´ ì—ë””í„°ì—ì„œ ì„¤ì •í•  ìˆ˜ ìˆëŠ” í™˜ê²½ë“±ì„ ì…‹íŒ…
+         * ExecutionData
+         * í™˜ê²½ì„¤ì •ì€ í•„ìš” ì—†ë‹¤ ì–´ì°¨í”¼ scriptableobjectì—ì„œ ë°›ì•„ì„œ ì‚¬ìš©í•˜ë©´ ë˜ê¸° ë•Œë¬¸ ì¦‰, ë¹Œë“œë¥¼ ìœ„í•´ ì‚¬ìš© í•˜ë©´ ë  ë“¯ í•˜ë‹¤
+         */
+        //[MenuItem("YhProjMenu/Preferences/Execution Preferences (ì‹¤í–‰í™˜ê²½ì„¤ì •)")]
+        //static void ExecutionPreferences()
+        //{
+        //    if(executionData == null)
+        //    {
+        //        executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(executionDataPath);
+        //    }
 
-        EditorGUILayout.Space();
-
-        // ¸ğµç define clear ÇÏ´Â ÀÛ¾÷
-        if (GUILayout.Button("PlayerSetting Symbol Clear", GUILayout.Height(50)))
-        {
-            //±âÁ¸ PlayerSettings ¿¡ scripting Define symbols °ªµé ;¸¦ ±¸ºĞÀ¸·Î Àß¶ó¼­ º¸°ü 
-            List<string> defineList = symbols.Split(';').ToList();
-            // ÈÄ¿¡ ÀÌ»ó ÀÖÀ»½Ã º¯°æ
-            defineList.Clear();
-            //¹®ÀÚ¿­ ´Ù½Ã ÇÕÄ£ÈÄ ½Éº¼(µğÆÄÀÎ) Àû¿ë 
-#if UNITY_IOS || UNITY_IPHONE
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, string.Join(";", defineList.ToArray()));
-#elif UNITY_ANDROID
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, string.Join(";", defineList.ToArray()));
-#else
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, string.Join(";", defineList.ToArray()));
-#endif
-            AssetDatabase.SaveAssets();
-        }
-        // end DefineSymbols button
-        #endregion DefineSymbols button
-
-        EditorGUILayout.Space();
-
-        #region Save
-        if (GUILayout.Button("Save", GUILayout.Height(50)))
-        {
-            AssetDatabase.SaveAssets();
-        }
-        #endregion
-        EditorGUILayout.Space();
+        //    // define symbolì„ ì ìš©í•´ì•¼ í•œë‹¤.. ë°›ì•„ì˜¤ëŠ”ê±´ ë„ˆë¬´ ë‚­ë¹„ë¼ê³  ìƒê°ì´ ë“¬
+        //}
     }
-    /*
-     * menuitemµîÀ» ÅëÇØ ¿¡µğÅÍ¿¡¼­ ¼³Á¤ÇÒ ¼ö ÀÖ´Â È¯°æµîÀ» ¼ÂÆÃ
-     * ExecutionData
-     * È¯°æ¼³Á¤Àº ÇÊ¿ä ¾ø´Ù ¾îÂ÷ÇÇ scriptableobject¿¡¼­ ¹Ş¾Æ¼­ »ç¿ëÇÏ¸é µÇ±â ¶§¹® Áï, ºôµå¸¦ À§ÇØ »ç¿ë ÇÏ¸é µÉ µí ÇÏ´Ù
-     */
-    //[MenuItem("YhProjMenu/Preferences/Execution Preferences (½ÇÇàÈ¯°æ¼³Á¤)")]
-    //static void ExecutionPreferences()
-    //{
-    //    if(executionData == null)
-    //    {
-    //        executionData = AssetDatabase.LoadAssetAtPath<ExecutionData>(executionDataPath);
-    //    }
-
-    //    // define symbolÀ» Àû¿ëÇØ¾ß ÇÑ´Ù.. ¹Ş¾Æ¿À´Â°Ç ³Ê¹« ³¶ºñ¶ó°í »ı°¢ÀÌ µë
-    //}
 }

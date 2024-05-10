@@ -1,29 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj;
 
-public class GameManager : MonoBehaviour
+namespace YhProj.Game.Play
 {
-    IFactory factory;
-
-    private void Awake()
+    public class GameManager : Singleton<GameManager>
     {
-
-    }
-    void Start()
-    {
+        // GamePlayPanelUI
         
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    void SwitchFactory<T>() where T : IFactory
-    {
-        factory = new CharacterFactory();
     }
 }

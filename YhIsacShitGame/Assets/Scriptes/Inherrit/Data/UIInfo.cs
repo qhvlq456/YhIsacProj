@@ -1,9 +1,10 @@
-using YhProj;
-
-[System.Serializable]
-public class UIInfo
+namespace YhProj.Game.UI
 {
-    public string name;
-    public string prefabName;
-    public Define.UIRootType uiRootType;
+    [System.Serializable]
+    public class UIInfo
+    {
+        public string name;
+        public string prefabName;
+        public UIRootType uiRootType;
+    }
 }

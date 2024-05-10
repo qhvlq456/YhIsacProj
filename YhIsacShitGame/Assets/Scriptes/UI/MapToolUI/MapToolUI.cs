@@ -1,145 +1,320 @@
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
-using YhProj;
 using TMPro;
-using System.Linq;
+using YhProj.Game.Map;
+using YhProj.Game.UI;
+using YhProj.Game.YhEditor;
+using YhProj.Game;
 
 
-public class MapToolUI : BaseUI
+public class MapToolUI : EditorUI
 {
-    List<string> excpetionAttribute = new List<string>()
+    [System.Serializable]
+    public struct sMapToolBtn
     {
-        "index",
-        "type",
-    };
+        public ButtonType btnType;
+        public sButtonUI buttonUI;
+        public Button Btn => buttonUI.btn;
 
-    [SerializeField]
-    private readonly string mapToolCategoryPath = "UI/MapTool/MapToolCategory";
-
-    [Header("Data")]
-    // 현재 클릭해서 UI를 표시되게한 오브젝트
-    public EditorTileObject editorTileObject;
-
-    [SerializeField]
-    private Button clearBtn;
-
-    [SerializeField]
-    private TextMeshProUGUI infoText;
-
-    // scorllview
-    private Dictionary<string, MapToolCategoryUI> categoryUIDic = new Dictionary<string, MapToolCategoryUI>();
-
-    [Header("ScrollView")]
-    [SerializeField]
-    private TextMeshProUGUI titleText;
-
-    [SerializeField]
-    private ScrollRect scrollRect;
-
-    [SerializeField]
-    private Transform contentTrf;
-
-    [SerializeField]
-    private Button applyBtn;
-
-    [SerializeField]
-    private Button exitBtn;
-
-    private void Awake()
+        public TextMeshProUGUI Text => buttonUI.btnText;
+    }
+    [System.Serializable]
+    public struct sMapTextInput
     {
-        titleText.text = "MapToolUI";
-        applyBtn.onClick.RemoveAllListeners();
-        exitBtn.onClick.RemoveAllListeners();
-        clearBtn.onClick.RemoveAllListeners();
+        public InputType inputType;
+        public sTextInputUI textInput;
+        public TMP_InputField InputField => textInput.inputField;
 
-        applyBtn.onClick.AddListener(ApplyBtnClick);
-        exitBtn.onClick.AddListener(ExitBtnClick);
-        clearBtn.onClick.AddListener(ClearBtnClick);
+        public TextMeshProUGUI Text => textInput.titleText;
+    }
+    [System.Serializable]
+    public struct sMapTextDropDown
+    {
+        public DropDownType dropDownType;
+        public sTextDropDownUI textDropDown;
+        public TMP_Dropdown Dropdown => textDropDown.dropdown;
+        
+        public TextMeshProUGUI Text => textDropDown.titleText;
+    }
+    public enum InputType
+    {
+        row,
+        col,
+        stage,
+        lv,
+    }
+    public enum DropDownType
+    {
+        stage,
+    }
 
-        foreach (var field in typeof(TileData).GetFields())
+    [SerializeField]
+    private List<sMapToolBtn> buttonList = new List<sMapToolBtn>();
+
+    [SerializeField]
+    private List<sMapTextInput> textInputList = new List<sMapTextInput>();
+
+    [SerializeField]
+    private List<sMapTextDropDown> textDropDownList = new List<sMapTextDropDown>();
+
+    [SerializeField]
+    private TextMeshProUGUI logText;
+
+    [SerializeField]
+    private StageData curStageData = null;
+
+    public override void Show(UIInfo _uiInfo)
+    {
+        baseDataHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        foreach (var dropDown in textDropDownList)
         {
-            if(excpetionAttribute.Contains(field.Name))
+            UnityAction<int> valueCallback = null;
+
+            switch (dropDown.dropDownType)
             {
-                continue;
+                case DropDownType.stage:
+                    valueCallback = OnDropdownValueChanged;
+                    break;
             }
 
-            MapToolCategoryUI mapToolCategoryUI = Util.InstantiateResource<MapToolCategoryUI>(mapToolCategoryPath);
-            mapToolCategoryUI.transform.SetParent(contentTrf, false);
-            mapToolCategoryUI.Set(field);
+            if (valueCallback != null)
+            {
+                dropDown.Dropdown.onValueChanged.AddListener(valueCallback);
+                dropDown.Text.text = dropDown.dropDownType.ToString();
+            }
+        }
 
-            categoryUIDic.Add(field.Name.ToLower(), mapToolCategoryUI);
+        foreach (var btn in buttonList)
+        {
+            btn.Btn.onClick.RemoveAllListeners();
+
+            UnityAction btnCallback = null;
+
+            switch (btn.btnType)
+            {
+                case ButtonType.save:
+                    btnCallback = SaveBtnClick;
+                    break;
+                case ButtonType.load:
+                    btnCallback = LoadBtnClick;
+                    break;
+                case ButtonType.delete:
+                    btnCallback = DeleteBtnClick;
+                    break;
+            }
+
+            if (btnCallback != null)
+            {
+                btn.Btn.onClick.AddListener(btnCallback);
+                btn.Text.text = btn.btnType.ToString();
+            }
+        }
+
+        foreach (var text in textInputList)
+        {
+            text.InputField.text = "";
+            text.Text.text = text.inputType.ToString();
+        }
+
+        logText.text = "Empty";
+
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
+
+        UpdateDropDown(stageDropDown);
+
+        if (stageDropDown.options.Count > 0)
+        {
+            int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
+            //StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+            StageData stageData = baseDataHandler.GetData<StageData>(idx);
+
+            curStageData = stageData;
+
+            for (int i = 0; i < textInputList.Count; i++)
+            {
+                textInputList[i].InputField.text = GetPropertyValue(curStageData, textInputList[i].inputType).ToString();
+            }
         }
     }
 
-    public override void Show<T>(UIInfo _uiInfo, T _param)
+    /// <summary>
+    /// Stage Data에 표시되어져 있는 모든 tile data json으로 저장하는 메서드
+    /// </summary>
+    public void SaveBtnClick()
     {
-        base.Show(_uiInfo);
-        editorTileObject = _param as EditorTileObject;
+        string text = "";
 
-        InfoText();
-    }
-    public void ExitBtnClick()
-    {
-        ClearBtnClick();
-        Managers.Instance.GetManager<UIManager>().HideUI(uiInfo);
-    }
-    public void ApplyBtnClick()
-    {
-        bool isEmpty = categoryUIDic.Values.Any(x => x.IsNotValue());
-
-        if(isEmpty) 
+        if (curStageData == null)
         {
-            Debug.LogError($"is empty");
+            text = "Save Fail!! StageData is null";
         }
         else
         {
-            TileData originData = editorTileObject.tileData;
+            text = $"Save Complete!! Stage : {curStageData.stage}";
 
-            TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["elementtype"].GetValue())
-                .SetDirection(categoryUIDic["direction"].GetValue())
-                .SetBatchIdx(int.Parse(categoryUIDic["batchidx"].GetValue().ToString()))
-                .SetName(categoryUIDic["name"].GetValue().ToString())
-                .SetType(originData.type)
-                .SetIndex(originData.index)
-                .Build();
+            // IDataHandler dataHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
-
-            editorTileObject.Load(newTileData);
+            EditorManager.Instance.Save(baseDataHandler, curStageData);
+            TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
+            UpdateDropDown(stageDropDown);
         }
 
-        InfoText();
+        DeleteBtnClick();
+        curStageData = null;
+        logText.text = text;
     }
-
-    public void ClearBtnClick()
+    /// <summary>
+    /// Stage data에 맞게끔 tileobject를 생성하는 메서드
+    /// </summary>
+    public void LoadBtnClick()
     {
-        // input field들 전부 empty 처리
-        foreach(var item in categoryUIDic) 
+        if (curStageData != null)
         {
-            item.Value.ClearBtnClick();
+            EditorManager.Instance.Delete(curStageData);
         }
+
+        var list = GetEnumValues<InputType>();
+        var dic = new Dictionary<InputType, TMP_InputField>();
+
+        foreach(var item in list)
+        {
+            TMP_InputField inputField = textInputList.Find(x => x.inputType == item).InputField;
+
+            dic.Add(item, inputField);
+        }
+
+        int row = GetInputFieldToType<int>(dic[InputType.row]);
+        int col = GetInputFieldToType<int>(dic[InputType.col]);
+        int stage = GetInputFieldToType<int>(dic[InputType.stage]);
+        int lv = GetInputFieldToType<int>(dic[InputType.lv]);
+
+        logText.text = "Stage : " + stage.ToString();
+
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        List<int> tileIdxList = baseDataHandler.GetData<StageData>(stage).tileIdxList;
+        tileIdxList = tileIdxList == null ? new List<int>() : tileIdxList;
+        int tileCount = row * col;
+
+        for (int i = 0; i < tileCount; i++)
+        {
+            if (i > list.Count)
+            {
+                tileIdxList.Add(0);
+            }
+        }
+
+        StageData stageData = new StageData(stage, lv, tileIdxList);
+
+        curStageData = stageData;
+
+        EditorManager.Instance.Create(curStageData);
+    }
+    /// <summary>
+    /// Stage Data에 표시되어져 있는 모든 tile data 삭제하는 메서드
+    /// </summary>
+    public void DeleteBtnClick()
+    {
+        // Managers.Instance.GetManager<MapManager>().DeleteTile(curStageData.stage);
+        logText.text = "Stage : Empty";
+        curStageData = null;
+        textInputList.ForEach(ui => ui.InputField.text = "");
+
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        if (stageDropDown.options.Count > 0)
+        {
+            int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
+            StageData stageData = baseDataHandler.GetData<StageData>(idx);
+
+            curStageData = stageData;
+
+            for (int i = 0; i < textInputList.Count; i++)
+            {
+                textInputList[i].InputField.text = GetPropertyValue(curStageData, textInputList[i].inputType).ToString();
+            }
+        }
+
     }
 
-    void InfoText()
+    /// <summary>
+    /// Stage Data를 삭제함
+    /// </summary>
+    public void RemoveBtnClick()
     {
-        string showInfoStr = "";
+        TMP_InputField inputField = textInputList.Find(x => x.inputType == InputType.stage).InputField;
 
-        if (editorTileObject.tileData != null)
+        int stage = GetInputFieldToType<int>(inputField);
+
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        if (baseDataHandler.ContainsData(stage))
         {
-            showInfoStr = $"Tile Data \n " +
-                $"name : {editorTileObject.tileData.name}, " +
-                $"index : {editorTileObject.tileData.index}, " +
-                $"type : {editorTileObject.tileData.type}, " +
-                $"Direction : {editorTileObject.tileData.direction}, " +
-                $"batchIdx : {editorTileObject.tileData.batchIdx}, " +
-                $"roadType : {editorTileObject.tileData.elementType}";
+            StageData stageData = baseDataHandler.GetData<StageData>(stage);
+            EditorManager.Instance.Delete(stageData);
+            logText.text = "Delete Stage Success!!";
         }
         else
         {
-            showInfoStr = "Tile Data is null";
-        }
 
-        infoText.text = showInfoStr;
+        }
+    }
+    public void OnDropdownValueChanged(int _value)
+    {
+        TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
+        int idx = int.Parse(stageDropDown.options[_value].text);
+
+        // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+
+        StageData stageData = baseDataHandler.GetData<StageData>(idx);
+
+        if (stageData != null)
+        {
+            curStageData = stageData;
+
+            for (int i = 0; i < textInputList.Count; i++)
+            {
+                textInputList[i].InputField.text = GetPropertyValue(curStageData, textInputList[i].inputType).ToString();
+            }
+        }
+        else
+        {
+
+        }
+    }
+    private object GetPropertyValue(StageData _stageData, InputType _inputType)
+    {
+        return _inputType switch
+        {
+            InputType.row => _stageData.row,
+            InputType.col => _stageData.col,
+            InputType.stage => _stageData.stage,
+            InputType.lv => _stageData.lv,
+            _ => null
+        };
+    }
+
+    protected void UpdateDropDown(TMP_Dropdown _dropDown)
+    {
+        TMP_Dropdown stageDropDown = _dropDown;
+        stageDropDown.ClearOptions();
+
+        var stageList = baseDataHandler.GetDataList<StageData>();
+        List<string> dropDownOptionList = stageList.Select(x => x.stage.ToString()).ToList();
+
+        stageDropDown.AddOptions(dropDownOptionList);
+    }
+
+    public override void Hide()
+    {
+        base.Hide();
+        curStageData = null;
     }
 }

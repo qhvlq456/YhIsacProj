@@ -2,22 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using YhProj;
 
-public class CharacterObject : BaseObject
+namespace YhProj.Game.Character
 {
-    [SerializeField]
-    private NavMeshAgent agent;
-    CharacterData characterData;
-
-    public override void Load<T>(T _baseData)
+    public class CharacterObject : BaseObject
     {
+        [SerializeField]
+        protected NavMeshAgent agent;
+        public CharacterData characterData;
 
+        public override void Create<T>(T _data)
+        {
+            characterData = _data as CharacterData;
+        }
+
+        public override void Update()
+        {
+
+        }
+        public override void Delete()
+        {
+            Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(BaseType.character, transform);
+        }
     }
-
-    public override void Delete()
-    {
-
-    }
-
 }

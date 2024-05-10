@@ -1,24 +1,46 @@
-namespace YhProj
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace YhProj.Game
 {
     /*
-     * json¿¡¼­´Â ·»´õ¸µ µî ÇÊ¿äÇÑ µ¥ÀÌÅÍ¸¦ ¹Ş¾Æ¾ß ÇÏ¸ç
-     * server¿¡¼­´Â Á¤º¸¸¦ ¹Ş¾Æ¾ß ÇÔ Áï, load and save
+     * jsonì—ì„œëŠ” ë Œë”ë§ ë“± í•„ìš”í•œ ë°ì´í„°ë¥¼ ë°›ì•„ì•¼ í•˜ë©°
+     * serverì—ì„œëŠ” ì •ë³´ë¥¼ ë°›ì•„ì•¼ í•¨ ì¦‰, load and save
      * 
-     * »ı°¢À» ÇÏ±ä ÇÏ¿©¾ß ÇÔ basemanager¿¡¼­ load¿Í delete°¡ ÇÊ¿ä ÇÑ °ÍÀÎ°¡?
+     * ìƒê°ì„ í•˜ê¸´ í•˜ì—¬ì•¼ í•¨ basemanagerì—ì„œ loadì™€ deleteê°€ í•„ìš” í•œ ê²ƒì¸ê°€?
      * 
-     * type¿¡ µû¸¥ load ºĞ±â update, delete ºĞ±â µîµî Á¶Á¤
+     * typeì— ë”°ë¥¸ load ë¶„ê¸° update, delete ë¶„ê¸° ë“±ë“± ì¡°ì •
      */
-    public abstract class BaseManager : ILogger
+    public abstract class BaseManager
     {
-        // dataÀÇ load ÇÃ·Î¿ìµéÀ» Á¤ÀÇ
-        public abstract void Load(Define.GameMode _gameMode);
-        // dataÀÇ ÀúÀå µîµî Á¤ÀÇ
-        public abstract void Update();
-        // dataÀÇ unload ÇÃ·Î¿ìµéÀ» Á¤ÀÇ
-        public abstract void Delete();
-        public virtual void Logger()
+        private Dictionary<Type, BaseDataHandler> dataHandlerMap = new Dictionary<Type, BaseDataHandler>();
+        public T GetDataHandler<T>() where T : BaseDataHandler, new()
         {
-            UnityEngine.Debug.LogWarningFormat("BaseManager");
+            Type type = typeof(T);
+
+            if (dataHandlerMap.ContainsKey(type))
+            {
+                return dataHandlerMap[type] as T;
+            }
+            else
+            {
+                T newHandler = new T();
+                dataHandlerMap[type] = newHandler;
+                return newHandler;
+            }
         }
+
+        public BaseDataHandler GetDataHandler(Type _type) => dataHandlerMap.TryGetValue(_type, out BaseDataHandler handler) ? handler : null;
+        protected IFactory factory;
+
+        public Transform root { get; protected set; }
+        // dataì˜ load í”Œë¡œìš°ë“¤ì„ ì •ì˜
+        public abstract void Load();
+        // dataì˜ ì €ì¥ ë“±ë“± ì •ì˜
+        public abstract void Update();
+        // dataì˜ unload í”Œë¡œìš°ë“¤ì„ ì •ì˜
+        public abstract void Dispose();
+
     }
 }

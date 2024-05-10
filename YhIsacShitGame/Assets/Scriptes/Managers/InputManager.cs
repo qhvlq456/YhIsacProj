@@ -2,71 +2,66 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using YhProj;
+using YhProj.Game.Player;
+using YhProj.Game.UI;
+using YhProj.Game.State;
 
-public class InputManager : BaseManager
+namespace YhProj.Game.GameInput
 {
-    // Äİ¶óÀÌ´õ¸¦ ³Ö¾î¼­ ÀÏ´Ü µå·¡±× ÇÒ ¼ö ÀÖ°Ô ¸¸µé±ä ÇØ¾ßÇÔ
-    // µå·¡±× ¿µ¿ª ¸·¾Æ¾ß ÇÔ
-    StateController stateController;
-    Transform target;
+    public class InputManager : BaseManager
+    {
+        // ì½œë¼ì´ë”ë¥¼ ë„£ì–´ì„œ ì¼ë‹¨ ë“œë˜ê·¸ í•  ìˆ˜ ìˆê²Œ ë§Œë“¤ê¸´ í•´ì•¼í•¨
+        // ë“œë˜ê·¸ ì˜ì—­ ë§‰ì•„ì•¼ í•¨
+        StateController stateController;
+        Transform target;
 
-    public InputManager(Transform _target)
-    {
-        // º¸·ù 
-        target = _target;
-    }
-    public override void Load(Define.GameMode _gameMode)
-    {
-        switch (_gameMode)
+        public InputManager(Transform _target)
         {
-            case Define.GameMode.EDITOR:
-                break;
-            case Define.GameMode.TEST:
-                // ¿©±â¼­ target attach¸¦ setÇÏ¿© ¼ø¼­¸¦ Á¤ÇÒ °ÍÀÓ
-                break;
-            case Define.GameMode.MAPTOOL:
-                EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
-                EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
-                // ¿©±â¼­ target attach¸¦ setÇÏ¿© ¼ø¼­¸¦ Á¤ÇÒ °ÍÀÓ
-                stateController = new EditStateController(target);
-                break;
+            // ë³´ë¥˜ 
+            target = _target;
         }
-    }
-    public override void Update()
-    {
-        // ui°¡ ¾ø°Å³ª È°¼ºÈ­µÈ UI°¡ ¾øÀ» ¶§¸¸ µå·¡±× ÀÌº¥Æ® Ã³¸®
-        // "¸¶¿ì½º Æ÷ÀÎÅÍ°¡ UI ¿ä¼Ò À§¿¡ ÀÖÁö ¾Ê°í, µ¿½Ã¿¡ È°¼ºÈ­µÈ UI°¡ ¾øÀ» ¶§" 
-        // ¿ø·¡´Â ±×³É isactiveui¸¸ »ç¿ëÇÏ·Á Çß´À³ª °£ÇæÀûÀ¸·Î µå·¡±×°¡ µÇ´Â Çö»óÀ¸·Î ÀÎÇØ Á¶°Ç¹® µÎ°³·Î ÅëÇÕ
-        
-        // ÀÌ ºÎºĞÀº º¸·ù
-        //if (!IsPointerOverUIObject() && !Managers.Instance.GetManager<UIManager>().IsActiveUI)
-
-        if(!Managers.Instance.GetManager<UIManager>().IsActiveUI)
+        public override void Load()
         {
-            stateController.OnEnter();
-            stateController.Update();
-            stateController.OnExit();
+            EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+            EventMediator.OnLoadSequenceEvent += LoadPlayerEvent;
+            // ì—¬ê¸°ì„œ target attachë¥¼ setí•˜ì—¬ ìˆœì„œë¥¼ ì •í•  ê²ƒì„
+            stateController = new EditStateController(target);
         }
-    }
-    public override void Delete()
-    {
-        EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
-    }
+        public override void Update()
+        {
+            // uiê°€ ì—†ê±°ë‚˜ í™œì„±í™”ëœ UIê°€ ì—†ì„ ë•Œë§Œ ë“œë˜ê·¸ ì´ë²¤íŠ¸ ì²˜ë¦¬
+            // "ë§ˆìš°ìŠ¤ í¬ì¸í„°ê°€ UI ìš”ì†Œ ìœ„ì— ìˆì§€ ì•Šê³ , ë™ì‹œì— í™œì„±í™”ëœ UIê°€ ì—†ì„ ë•Œ" 
+            // ì›ë˜ëŠ” ê·¸ëƒ¥ isactiveuië§Œ ì‚¬ìš©í•˜ë ¤ í–ˆëŠë‚˜ ê°„í—ì ìœ¼ë¡œ ë“œë˜ê·¸ê°€ ë˜ëŠ” í˜„ìƒìœ¼ë¡œ ì¸í•´ ì¡°ê±´ë¬¸ ë‘ê°œë¡œ í†µí•©
 
-    public void LoadPlayerEvent(PlayerInfo _playerInfo)
-    {
-        // camera controller¸¦ ¸¸µé¾î °ü¸®ÇÏ´Â ¹æ¹ıÀ¸·Î ÇÒ °ÍÀÓ statecontroller¶û ºñ½ÁÇÏ´Ù°í »ı°¢ÇÏ¸é µÉµí??
-        Debug.LogError("InputManager LoadPlayerEvent!!");
-    }
+            // ì´ ë¶€ë¶„ì€ ë³´ë¥˜
+            //if (!IsPointerOverUIObject() && !Managers.Instance.GetManager<UIManager>().IsActiveUI)
 
-    // ÀÌ ºÎºĞÀº º¸·ù
-    private bool IsPointerOverUIObject()
-    {
-        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-        eventDataCurrentPosition.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-        return results.Count > 0;
+            if (!Managers.Instance.GetManager<UIManager>().IsActiveUI)
+            {
+                stateController.OnEnter();
+                stateController.Update();
+                stateController.OnExit();
+            }
+        }
+        public override void Dispose()
+        {
+            EventMediator.OnLoadSequenceEvent -= LoadPlayerEvent;
+        }
+
+        public void LoadPlayerEvent(PlayerInfo _playerInfo)
+        {
+            // camera controllerë¥¼ ë§Œë“¤ì–´ ê´€ë¦¬í•˜ëŠ” ë°©ë²•ìœ¼ë¡œ í•  ê²ƒì„ statecontrollerë‘ ë¹„ìŠ·í•˜ë‹¤ê³  ìƒê°í•˜ë©´ ë ë“¯??
+            Debug.LogError("InputManager LoadPlayerEvent!!");
+        }
+
+        // ì´ ë¶€ë¶„ì€ ë³´ë¥˜
+        private bool IsPointerOverUIObject()
+        {
+            PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+            eventDataCurrentPosition.position = new Vector2(UnityEngine.Input.mousePosition.x, UnityEngine.Input.mousePosition.y);
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+            return results.Count > 0;
+        }
     }
 }

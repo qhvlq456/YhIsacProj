@@ -4,15 +4,17 @@ using UnityEditor;
 using UnityEngine;
 using YhProj;
 
-//[System.Serializable, CreateAssetMenu(fileName = "ExecutionData", menuName = "Execution Scriptable/Execution Data", order = int.MaxValue)]
-public class ExecutionData : ScriptableObject
+namespace YhProj.Game
 {
-    // staicÀ¸·Î µÑ ¶§ ÀÎ½ºÆåÅÍ Ã¢¿¡ Ç¥½Ã°¡ ¾ÈµÊ
-    public Define.ServerType serverType;
-    public Define.GameMode gameMode;
-    public Define.DebugLogeer logType;
-    public Define.DefineSymbol defineSymbolType;
+    //[System.Serializable, CreateAssetMenu(fileName = "ExecutionData", menuName = "Execution Scriptable/Execution Data", order = int.MaxValue)]
+    public class ExecutionData : ScriptableObject
+    {
+        // staicìœ¼ë¡œ ë‘˜ ë•Œ ì¸ìŠ¤í™í„° ì°½ì— í‘œì‹œê°€ ì•ˆë¨
+        public Define.ServerType serverType;
+        public Define.Logger logType;
+        public Define.DefineSymbol defineSymbolType;
 
-    public int version;
-    public int gameInfo;
+        public int version;
+        public int gameInfo;
+    }
 }

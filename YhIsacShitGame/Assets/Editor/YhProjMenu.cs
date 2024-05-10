@@ -3,46 +3,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using YhProj;
+using YhProj.Game.UI;
 
-public class YhProjMenu
+namespace YhProj.Game.YhEditor
 {
-    // AssetDatabase.LoadAssetAtPath ∞Ê∑Œø° ¿÷¥¬ √ππ¯¿Á ø¿∫Í¡ß∆Æ∏¶ √£æ∆ π›»Ø«—¥Ÿ.
-    // º±≈√µ» ø°º¬¿« path æÚ±‚ : AssetDatabase.GetAssetPath
-    private static ExecutionData executionData = null;
-    private static UIData uiData = null;
-
-    // ¥Î±‚
-    [MenuItem("YhProjMenu/Create/Scriptable/Execution Data")]
-    public static void CreateExecution()
+    public class YhProjMenu
     {
-        executionData = AssetDatabase.LoadAssetAtPath(StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset", typeof(ExecutionData)) as ExecutionData;
-        if (executionData == null)
+        // AssetDatabase.LoadAssetAtPath Í≤ΩÎ°úÏóê ÏûàÎäî Ï≤´Î≤àÏû¨ Ïò§Î∏åÏ†ùÌä∏Î•º Ï∞æÏïÑ Î∞òÌôòÌïúÎã§.
+        // ÏÑ†ÌÉùÎêú ÏóêÏÖãÏùò path ÏñªÍ∏∞ : AssetDatabase.GetAssetPath
+        private static ExecutionData executionData = null;
+        private static UIData uiData = null;
+
+        // ÎåÄÍ∏∞
+        [MenuItem("YhProjMenu/Create/Scriptable/Execution Data")]
+        public static void CreateExecution()
         {
-            AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ExecutionData>(), StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset");
-            AssetDatabase.SaveAssets();
+            executionData = AssetDatabase.LoadAssetAtPath(StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset", typeof(ExecutionData)) as ExecutionData;
+            if (executionData == null)
+            {
+                AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<ExecutionData>(), StaticDefine.SCRIPTABLEOBJECT_PATH + "ExecutionData.asset");
+                AssetDatabase.SaveAssets();
+            }
+
+            Selection.activeObject = executionData;
         }
 
-        Selection.activeObject = executionData;
-    }
-
-    [MenuItem("YhProjMenu/Create/Scriptable/UI Data")]
-    public static void CreateUIData()
-    {
-        executionData = AssetDatabase.LoadAssetAtPath(StaticDefine.SCRIPTABLEOBJECT_PATH + "UIData.asset", typeof(UIData)) as ExecutionData;
-
-        if(uiData == null)
+        [MenuItem("YhProjMenu/Create/Scriptable/UI Data")]
+        public static void CreateUIData()
         {
-            AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<UIData>(), StaticDefine.SCRIPTABLEOBJECT_PATH + "UIData.asset");
-            AssetDatabase.SaveAssets();
+            executionData = AssetDatabase.LoadAssetAtPath(StaticDefine.SCRIPTABLEOBJECT_PATH + "UIData.asset", typeof(UIData)) as ExecutionData;
+
+            if (uiData == null)
+            {
+                AssetDatabase.CreateAsset(ScriptableObject.CreateInstance<UIData>(), StaticDefine.SCRIPTABLEOBJECT_PATH + "UIData.asset");
+                AssetDatabase.SaveAssets();
+            }
+
+            Selection.activeObject = uiData;
         }
 
-        Selection.activeObject = uiData;
-    }
+        [MenuItem("YhProjMenu/Test/Test")]
+        static void JsonCreate()
+        {
 
-    [MenuItem("YhProjMenu/Test/Test")]
-    static void JsonCreate()
-    {
-
+        }
     }
 }

@@ -1,28 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using YhProj;
 
-public class CharacterStateController : StateController
+namespace YhProj.Game.State
 {
-    protected List<State> stateList = new List<State>();
-    public void AddState(State _state)
+    public class CharacterStateController : StateController
     {
-        stateList.Add(_state);
-    }
-    public override void Update()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    // ÈÄ¿¡ ¸¶¿ì½º ÀÎÇ² ¸»°í ´Ù¸¥ »óÅÂÀüÈ¯ÀÏ¶§ »ç¿ë
-    public virtual void TransitionTo(State _nextState)
-    {
-        if (currentState != _nextState)
+        protected List<State> stateList = new List<State>();
+        public void AddState(State _state)
         {
-            currentState.Exit();
-            currentState = _nextState;
-            currentState.Enter(null);
+            stateList.Add(_state);
+        }
+        public override void Update()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        // í›„ì— ë§ˆìš°ìŠ¤ ì¸í’‹ ë§ê³  ë‹¤ë¥¸ ìƒíƒœì „í™˜ì¼ë•Œ ì‚¬ìš©
+        public virtual void TransitionTo(State _nextState)
+        {
+            if (currentState != _nextState)
+            {
+                currentState.Exit();
+                currentState = _nextState;
+                currentState.Enter(null);
+            }
         }
     }
 }

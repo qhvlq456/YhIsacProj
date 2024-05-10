@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using YhProj;
 
-public class PlayStateController : StateController
+namespace YhProj.Game.State
 {
-    public override void Update()
+    public class PlayStateController : StateController
     {
-        
+        public override void Update()
+        {
+
+        }
     }
 }

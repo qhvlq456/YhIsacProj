@@ -2,29 +2,10 @@ using System;
 
 namespace YhProj
 {
-    [Serializable]
     public class Define
     {
-        // 게임 실행시 어떤 모드로 선택 할지의 타입
-        public enum GameMode
-        {
-            TEST,
-            EDITOR,
-            MAPTOOL,
-            BUILDTOOL
-        }
-        // 모든 게임 데이터의 베이스의 타입 // base type -> subType 으로 간다, 필드 오브젝트만
-        public enum BaseType
-        {
-            NONE,
-            TILE,
-            CHARACTER,
-            BUILD,
-            ITEM,
-            COUNT
-        }
         // log를 보이게 할 것인지 안보이게 할 것인지
-        public enum DebugLogeer
+        public enum Logger
         {
             ENABLE,
             DISABLE
@@ -34,17 +15,8 @@ namespace YhProj
         {
             DEV,
             ALHPA,
+            beta,
             LIVE
-        }
-        // uiroot 하위 랜더링할 캔버스 종류들
-        public enum UIRootType
-        {
-            MAIN_UI, // 항상 고정값이 되어야 함
-            POPUP_UI,
-            TOOLTIP_UI,
-            CONTEXTUAL_UI,
-            TEST_UI, // 테스트는 항상 아래 (솔직히 순서 상관없음)
-            COUNT
         }
 
         // define symbol 들 enum처리
@@ -65,13 +37,6 @@ namespace YhProj
             LEFT_BOTTOM, // 좌하
             RIGHT_BOTTOM, // 우하
         }
-
-        public enum ElementType
-        {
-            MINE,
-            ENEMY,
-            DECO
-        }
     }
 
     // 나중에 경로에 대한 지정이 다시 필요할듯
@@ -86,13 +51,8 @@ namespace YhProj
 
         public static int MAX_CREATE_TILE_NUM = 12;
 
-        public static string JSON_MAP_FILE_NAME = "StageData.json";
-
         // json 위치 
-        public static string JSON_MAP_DATA_PATH = "StreamingAssets";
-
-        // 리소스 위치
-        public static string TILE_PATH = "Map/Tool";
+        public static string json_data_path = "StreamingAssets";
 
         // 임시 일단 넣을거
         public static float TILE_YPOSITION = 0f;

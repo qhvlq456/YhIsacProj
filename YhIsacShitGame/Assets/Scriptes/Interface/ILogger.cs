@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace YhProj
+namespace YhProj.Game
 {
     public interface ILogger
     {
