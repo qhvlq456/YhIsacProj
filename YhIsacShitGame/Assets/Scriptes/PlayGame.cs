@@ -19,7 +19,7 @@ namespace YhProj.Game.Play
 
         public void StartStep()
         {
-
+            Managers.Instance.LoadAllManagers();
         }
         // 게임이 끝나면 이벤트를 발생시킵니다.
         public void StopStep()

@@ -13,15 +13,15 @@ namespace YhProj.Game.Resource
         //private Dictionary<string, GameObject> objResMap = new Dictionary<string, GameObject>();
         //private Dictionary<string, Material> matResMap = new Dictionary<string, Material>();
 
-        private Dictionary<System.Type, object> resourceDicts = new Dictionary<System.Type, object>();
+        private Dictionary<System.Type, object> resourceDictMap = new Dictionary<System.Type, object>();
 
         public T GetResByString<T>(string _name) where T : Object
         {
             System.Type type = typeof(T);
 
-            if (resourceDicts.ContainsKey(type))
+            if (resourceDictMap.ContainsKey(type))
             {
-                var dictionary = resourceDicts[type] as ResourceDictionary<T>;
+                var dictionary = resourceDictMap[type] as ResourceDictionary<T>;
                 return dictionary.GetResource(_name);
             }
 
@@ -33,9 +33,9 @@ namespace YhProj.Game.Resource
         {
             System.Type type = typeof(T);
 
-            if (resourceDicts.ContainsKey(type))
+            if (resourceDictMap.ContainsKey(type))
             {
-                var dictionary = resourceDicts[type] as ResourceDictionary<T>;
+                var dictionary = resourceDictMap[type] as ResourceDictionary<T>;
                 dictionary.AddResource(_name, _resource);
             }
             else
@@ -62,9 +62,9 @@ namespace YhProj.Game.Resource
         private void AddResourceDictionary<T>() where T : Object
         {
             System.Type type = typeof(T);
-            if (!resourceDicts.ContainsKey(type))
+            if (!resourceDictMap.ContainsKey(type))
             {
-                resourceDicts[type] = new ResourceDictionary<T>();
+                resourceDictMap[type] = new ResourceDictionary<T>();
             }
             else
             {

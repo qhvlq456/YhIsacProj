@@ -11,7 +11,7 @@ namespace YhProj.Game
     {
         // staic으로 둘 때 인스펙터 창에 표시가 안됨
         public Define.ServerType serverType;
-        public Define.DebugLogeer logType;
+        public Define.Logger logType;
         public Define.DefineSymbol defineSymbolType;
 
         public int version;

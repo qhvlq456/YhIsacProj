@@ -2,11 +2,10 @@ using System;
 
 namespace YhProj
 {
-    [Serializable]
     public class Define
     {
         // log를 보이게 할 것인지 안보이게 할 것인지
-        public enum DebugLogeer
+        public enum Logger
         {
             ENABLE,
             DISABLE
