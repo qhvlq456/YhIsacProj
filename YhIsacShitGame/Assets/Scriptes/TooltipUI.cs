@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace YhProj.Game.Map
+namespace YhProj.Game.UI
 {
-    public class DecoTileObject : TileObject
+    public class TooltipUI : BaseUI
     {
-
+        
     }
 }
+

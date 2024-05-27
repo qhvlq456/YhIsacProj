@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using YhProj.Game.Map;
+using YhProj.Game.Play;
 
 namespace YhProj.Game.YhEditor
 {
@@ -10,10 +11,11 @@ namespace YhProj.Game.YhEditor
     // 또 두개 다 분리 stagedata라고 생각해야 함
     public class MapEditor : BaseEditor
     {
+        private ITileFactory tileFactory;
         public MapEditor()
         {
             // 후에 인터페이스를 이용한 다향성으로 스위칭
-            factory = new TileFactory();
+            // tileFactory = new TileFactory();
 
             dataHandlerMap.Add(typeof(StageHandler), new StageHandler());
             dataHandlerMap.Add(typeof(TileHandler), new TileHandler());
@@ -57,17 +59,9 @@ namespace YhProj.Game.YhEditor
 
                 switch (tileData.elementType)
                 {
-                    case ElementType.mine:
-                        tileObject = factory.Create<HeroTileObject>(tileData);
-                        break;
-                    case ElementType.enemy:
-                        tileObject = factory.Create<EnemyTileObject>(tileData);
-                        break;
-                    case ElementType.deco:
-                        tileObject = factory.Create<DecoTileObject>(tileData);
-                        break;
                     default:
-                        tileObject = factory.Create<EditorTileObject>(tileData);
+                        tileFactory = new EditorTileFactory();
+                        tileObject = tileFactory.Create(tileData);
                         break;
                 }
 
@@ -84,7 +78,7 @@ namespace YhProj.Game.YhEditor
         {
             if(_gameData is TileData tileData)
             {
-                TileObject tileObject = objectList.Select(x => x as TileObject).Where(x => x.tileData.index == _gameData.index).First();
+                TileObject tileObject = objectList.Select(x => x as TileObject).Where(x => x.gameData.index == _gameData.index).First();
                 tileObject?.Delete();
             }
             else

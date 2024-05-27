@@ -11,31 +11,4 @@ namespace YhProj.Game.Map
         // 배치된 오브젝트 인덱스 후에 다른것들로 통합할 필요가 있다.
         public int batchIdx;
     }
-
-    [System.Serializable]
-    public class HeroTileData : GameData
-    {
-        public HeroTileData() { }
-        public HeroTileData(TileData _tileData) 
-        {
-        }
-    }
-
-    [System.Serializable]
-    public class EnemyTileData : GameData
-    {
-        public EnemyTileData() { }
-        public EnemyTileData(TileData _tileData)
-        {
-        }
-    }
-
-    [System.Serializable]
-    public class DecoTileData : GameData
-    {
-        public DecoTileData() { }
-        public DecoTileData(TileData _tileData)
-        {
-        }
-    }
 }

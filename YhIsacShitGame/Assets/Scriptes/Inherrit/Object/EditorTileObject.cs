@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 
 namespace YhProj.Game.Map
@@ -53,6 +54,8 @@ namespace YhProj.Game.Map
             base.Create(_baseData);
 
             transform.localScale = Vector3.one * 0.8f;
+
+            TileData tileData = gameData as TileData;
 
             switch (tileData.elementType)
             {

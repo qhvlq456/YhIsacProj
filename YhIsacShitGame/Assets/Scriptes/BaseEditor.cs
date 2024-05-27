@@ -30,7 +30,7 @@ namespace YhProj.Game.YhEditor
 
 
         protected List<BaseObject> objectList = new List<BaseObject>();
-        protected IFactory factory;
+        //protected IFactory factory;
         public abstract void Initialize();
         // data 필요 
         public abstract void Create(GameData _gameData);

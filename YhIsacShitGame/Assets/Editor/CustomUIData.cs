@@ -28,32 +28,32 @@ namespace YhProj.Game.YhEditor
             // testUIList = new ReorderableList(serializedObject, serializedObject.FindProperty("testUIDataList"), true, true, true, true);
 
             // main ui
-            DrawHeaderCallback(UIRootType.MAIN_UI, mainUIList);
-            DrawElementCallback(mainUIList);
-            OnSelectCallback(mainUIList);
-            OnRemoveCallback(mainUIList);
-            OnAddCallback(UIRootType.MAIN_UI, mainUIList);
+            //DrawHeaderCallback(UIRootType.MAIN_UI, mainUIList);
+            //DrawElementCallback(mainUIList);
+            //OnSelectCallback(mainUIList);
+            //OnRemoveCallback(mainUIList);
+            //OnAddCallback(UIRootType.MAIN_UI, mainUIList);
 
             // popup ui
-            DrawHeaderCallback(UIRootType.POPUP_UI, popupUIList);
+            DrawHeaderCallback(UIRootType.Popup, popupUIList);
             DrawElementCallback(popupUIList);
             OnSelectCallback(popupUIList);
             OnRemoveCallback(popupUIList);
-            OnAddCallback(UIRootType.POPUP_UI, popupUIList);
+            OnAddCallback(UIRootType.Popup, popupUIList);
 
             // tooltip ui
-            DrawHeaderCallback(UIRootType.TOOLTIP_UI, tooltipUIList);
+            DrawHeaderCallback(UIRootType.Tooltip, tooltipUIList);
             DrawElementCallback(tooltipUIList);
             OnSelectCallback(tooltipUIList);
             OnRemoveCallback(tooltipUIList);
-            OnAddCallback(UIRootType.TOOLTIP_UI, tooltipUIList);
+            OnAddCallback(UIRootType.Tooltip, tooltipUIList);
 
             // contextual ui
-            DrawHeaderCallback(UIRootType.CONTEXTUAL_UI, contextualUIList);
+            DrawHeaderCallback(UIRootType.Contextual, contextualUIList);
             DrawElementCallback(contextualUIList);
             OnSelectCallback(contextualUIList);
             OnRemoveCallback(contextualUIList);
-            OnAddCallback(UIRootType.CONTEXTUAL_UI, contextualUIList);
+            OnAddCallback(UIRootType.Contextual, contextualUIList);
 
             // test ui
             //DrawHeaderCallback(UIRootType.TEST_UI, testUIList);
@@ -91,19 +91,19 @@ namespace YhProj.Game.YhEditor
 
             switch (_rootType)
             {
-                case UIRootType.MAIN_UI:
-                    header = "Main UI";
-                    break;
-                case UIRootType.POPUP_UI:
+                //case UIRootType.MAIN_UI:
+                //    header = "Main UI";
+                //    break;
+                case UIRootType.Popup:
                     header = "Popup UI";
                     break;
                 //case UIRootType.TEST_UI:
                 //    header = "Test UI";
                 //break;
-                case UIRootType.TOOLTIP_UI:
+                case UIRootType.Tooltip:
                     header = "Tooltip UI";
                     break;
-                case UIRootType.CONTEXTUAL_UI:
+                case UIRootType.Contextual:
                     header = "Contextual UI";
                     break;
             }

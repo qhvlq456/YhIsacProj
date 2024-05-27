@@ -14,7 +14,7 @@ namespace YhProj.Game
      */
     public abstract class BaseManager
     {
-        private Dictionary<Type, BaseDataHandler> dataHandlerMap = new Dictionary<Type, BaseDataHandler>();
+        protected Dictionary<Type, BaseDataHandler> dataHandlerMap = new Dictionary<Type, BaseDataHandler>();
         public T GetDataHandler<T>() where T : BaseDataHandler, new()
         {
             Type type = typeof(T);
@@ -27,12 +27,12 @@ namespace YhProj.Game
             {
                 T newHandler = new T();
                 dataHandlerMap[type] = newHandler;
+                newHandler.LoadJsonData();
                 return newHandler;
             }
         }
 
         public BaseDataHandler GetDataHandler(Type _type) => dataHandlerMap.TryGetValue(_type, out BaseDataHandler handler) ? handler : null;
-        protected IFactory factory;
 
         public Transform root { get; protected set; }
         // data의 load 플로우들을 정의

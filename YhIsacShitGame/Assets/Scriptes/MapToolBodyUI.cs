@@ -95,7 +95,7 @@ public class MapToolBodyUI : BaseUI
         }
         else
         {
-            TileData originData = editorTileObject.tileData;
+            TileData originData = editorTileObject.gameData as TileData;
 
             TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["elementtype"].GetValue())
                 .SetDirection(categoryUIDic["direction"].GetValue())
@@ -125,15 +125,17 @@ public class MapToolBodyUI : BaseUI
     {
         string showInfoStr = "";
 
-        if (editorTileObject.tileData != null)
+        if (editorTileObject.gameData != null)
         {
+            TileData tileData = editorTileObject.gameData as TileData;
+
             showInfoStr = $"Tile Data \n " +
-                $"name : {editorTileObject.tileData.name}, " +
-                $"index : {editorTileObject.tileData.index}, " +
-                $"type : {editorTileObject.tileData.type}, " +
-                $"Direction : {editorTileObject.tileData.direction}, " +
-                $"batchIdx : {editorTileObject.tileData.batchIdx}, " +
-                $"roadType : {editorTileObject.tileData.elementType}";
+                $"name : {tileData.name}, " +
+                $"index : {tileData.index}, " +
+                $"type : {tileData.type}, " +
+                $"Direction : {tileData.direction}, " +
+                $"batchIdx : {tileData.batchIdx}, " +
+                $"roadType : {tileData.elementType}";
         }
         else
         {

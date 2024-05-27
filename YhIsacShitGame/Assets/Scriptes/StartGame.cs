@@ -11,7 +11,7 @@ namespace YhProj.Game.Play
         public void StopStep();
     }
 
-    public class GameFlow : MonoBehaviour
+    public class StartGame : MonoBehaviour
     {
         private Intro intro;
         private Loading loading;

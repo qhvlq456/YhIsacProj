@@ -11,6 +11,8 @@ using System.IO;
 
 using System.Text;
 using System.Linq;
+using YhProj.Game.Play;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -22,11 +24,12 @@ namespace YhProj.Game
     {
         public event Action<Transform> OnLookTargetChanged;
 #if UNITY_EDITOR
-        ExecutionData executionData;
+        private  ExecutionData executionData;
 #endif
         // 후에 lazy로 매니저 클래스를 변경할지 생각해 봐야 함
-        List<BaseManager> baseManagerList = new List<BaseManager>();
+        private List<BaseManager> baseManagerList = new List<BaseManager>();
 
+        public List<IGameFlow> GameFlowManagerList => baseManagerList.OfType<IGameFlow>().ToList();
 
         // maptool mode일 때 데이터?를 저장 할 곳이 필요하긴 한데.. 임시로 여길 사용할까?
         // 일단 대기

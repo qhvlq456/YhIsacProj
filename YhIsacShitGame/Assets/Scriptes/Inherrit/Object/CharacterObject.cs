@@ -9,16 +9,14 @@ namespace YhProj.Game.Character
     {
         [SerializeField]
         protected NavMeshAgent agent;
-        public CharacterData characterData;
 
+        [SerializeField]
+        protected Animator animator;
+
+        // hero는 타일 위치, enemy : start postion ~ end postion으로 이동
         public override void Create<T>(T _data)
         {
-            characterData = _data as CharacterData;
-        }
-
-        public override void Update()
-        {
-
+            gameData = _data as CharacterData;
         }
         public override void Delete()
         {

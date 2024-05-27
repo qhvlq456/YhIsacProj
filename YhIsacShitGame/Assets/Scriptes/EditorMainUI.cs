@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.Timeline;
 using UnityEngine;
 using UnityEngine.UI;
 using YhProj.Game.UI;
@@ -35,7 +36,7 @@ namespace YhProj.Game.YhEditor
         [SerializeField]
         private Button exitBtn;
 
-        public override void Show(UIInfo _uiInfo)
+        public override void Show()
         {
             startBtn.onClick.RemoveAllListeners();
             exitBtn.onClick.RemoveAllListeners();
@@ -47,8 +48,6 @@ namespace YhProj.Game.YhEditor
 
                 btn.btn.onClick.AddListener(() => EditorBtnClick((int)btn.editorType));
             }
-
-            base.Show(_uiInfo);
         }
         private void EditorBtnClick(int _idx)
         {

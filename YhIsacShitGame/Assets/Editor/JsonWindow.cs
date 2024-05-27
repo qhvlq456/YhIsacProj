@@ -5,6 +5,7 @@ using UnityEditor;
 using Newtonsoft.Json;
 using System;
 using YhProj.Game.Map;
+using YhProj.Game.Play;
 
 namespace YhProj.Game.YhEditor
 {

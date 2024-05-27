@@ -9,6 +9,7 @@ using YhProj.Game.Map;
 using YhProj.Game.UI;
 using YhProj.Game.YhEditor;
 using YhProj.Game;
+using YhProj.Game.Play;
 
 
 public class MapToolUI : EditorUI

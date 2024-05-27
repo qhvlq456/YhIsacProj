@@ -3,22 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using YhProj.Game.Map;
-using Unity.VisualScripting;
+using YhProj.Game.Play;
 
 namespace YhProj.Game.Character
 {
-    public class CharacterManager : BaseManager
+    public class CharacterManager : BaseManager, IGameFlow
     {
-        private CharDataHandler charDataHandler;
-
+        private List<CharacterObject> instanceCharList = new List<CharacterObject>();
+        private IFactorySelector factorySelector;
         public override void Load()
         {
-            charDataHandler = new CharDataHandler();
-
             if (root == null)
             {
                 root = GameUtil.AttachObj<Transform>("CharaterRoot");
                 root.transform.position = Vector3.zero;
+            }
+
+            // 아님 나중에 basemanager로 load부분 gameadta load하는 부분으로 통합 작업 필요
+            // 나중에 각 매니저마다 비동기식으로 로드 할 것
+            dataHandlerMap.Add(typeof(CharDataHandler), new CharDataHandler());
+
+            foreach (var item in dataHandlerMap)
+            {
+                item.Value.LoadJsonData();
             }
         }
         public override void Update()
@@ -28,6 +35,58 @@ namespace YhProj.Game.Character
         public override void Dispose()
         {
             
+        }
+
+        // 시작 지점을 알긴 알아야하는데 의존성 때문에;; 매니저가 알 필욘 없긴 해
+        public void OnStart()
+        {
+            StageData stageData = GameManager.Instance.stageData;
+            CharDataHandler handler = GetDataHandler<CharDataHandler>();
+
+            string log = "";
+
+            List<int> list = stageData.enemyIdxList;
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                CharacterData charData = handler.GetData<CharacterData>(list[i]);
+
+                if (charData != null)
+                {
+                    ICharacterFactory characterFactory = factorySelector.SelectFactory(charData.elementType);
+                    if (characterFactory != null)
+                    {
+                        CharacterObject charObject = characterFactory.Create(charData);
+                        charObject.transform.SetParent(root);
+                        charObject.transform.localPosition = Vector3.zero;
+                        instanceCharList.Add(charObject);
+                    }
+                    else
+                    {
+                        Debug.LogError($"No factory found for ElementType: {charData.elementType}");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"CharacterData not found for index: {list[i]}");
+                }
+            }
+        }
+
+        public void OnUpdate()
+        {
+            foreach (var item in instanceCharList)
+            {
+                item.Update();
+            }
+        }
+
+        public void OnEnd()
+        {
+            foreach(var item in instanceCharList)
+            {
+                item?.Delete();
+            }
         }
     }
 
@@ -40,8 +99,8 @@ namespace YhProj.Game.Character
         {
             List<CharacterData> list = new List<CharacterData>();
 
-            List<HeroTileData> heroTileDataList = GameUtil.LoadJsonArray<HeroTileData>(StaticDefine.json_data_path, json_char_hero_file_name);
-            List<EnemyTileData> enemyTileDataList = GameUtil.LoadJsonArray<EnemyTileData>(StaticDefine.json_data_path, json_enemy_hero_file_name);
+            List<HeroData> heroTileDataList = GameUtil.LoadJsonArray<HeroData>(StaticDefine.json_data_path, json_char_hero_file_name);
+            List<EnemyData> enemyTileDataList = GameUtil.LoadJsonArray<EnemyData>(StaticDefine.json_data_path, json_enemy_hero_file_name);
 
             list.AddRange(heroTileDataList);
             list.AddRange(enemyTileDataList);

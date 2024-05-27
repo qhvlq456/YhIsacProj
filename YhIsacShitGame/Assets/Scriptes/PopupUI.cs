@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace YhProj.Game.Map
+namespace YhProj.Game.UI
 {
-    public class HeroTileObject : TileObject
+    public class PopupUI : BaseUI
     {
         
     }

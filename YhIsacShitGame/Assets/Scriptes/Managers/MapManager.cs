@@ -2,12 +2,11 @@ using OpenCover.Framework.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+using YhProj.Game.Character;
+using YhProj.Game.Play;
 using YhProj.Game.Player;
 
 namespace YhProj.Game.Map
@@ -18,20 +17,72 @@ namespace YhProj.Game.Map
     /// 후에 모드 컨트롤러를 생성하여 다른 모드들에 대한 클래스를 정의 후 모드에 따라 분류하여 로직을 만들어 사용하자 아마 inputmanager보면 알듯?
     /// </summary>
     /// 여기서 tile과 stage 두개를 분리하여 관리
-    public class MapManager : BaseManager
+    public class MapManager : BaseManager, IGameFlow
     {
         // 여기서 combine해서 결과물 도출하여야 함
-        //public void AddStageData(StageData _stageData) => stageHandler.AddStageData(_stageData);
-        //public StageData GetStageData(int _stage) => stageHandler.GetStageData(_stage);
-        //public List<int> GetTileArrByStage(int _stage) => stageHandler.GetTileArrByStage(_stage);
-        //public bool IsConstainsStage(int _stage) => stageHandler.IsConstainsStage(_stage);
-        //public List<StageData> GetStageDataList() => stageHandler.GetStageDataList();
+
+        // navmesh를 구워야 함
+        private List<TileObject> instanceTileList = new List<TileObject>();
+        private ITileFactory tileFactory;
+
+        public void OnStart()
+        {
+            StageData stageData = GameManager.Instance.stageData;
+            TileHandler handler = GetDataHandler<TileHandler>();
+
+            string log = "";
+
+            List<int> list = stageData.tileIdxList;
+
+            int tileCount = stageData.row * stageData.col;
+
+            for (int i = 0; i < tileCount; i++)
+            {
+                // 이거 생각해봐야 함
+                int z = i / stageData.row;
+                int x = i % stageData.col;
+
+                // 생성하는 부분이 사라졌네??
+                TileObject tileObject = null;
+                TileData tileData = handler.GetData<TileData>(list[i]);
+
+                tileObject.transform.SetParent(root);
+                tileObject.transform.localPosition = new Vector3(x, 0, z);
+                instanceTileList.Add(tileObject);
+                log += $"idx = {tileData.index}, road type = {tileData.elementType}, \n";
+            }
+
+            // 후에 navmesh굽는 작업 필요
+            Debug.LogError(log);
+        }
+
+        public void OnUpdate()
+        {
+            
+        }
+
+        public void OnEnd()
+        {
+            foreach (var item in instanceTileList)
+            {
+                item?.Delete();
+            }
+        }
+
         public override void Load()
         {
             if (root == null)
             {
                 root = GameUtil.AttachObj<Transform>("MapRoot");
                 root.transform.position = Vector3.zero;
+            }
+
+            // 나중에 각 매니저마다 비동기식으로 로드 할 것
+            dataHandlerMap.Add(typeof(TileHandler), new TileHandler());
+
+            foreach(var item in  dataHandlerMap)
+            {
+                item.Value.LoadJsonData();
             }
         }
         // 타일에 대한 delete, update라고 생각하면 안되긴 함...
@@ -71,20 +122,10 @@ namespace YhProj.Game.Map
     }
     public sealed class TileHandler : BaseDataHandler
     {
-        public static string json_hero_tile_file_name = "StageData.json";
-        public static string json_enemy_tile_file_name = "StageData.json";
-        public static string json_deco_tile_file_name = "StageData.json";
+        public static string json_tile_file_name = "StageData.json";
         public override void LoadJsonData()
         {
-            List<TileData> list = new List<TileData>();
-
-            List<HeroTileData> heroTileDataList = GameUtil.LoadJsonArray<HeroTileData>(StaticDefine.json_data_path, json_hero_tile_file_name);
-            List<EnemyTileData> enemyTileDataList = GameUtil.LoadJsonArray<EnemyTileData>(StaticDefine.json_data_path, json_enemy_tile_file_name);
-            List<DecoTileData> decoTileDataList = GameUtil.LoadJsonArray<DecoTileData>(StaticDefine.json_data_path, json_deco_tile_file_name);
-
-            list.AddRange(heroTileDataList);
-            list.AddRange(enemyTileDataList);
-            list.AddRange(decoTileDataList);
+            List<TileData> list = GameUtil.LoadJsonArray<TileData>(StaticDefine.json_data_path, json_tile_file_name);
 
             foreach(var data in list) 
             { 
@@ -120,48 +161,5 @@ namespace YhProj.Game.Map
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());
         }
     }
-
-    // Data류 클래스들은 idatahandler를 통해 재구현하고 클래스로 데이터 보관
-    public sealed class StageHandler : BaseDataHandler
-    {
-        public static string json_stage_file_name = "StageData.json";
-
-        public override void LoadJsonData()
-        {
-            // 일단 여기서 먼가 생성을 하긴 해야 함 데이터를
-            List<StageData> stageDataList = GameUtil.LoadJsonArray<StageData>(StaticDefine.json_data_path, json_stage_file_name);
-
-
-            foreach (var data in stageDataList)
-            {
-                if (!dataDic.ContainsKey(data.index))
-                {
-                    dataDic.Add(data.index, data);
-                }
-                else
-                {
-                    Debug.LogError($"[StageHandler] Already is constains key : {data.index}!!");
-                }
-            }
-        }
-
-        public override void SaveJsonData()
-        {
-            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
-        }
-
-        public override void SaveJsonData<T>(params T[] _params)
-        {
-            List<StageData> stageList = _params.OfType<StageData>().ToList();
-
-            foreach (var stage in stageList)
-            {
-                AddData(stage);
-            }
-
-            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
-        }
-    }
-
 }
 

@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using System;
-using System.Security.Cryptography;
 
 namespace YhProj.Game.UI
 {
     // uiroot 하위 랜더링할 캔버스 종류들
     public enum UIRootType
     {
-        MAIN_UI, // 항상 고정값이 되어야 함
-        POPUP_UI,
-        TOOLTIP_UI,
-        CONTEXTUAL_UI,
-        COUNT
+        //Main, // 항상 고정값이 되어야 함
+        Popup,
+        Tooltip,
+        Contextual,
+        Count
     }
     /// <summary>
     /// ui가 닫히고 다른 ui를 띄우는경우
@@ -31,6 +30,137 @@ namespace YhProj.Game.UI
      * Contextual UI ?? 
      * 너무 많은 캔버스 사용은 렌더링 성능 저하를 가져 올 수 있음으로 루트 캔버스 하위에 빈 오브젝트를 이용해 카테고리 분류
      */
+
+    // 만약 아래 클래스에서 다양성에 문제가 생긴다면 파생시켜서 관리할 것
+    public class UIDerived
+    {
+        private readonly string path;
+
+        protected Transform root;
+
+        [SerializeField]
+        private List<UIInfo> uiInfoList = new List<UIInfo>();
+        public bool IsConstains(string _uiName) => uiInfoList.Find(x => x.uiName == _uiName) == null ? false : true;
+
+        [SerializeField]
+        protected List<BaseUI> displayUIList = new List<BaseUI>();
+        public bool IsActiveUI
+        {
+            get => displayUIList.Count > 0;
+        }
+
+        public UIDerived(string _path, Transform _parent, List<UIInfo> _uiInfoList)
+        {
+            path = _path;
+            root = _parent;
+            uiInfoList = _uiInfoList;
+        }
+        public BaseUI GetUI(UIInfo _uiInfo)
+        {
+            List<BaseUI> baseUIList = new List<BaseUI>();
+            BaseUI baseUI = null;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
+
+                if (_uiInfo.uiName == ui.uiInfo.uiName)
+                {
+                    baseUI = ui;
+                }
+
+                baseUIList.Add(ui);
+            }
+
+            // 제일 마지막으로 옮김
+            if (baseUI != null)
+            {
+                baseUI.transform.SetAsLastSibling();
+            }
+            else
+            {
+                baseUI = GameUtil.InstantiateResource<BaseUI>(path + _uiInfo.uiName);
+                baseUI.transform.SetParent(root, false);
+                baseUI.transform.localPosition = Vector3.zero;
+                baseUI.transform.SetSiblingIndex(root.childCount - 1);
+            }
+
+            int depth = 0;
+
+            // depth 새로 조정
+            for (int i = 0; i < baseUIList.Count; i++)
+            {
+                if (baseUIList[i].gameObject.activeSelf)
+                {
+                    baseUIList[i].depth = depth;
+                    depth++;
+                }
+            }
+
+            return baseUI;
+        }
+
+        public T ShowUI<T>(string _uiName) where T : Component
+        {
+            UIInfo uiInfo = uiInfoList.Find(u => u.uiName == _uiName);
+
+            if (uiInfo == null)
+            {
+                Debug.LogError($"UIRootType : , Show UI Not UIInfo Set Please Check your uidata.asset");
+                return default(T);
+            }
+
+            BaseUI baseUI = GetUI(uiInfo);
+
+            baseUI.Show(uiInfo);
+
+            return baseUI.GetComponent<T>();
+        }
+        public void Hide(UIInfo _uiInfo)
+        {
+            List<BaseUI> baseUIList = new List<BaseUI>();
+            BaseUI baseUI = null;
+
+            int idx = root.childCount;
+
+            // 순서에 맞게 뎁스도 조정하여야 함
+            for (int i = 0; i < root.childCount; i++)
+            {
+                BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
+
+                if (_uiInfo.uiName == ui.uiInfo.uiName)
+                {
+                    baseUI = ui;
+                }
+
+                baseUIList.Add(ui);
+            }
+
+            int depth = 0;
+
+            for (int i = 0; i < root.childCount; i++)
+            {
+                if (baseUIList[i].gameObject.activeSelf)
+                {
+                    baseUIList[i].depth = depth;
+                    depth++;
+                }
+            }
+
+            if (baseUI != null)
+            {
+                baseUI.Hide();
+            }
+        }
+
+        public void AllHide()
+        {
+            for (int i = 0; i < uiInfoList.Count; i++)
+            {
+                Hide(uiInfoList[i]);
+            }
+        }
+    }
     public class UIManager : BaseManager
     {
         //internal static readonly Lazy<UIManager> Lazy = new Lazy<UIManager>(() =>
@@ -42,28 +172,29 @@ namespace YhProj.Game.UI
 
         [SerializeField]
         private string uiRootName = "UIRoot";
+        private Dictionary<UIRootType, UIDerived> rootDerivedMap = new Dictionary<UIRootType, UIDerived>();
 
-        private List<UIInfo> uiInfoList = new List<UIInfo>();
+        private readonly Dictionary<UIRootType, string> uIPathMap = new Dictionary<UIRootType, string>()
+        {
+            { UIRootType.Contextual, "UI/Contextual/"},
+            { UIRootType.Popup, "UI/Popup/"},
+            { UIRootType.Tooltip, "UI/Tooltip/"},
+        };
+
 
         // main ui만 따로 
-        private MainUI mainUI;
-        private Dictionary<UIRootType, Transform> rootTrfDic = new Dictionary<UIRootType, Transform>();
+        private List<MainUI> mainUIList = new List<MainUI>();
         public bool IsActiveUI
         {
             get
             {
                 bool ret = false;
 
-                foreach (var ui in rootTrfDic)
+                foreach (var ui in rootDerivedMap)
                 {
-                    if (ui.Key == UIRootType.MAIN_UI)
-                    {
-                        continue;
-                    }
-
                     var parent = ui.Value;
 
-                    if (parent.childCount > 0 && parent.GetChild(parent.childCount - 1).gameObject.activeSelf)
+                    if (parent.IsActiveUI)
                     {
                         ret = true;
                         break;
@@ -92,13 +223,11 @@ namespace YhProj.Game.UI
             // 통일이 필요할 것 같은데..
             // uidata set 
             UIData uiData = Resources.Load<UIData>("ScriptableObjects/UIData");
-            uiInfoList.AddRange(uiData.mainUIDataList);
-            uiInfoList.AddRange(uiData.popupUIDataList);
-            uiInfoList.AddRange(uiData.tooltipUIDataList);
-            uiInfoList.AddRange(uiData.contextualUIDataList);
+
+
 
             // 1은 main ui이기 때문에 제외
-            for (int i = 0; i < (int)UIRootType.COUNT; i++)
+            for (int i = 0; i < (int)UIRootType.Count; i++)
             {
                 string name = string.Format("{0}", (UIRootType)i);
                 GameObject child = new GameObject(name);
@@ -118,9 +247,29 @@ namespace YhProj.Game.UI
                 child.transform.localPosition = Vector3.zero;
                 child.transform.localScale = Vector3.one;
 
-                if (!rootTrfDic.ContainsKey((UIRootType)i))
+                UIRootType rootType = (UIRootType)i;
+                List<UIInfo> uiDataList = new List<UIInfo>();
+
+                switch(rootType)
                 {
-                    rootTrfDic.Add((UIRootType)i, child.transform);
+                    case UIRootType.Tooltip:
+                        uiDataList = uiData.tooltipUIDataList;
+                        break;
+                    case UIRootType.Popup:
+                        uiDataList = uiData.popupUIDataList;
+                        break;
+                    case UIRootType.Contextual:
+                        uiDataList = uiData.contextualUIDataList;
+                        break;
+                }
+
+                // uiInfoList.AddRange(uiData.mainUIDataList);
+
+                if (!rootDerivedMap.ContainsKey(rootType))
+                {
+                    UIDerived uIDerived = new UIDerived(uIPathMap[rootType], child.transform, uiDataList);
+
+                    rootDerivedMap.Add((UIRootType)i, uIDerived);
                 }
             }
 
@@ -128,7 +277,7 @@ namespace YhProj.Game.UI
 
             // 메인 UI 변경이 필요 그리고 loading 등등 조치가 필요하긴 함.. 씬전환등
 
-            rootTrfDic[UIRootType.MAIN_UI].gameObject.SetActive(true);
+            // rootTrfDic[UIRootType.MAIN_UI].gameObject.SetActive(true);
             // mainUI = ShowUI<MapToolMainUI>(mainUIName);
         }
 
@@ -143,51 +292,7 @@ namespace YhProj.Game.UI
 
         public BaseUI GetUI(UIInfo _uiInfo)
         {
-            List<BaseUI> baseUIList = new List<BaseUI>();
-
-            Transform root = rootTrfDic[_uiInfo.uiRootType];
-            BaseUI baseUI = null;
-
-            for (int i = 0; i < root.childCount; i++)
-            {
-                BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
-
-                if (_uiInfo.name == ui.uiInfo.name)
-                {
-                    baseUI = ui;
-                }
-
-                baseUIList.Add(ui);
-            }
-
-            // 제일 마지막으로 옮김
-            if (baseUI != null)
-            {
-                baseUI.transform.SetAsLastSibling();
-            }
-            else
-            {
-                string path = "UI/MapTool/";
-
-                baseUI = GameUtil.InstantiateResource<BaseUI>(path + _uiInfo.name);
-                baseUI.transform.SetParent(root, false);
-                baseUI.transform.localPosition = Vector3.zero;
-                baseUI.transform.SetSiblingIndex(root.childCount - 1);
-            }
-
-            int depth = 0;
-
-            // depth 새로 조정
-            for (int i = 0; i < baseUIList.Count; i++)
-            {
-                if (baseUIList[i].gameObject.activeSelf)
-                {
-                    baseUIList[i].depth = depth;
-                    depth++;
-                }
-            }
-
-            return baseUI;
+            return default(BaseUI);
         }
 
         /// <summary>
@@ -200,102 +305,43 @@ namespace YhProj.Game.UI
         /// <param name="_uiData"> UI를 생성하고 셋팅을 위한 데이터 </param>
         /// <returns> 패널의 컴포넌트 </returns>
 
-        public T ShowUI<T, V>(string _uiName, V _param = null) where T : Component where V : BaseObject
+        public T ShowUI<T, V>(UIRootType _rootType, string _uiName, V _param = null) where T : Component where V : BaseObject
         {
-            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
-
-            if (uiInfo == null)
-            {
-                Debug.LogError("Show UI Not UIInfo Set Please Check your uidata.asset");
-                return default(T);
-            }
-
-            BaseUI baseUI = GetUI(uiInfo);
-
-            baseUI.Show(uiInfo, _param);
-
-            return baseUI.GetComponent<T>();
+            return default(T);
         }
-        public T ShowUI<T>(string _uiName) where T : Component
+        public T ShowUI<T>(UIRootType _rootType, string _uiName) where T : Component
         {
-            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
 
-            if (uiInfo == null)
-            {
-                Debug.LogError("Show UI Not UIInfo Set Please Check your uidata.asset");
-                return default(T);
-            }
 
-            BaseUI baseUI = GetUI(uiInfo);
+            return default(T);
+        }
+        public T ShowUI<T>(UIInfo _uiInfo) where T : Component
+        {
 
-            baseUI.Show(uiInfo);
 
-            return baseUI.GetComponent<T>();
+            return default(T);
+        }
+        public void ShowUI(UIRootType _rootType, string _uiName)
+        {
+            UIDerived derived = null;
+
+
+
         }
 
-        public void ShowUI(string _uiName)
+        public void ShowUI(UIInfo _uiInfo)
         {
-            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
 
-            if (uiInfo == null)
-            {
-                Debug.LogError("Show UI Not UIInfo Set Please Check your uidata.asset");
-            }
-
-            BaseUI baseUI = GetUI(uiInfo);
-
-            baseUI.Show(uiInfo);
         }
 
         public void HideUI(UIInfo _uiInfo)
         {
-            List<BaseUI> baseUIList = new List<BaseUI>();
-
-            Transform root = rootTrfDic[_uiInfo.uiRootType];
-            BaseUI baseUI = null;
-
-            int idx = root.childCount;
-
-            // 순서에 맞게 뎁스도 조정하여야 함
-            for (int i = 0; i < root.childCount; i++)
-            {
-                BaseUI ui = root.GetChild(i).GetComponent<BaseUI>();
-
-                if (_uiInfo.name == ui.uiInfo.name)
-                {
-                    baseUI = ui;
-                }
-
-                baseUIList.Add(ui);
-            }
-
-            int depth = 0;
-
-            for (int i = 0; i < root.childCount; i++)
-            {
-                if (baseUIList[i].gameObject.activeSelf)
-                {
-                    baseUIList[i].depth = depth;
-                    depth++;
-                }
-            }
-
-            if (baseUI != null)
-            {
-                baseUI.Hide();
-            }
+            
         }
 
         public void HideUI(string _uiName)
         {
-            UIInfo uiInfo = uiInfoList.Find(u => u.name == _uiName);
-
-            if (uiInfo == null)
-            {
-                Debug.LogError("Hide UI Not UIInfo Set Please Check your uidata.asset");
-            }
-
-            HideUI(uiInfo);
+            
         }
         /// <summary>
         /// 코루틴으로 패널을 닫는 경우가 있음 그래서 닫고나서 열린다는 보장을 할 수 없다.
@@ -303,13 +349,7 @@ namespace YhProj.Game.UI
         /// </summary>
         public void AllHide()
         {
-            for(int i = 0; i < uiInfoList.Count; i++) 
-            {
-                if (uiInfoList[i].uiRootType != UIRootType.MAIN_UI)
-                {
-                    HideUI(uiInfoList[i]);
-                }
-            }
+            
         }
     }
 
@@ -353,9 +393,9 @@ namespace YhProj.Game.UI
             return null;
         }
 
-        public static GameObject FindChild(GameObject _go, string name = null, bool _recursive = false)
+        public static GameObject FindChild(GameObject _go, string _name = null, bool _recursive = false)
         {
-            Transform trf = FindChild<Transform>(_go, name, _recursive);
+            Transform trf = FindChild<Transform>(_go, _name, _recursive);
 
             if (trf == null)
             {

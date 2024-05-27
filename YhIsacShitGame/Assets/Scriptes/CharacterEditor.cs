@@ -8,10 +8,7 @@ namespace YhProj.Game.YhEditor
 {
     public class CharacterEditor : BaseEditor
     {
-        public CharacterEditor()
-        {
-            factory = new CharacterFactory();
-        }
+        private ICharacterFactory characterFacotry;
         public override void Initialize()
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
@@ -22,20 +19,21 @@ namespace YhProj.Game.YhEditor
         {
             CharacterObject charObject = null;
             CharacterData charData = _gameData as CharacterData;
-
+            
             switch (charData.elementType)
             {
                 case ElementType.mine:
-                    charObject = factory.Create<HeroObject>(charData);
+                    characterFacotry = new HeroFactory();
                     break;
                 case ElementType.enemy:
-                    charObject = factory.Create<EnemyObject>(charData);
+                    characterFacotry = new EnemyFactory();
                     break;
                 default:
                     Debug.LogError($"characterData is Not ElementType : {charData.elementType}");
                     break;
             }
 
+            charObject = characterFacotry.Create(charData);
             charObject.transform.SetParent(root);
             // 일단 기획에 없음으로 zero
             charObject.transform.localPosition = Vector3.zero;
@@ -45,7 +43,7 @@ namespace YhProj.Game.YhEditor
         {
             if (_gameData is CharacterData charData)
             {
-                CharacterObject charObject = objectList.Select(x => x as CharacterObject).Where(x => x.characterData.index == _gameData.index).First();
+                CharacterObject charObject = objectList.Select(x => x as CharacterObject).Where(x => x.gameData.index == _gameData.index).First();
                 charObject?.Delete();
             }
             else

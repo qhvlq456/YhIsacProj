@@ -5,7 +5,7 @@ using YhProj;
 
 namespace YhProj.Game.UI
 {
-    public class MainUI : BaseUI
+    public class MainUI : MonoBehaviour
     {
         /// notch대응을 위해 그룹별로 나누는 작업이 있음 좋을 것 같다
         public class UIParts
@@ -52,7 +52,7 @@ namespace YhProj.Game.UI
         }
 
         // UI 영역을 관리하기 위한 딕셔너리
-        private Dictionary<UIArea, UIParts> uiPartsDictionary = new Dictionary<UIArea, UIParts>();
+        private Dictionary<UIArea, UIParts> uiPartsMap = new Dictionary<UIArea, UIParts>();
 
         // Start 메서드에서 UI를 초기화합니다.
         private void Start()
@@ -61,7 +61,7 @@ namespace YhProj.Game.UI
         }
         /// <summary>
         /// anchorMin = Vector2.zero: 좌상단 앵커를 (0, 0)으로 설정하여 캔버스의 좌측 상단에 정확하게 위치합니다.
-        // anchorMax = new Vector2(0.5f, 0.5f) : 우하단 앵커를(0.5, 0.5)으로 설정하여 캔버스의 가로 길이의 절반, 세로 길이의 절반 위치까지 영역을 확장합니다.
+        /// anchorMax = new Vector2(0.5f, 0.5f) : 우하단 앵커를(0.5, 0.5)으로 설정하여 캔버스의 가로 길이의 절반, 세로 길이의 절반 위치까지 영역을 확장합니다.
         /// </summary>
         private void CreateUIAreas()
         {
@@ -111,9 +111,9 @@ namespace YhProj.Game.UI
         // 주어진 UI 영역에 UI를 추가하는 메서드
         public void AddUI(UIArea area, BaseUI ui)
         {
-            if (uiPartsDictionary.ContainsKey(area))
+            if (uiPartsMap.ContainsKey(area))
             {
-                uiPartsDictionary[area].Add(ui);
+                uiPartsMap[area].Add(ui);
             }
             else
             {
@@ -124,9 +124,9 @@ namespace YhProj.Game.UI
         // 주어진 UI 영역에서 UI를 제거하는 메서드
         public void RemoveUI(UIArea area, BaseUI ui)
         {
-            if (uiPartsDictionary.ContainsKey(area))
+            if (uiPartsMap.ContainsKey(area))
             {
-                uiPartsDictionary[area].Remove(ui);
+                uiPartsMap[area].Remove(ui);
             }
             else
             {
@@ -135,5 +135,15 @@ namespace YhProj.Game.UI
         }
 
         // TODO: 다른 필요한 메서드 및 기능 추가
+
+        public virtual void Show()
+        {
+
+        }
+
+        public virtual void Hide() 
+        { 
+
+        }
     }
 }
