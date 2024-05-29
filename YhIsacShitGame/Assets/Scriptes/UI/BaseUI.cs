@@ -10,7 +10,7 @@ namespace YhProj.Game.UI
         // 각종 UI button, label등등을 캐싱함
         protected Dictionary<Type, List<UnityEngine.Object>> uiObjDic = new Dictionary<Type, List<UnityEngine.Object>>();
 
-        public UIInfo uiInfo { get; private set; }
+        public UIInfo uiInfo;
 
         // ugui는 canvas에서 솔팅을 조절함 그래서 확인 또는 필요시 각 패널마다 canvas를 넣을지 판단하여야 함
         public int depth;

@@ -315,6 +315,12 @@ namespace YhProj.Game.UI
 
             return default(T);
         }
+        public T ShowUI<T>(string _uiName) where T : Component
+        {
+
+
+            return default(T);
+        }
         public T ShowUI<T>(UIInfo _uiInfo) where T : Component
         {
 
@@ -328,7 +334,13 @@ namespace YhProj.Game.UI
 
 
         }
+        public void ShowUI(string _uiName)
+        {
+            UIDerived derived = null;
 
+
+
+        }
         public void ShowUI(UIInfo _uiInfo)
         {
 

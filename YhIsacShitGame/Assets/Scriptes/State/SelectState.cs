@@ -30,7 +30,7 @@ namespace YhProj.Game.State
             if (editorTileObject != null)
             {
                 editorTileObject.Create(editorTileObject.gameData);
-                Managers.Instance.GetManager<UIManager>().ShowUI<MapToolBodyUI, EditorTileObject>("MapToolUI", editorTileObject);
+                Managers.Instance.GetManager<UIManager>().ShowUI<MapToolBodyUI, EditorTileObject>(UIRootType.Contextual,"MapToolUI", editorTileObject);
             }
             else
             {
