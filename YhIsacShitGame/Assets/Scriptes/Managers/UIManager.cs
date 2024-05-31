@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
 using System;
+using System.Linq;
 
 namespace YhProj.Game.UI
 {
@@ -54,6 +55,13 @@ namespace YhProj.Game.UI
             path = _path;
             root = _parent;
             uiInfoList = _uiInfoList;
+        }
+
+        public UIInfo GetUIInfo(string _uiName)
+        {
+            UIInfo ret = uiInfoList.Find(x => x.uiName == _uiName);
+
+            return ret;
         }
         public BaseUI GetUI(UIInfo _uiInfo)
         {
@@ -116,7 +124,20 @@ namespace YhProj.Game.UI
 
             return baseUI.GetComponent<T>();
         }
-        public void Hide(UIInfo _uiInfo)
+        public void HideUI(string _uiName)
+        {
+            UIInfo info = uiInfoList.Find(x => x.uiName == _uiName);
+
+            if(info != null)
+            {
+                HideUI(info.uiName);
+            }
+            else
+            {
+                Debug.LogError("[HideUI] Not found ui info");
+            }
+        }
+        public void HideUI(UIInfo _uiInfo)
         {
             List<BaseUI> baseUIList = new List<BaseUI>();
             BaseUI baseUI = null;
@@ -153,217 +174,235 @@ namespace YhProj.Game.UI
             }
         }
 
-        public void AllHide()
+        public void HideAllUI()
         {
             for (int i = 0; i < uiInfoList.Count; i++)
             {
-                Hide(uiInfoList[i]);
+                HideUI(uiInfoList[i]);
             }
         }
     }
     public class UIManager : BaseManager
     {
-        //internal static readonly Lazy<UIManager> Lazy = new Lazy<UIManager>(() =>
-        //{
-        //    if (!NeonSdkService.IsInitialized)
-        //        throw new NeonException("NeonSdk is not initialized.");
-        //    return new NeonAuth();
-        //});
-
         [SerializeField]
         private string uiRootName = "UIRoot";
         private Dictionary<UIRootType, UIDerived> rootDerivedMap = new Dictionary<UIRootType, UIDerived>();
-
-        private readonly Dictionary<UIRootType, string> uIPathMap = new Dictionary<UIRootType, string>()
+        private readonly Dictionary<UIRootType, string> uiPathMap = new Dictionary<UIRootType, string>()
         {
-            { UIRootType.Contextual, "UI/Contextual/"},
-            { UIRootType.Popup, "UI/Popup/"},
-            { UIRootType.Tooltip, "UI/Tooltip/"},
+            { UIRootType.Contextual, "UI/Contextual/" },
+            { UIRootType.Popup, "UI/Popup/" },
+            { UIRootType.Tooltip, "UI/Tooltip/" },
         };
 
-
-        // main ui만 따로 
         private List<MainUI> mainUIList = new List<MainUI>();
+
         public bool IsActiveUI
         {
             get
             {
-                bool ret = false;
-
-                foreach (var ui in rootDerivedMap)
+                foreach (var ui in rootDerivedMap.Values)
                 {
-                    var parent = ui.Value;
-
-                    if (parent.IsActiveUI)
+                    if (ui.IsActiveUI)
                     {
-                        ret = true;
-                        break;
+                        return true;
                     }
                 }
-
-                return ret;
+                return false;
             }
         }
+
         public override void Load()
         {
             root = GameUtil.AttachObj<Transform>(uiRootName);
 
-            Canvas canvas = root.gameObject.GetComponent<Canvas>();
+            InitializeCanvas(root);
+            LoadUIData();
+            CreateUIRoots();
+        }
+
+        private void InitializeCanvas(Transform root)
+        {
+            var canvas = root.gameObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
-            // 해상도에 따라 크기 조정
-            CanvasScaler canvasScaler = root.gameObject.GetComponent<CanvasScaler>();
+            var canvasScaler = root.gameObject.GetComponent<CanvasScaler>();
             canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            canvasScaler.referenceResolution = new Vector2(Screen.width, Screen.height); // 후에 리솔루션 고정 값 넣을 것임 screen 함수라든지?
+            canvasScaler.referenceResolution = new Vector2(Screen.width, Screen.height);
 
-            // 이벤트 전파를 위한 설정
-            root.gameObject.GetComponent<GraphicRaycaster>();
+            root.gameObject.AddComponent<GraphicRaycaster>();
+        }
 
-            // 후에 경로에 대한 재지정이 필요함
-            // 통일이 필요할 것 같은데..
-            // uidata set 
-            UIData uiData = Resources.Load<UIData>("ScriptableObjects/UIData");
+        private void LoadUIData()
+        {
+            var uiData = Resources.Load<UIData>("ScriptableObjects/UIData");
 
-
-
-            // 1은 main ui이기 때문에 제외
             for (int i = 0; i < (int)UIRootType.Count; i++)
             {
-                string name = string.Format("{0}", (UIRootType)i);
-                GameObject child = new GameObject(name);
-
-                RectTransform childRect = child.AddComponent<RectTransform>();
-                // strech
-                childRect.anchorMin = Vector2.zero;
-                childRect.anchorMax = Vector2.one;
-
-                //Left, Bottom 변경
-                childRect.offsetMin = Vector2.zero;
-
-                //Right, Top 변경 -> 원하는 크기 - 기준해상도값
-                childRect.offsetMax = new Vector2(Screen.width, Screen.height);
-
-                child.transform.SetParent(root, false);
-                child.transform.localPosition = Vector3.zero;
-                child.transform.localScale = Vector3.one;
-
-                UIRootType rootType = (UIRootType)i;
-                List<UIInfo> uiDataList = new List<UIInfo>();
-
-                switch(rootType)
-                {
-                    case UIRootType.Tooltip:
-                        uiDataList = uiData.tooltipUIDataList;
-                        break;
-                    case UIRootType.Popup:
-                        uiDataList = uiData.popupUIDataList;
-                        break;
-                    case UIRootType.Contextual:
-                        uiDataList = uiData.contextualUIDataList;
-                        break;
-                }
-
-                // uiInfoList.AddRange(uiData.mainUIDataList);
+                var rootType = (UIRootType)i;
+                var uiDataList = GetUIDataListForRootType(uiData, rootType);
+                var child = CreateUIRootObject(rootType);
 
                 if (!rootDerivedMap.ContainsKey(rootType))
                 {
-                    UIDerived uIDerived = new UIDerived(uIPathMap[rootType], child.transform, uiDataList);
-
-                    rootDerivedMap.Add((UIRootType)i, uIDerived);
+                    var uIDerived = new UIDerived(uiPathMap[rootType], child.transform, uiDataList);
+                    rootDerivedMap.Add(rootType, uIDerived);
                 }
             }
-
-            string mainUIName = "";
-
-            // 메인 UI 변경이 필요 그리고 loading 등등 조치가 필요하긴 함.. 씬전환등
-
-            // rootTrfDic[UIRootType.MAIN_UI].gameObject.SetActive(true);
-            // mainUI = ShowUI<MapToolMainUI>(mainUIName);
         }
 
+        private List<UIInfo> GetUIDataListForRootType(UIData uiData, UIRootType rootType)
+        {
+            return rootType switch
+            {
+                UIRootType.Tooltip => uiData.tooltipUIDataList,
+                UIRootType.Popup => uiData.popupUIDataList,
+                UIRootType.Contextual => uiData.contextualUIDataList,
+                _ => new List<UIInfo>()
+            };
+        }
+
+        private GameObject CreateUIRootObject(UIRootType rootType)
+        {
+            var name = $"{rootType}";
+            var child = new GameObject(name);
+            var childRect = child.AddComponent<RectTransform>();
+
+            childRect.anchorMin = Vector2.zero;
+            childRect.anchorMax = Vector2.one;
+            childRect.offsetMin = Vector2.zero;
+            childRect.offsetMax = Vector2.zero;
+
+            child.transform.SetParent(root, false);
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localScale = Vector3.one;
+
+            return child;
+        }
+        private void CreateUIRoots()
+        {
+            for (int i = 0; i < (int)UIRootType.Count; i++)
+            {
+                var rootType = (UIRootType)i;
+                if (!rootDerivedMap.ContainsKey(rootType))
+                {
+                    var child = CreateUIRootObject(rootType);
+                    var uiDataList = new List<UIInfo>(); // Assuming you have a method to get UI data list for each root type
+                    var uIDerived = new UIDerived(uiPathMap[rootType], child.transform, uiDataList);
+                    rootDerivedMap.Add(rootType, uIDerived);
+                }
+            }
+        }
         public override void Update()
         {
-
         }
+
         public override void Dispose()
         {
-
         }
 
-        public BaseUI GetUI(UIInfo _uiInfo)
+        public T ShowUI<T>(UIRootType rootType, string uiName) where T : Component
         {
-            return default(BaseUI);
+            var uiInfo = GetUIInfo(rootType, uiName);
+            return ShowInternalUI<T>(uiInfo);
         }
 
-        /// <summary>
-        /// 부모의 자식 갯수를 통해 order를 정하여 UI를 표시하는 함수
-        /// 스택과 같이 제일 하위에 생성됨
-        /// </summary>
-        /// <typeparam name="T"> ui 에 장착되어 있는 컴포넌트를 반환 </typeparam>
-        /// <typeparam name="V">UI를 생성하고 셋팅을 위한 데이터의 타입</typeparam>
-        /// <param name="_rootType"> 생성될 UI 오브젝트가 부모로 섬기게 될 타입 </param>
-        /// <param name="_uiData"> UI를 생성하고 셋팅을 위한 데이터 </param>
-        /// <returns> 패널의 컴포넌트 </returns>
-
-        public T ShowUI<T, V>(UIRootType _rootType, string _uiName, V _param = null) where T : Component where V : BaseObject
+        public T ShowUI<T>(string uiName) where T : Component
         {
-            return default(T);
-        }
-        public T ShowUI<T>(UIRootType _rootType, string _uiName) where T : Component
-        {
-
-
-            return default(T);
-        }
-        public T ShowUI<T>(string _uiName) where T : Component
-        {
-
-
-            return default(T);
-        }
-        public T ShowUI<T>(UIInfo _uiInfo) where T : Component
-        {
-
-
-            return default(T);
-        }
-        public void ShowUI(UIRootType _rootType, string _uiName)
-        {
-            UIDerived derived = null;
-
-
-
-        }
-        public void ShowUI(string _uiName)
-        {
-            UIDerived derived = null;
-
-
-
-        }
-        public void ShowUI(UIInfo _uiInfo)
-        {
-
+            var uiInfo = GetUIInfo(uiName);
+            return ShowInternalUI<T>(uiInfo);
         }
 
-        public void HideUI(UIInfo _uiInfo)
+        public T ShowUI<T>(UIInfo uiInfo) where T : Component
         {
-            
+            return ShowInternalUI<T>(uiInfo);
+        }
+
+        private T ShowInternalUI<T>(UIInfo uiInfo) where T : Component
+        {
+            if (uiInfo == null)
+            {
+                Debug.LogError("UIInfo not found.");
+                return null;
+            }
+
+            if (!rootDerivedMap.TryGetValue(uiInfo.uiRootType, out var derived))
+            {
+                Debug.LogError($"UIRootType: {uiInfo.uiRootType} not found.");
+                return null;
+            }
+
+            var baseUI = derived.GetUI(uiInfo);
+            baseUI.Show(uiInfo);
+
+            return baseUI.GetComponent<T>();
         }
 
         public void HideUI(string _uiName)
         {
-            
+            UIDerived derived = rootDerivedMap.Values.First(x => x.IsConstains(_uiName));
+
+            if(derived != null)
+            {
+                derived.HideUI(_uiName);
+            }
+            else
+            {
+                Debug.LogError($"_uiName : {_uiName}, not found.");
+            }
+
         }
-        /// <summary>
-        /// 코루틴으로 패널을 닫는 경우가 있음 그래서 닫고나서 열린다는 보장을 할 수 없다.
-        /// 그래서 방법을 생각해야 한다
-        /// </summary>
-        public void AllHide()
+
+        public void HideUI(UIInfo uiInfo)
         {
-            
+            if (uiInfo == null)
+            {
+                Debug.LogError("UIInfo not found.");
+                return;
+            }
+
+            if (rootDerivedMap.TryGetValue(uiInfo.uiRootType, out var derived))
+            {
+                derived.HideUI(uiInfo);
+            }
+            else
+            {
+                Debug.LogError($"UIRootType: {uiInfo.uiRootType} not found.");
+            }
+        }
+
+        public void HideAllUI()
+        {
+            foreach (var derived in rootDerivedMap.Values)
+            {
+                derived.HideAllUI();
+            }
+        }
+
+        private UIInfo GetUIInfo(UIRootType rootType, string uiName)
+        {
+            if (rootDerivedMap.TryGetValue(rootType, out var derived))
+            {
+                return derived.GetUIInfo(uiName);
+            }
+            Debug.LogError($"UIRootType: {rootType} not found.");
+            return null;
+        }
+
+        private UIInfo GetUIInfo(string uiName)
+        {
+            foreach (var derived in rootDerivedMap.Values)
+            {
+                var uiInfo = derived.GetUIInfo(uiName);
+                if (uiInfo != null)
+                {
+                    return uiInfo;
+                }
+            }
+            Debug.LogError($"UIInfo not found for UIName: {uiName}");
+            return null;
         }
     }
+
 
 
 

@@ -61,7 +61,7 @@ namespace YhProj.Game.YhEditor
 
             uiName = EditorManager.Instance.uiNameDic[curEditorType];
 
-            EditorManager.Instance.UIManager.ShowUI(uiName);
+            // EditorManager.Instance.UIManager.ShowUI<>(uiName);
 
             switch(curEditorType)
             {
