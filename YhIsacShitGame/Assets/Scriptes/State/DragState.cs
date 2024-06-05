@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace YhProj.Game.State
 {
+    // object를 잡고 있는가? 
     public class DragState : State
     {
         float moveSpeed;

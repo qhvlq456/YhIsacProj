@@ -11,18 +11,26 @@ using YhProj.Game.Player;
 
 namespace YhProj.Game.Map
 {
+    // 함수를 인터페이스로 구현하여 역전의존성 하면 객체지향적으로 변하는구나...
+
+
     /// <summary>
     /// Map에 대한 데이터를 총괄
     /// map을 create, update, delete를 한다
     /// 후에 모드 컨트롤러를 생성하여 다른 모드들에 대한 클래스를 정의 후 모드에 따라 분류하여 로직을 만들어 사용하자 아마 inputmanager보면 알듯?
     /// </summary>
     /// 여기서 tile과 stage 두개를 분리하여 관리
-    public class MapManager : BaseManager, IGameFlow
+    public class MapManager : BaseManager, IGameFlow, IBuildable
     {
+        // 설치 가능한 grid 표시 작업 필요 // 행과 열 구분이 필요함... 하지 않을지도? 그냥 batchidx == 0인것만 찾음 됨
+        // input에서 관리해야 할 것 같은데?
         // 여기서 combine해서 결과물 도출하여야 함
 
         // navmesh를 구워야 함
         private List<TileObject> instanceTileList = new List<TileObject>();
+        public List<TileObject> InstanceTileList => instanceTileList;
+        
+
         private ITileFactory tileFactory;
 
         public void OnStart()
@@ -119,6 +127,20 @@ namespace YhProj.Game.Map
             // Managers.Instance.lookTarget.transform.position = targetPos;
         }
         #endregion
+
+
+        #region Grid
+        public bool IsBuildable(Vector3 _position)
+        {
+            // 예시: position에 빌드 가능한지 판단하는 로직
+            foreach (var tile in instanceTileList)
+            {
+
+            }
+
+            return false;
+        }
+        #endregion
     }
     public sealed class TileHandler : BaseDataHandler
     {
@@ -129,9 +151,9 @@ namespace YhProj.Game.Map
 
             foreach(var data in list) 
             { 
-                if(!dataDic.ContainsKey(data.index)) 
+                if(!dataMap.ContainsKey(data.index)) 
                 {
-                    dataDic.Add(data.index, data);
+                    dataMap.Add(data.index, data);
                 }
                 else
                 {

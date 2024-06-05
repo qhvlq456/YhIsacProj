@@ -107,9 +107,9 @@ namespace YhProj.Game.Character
 
             foreach (var data in list)
             {
-                if (!dataDic.ContainsKey(data.index))
+                if (!dataMap.ContainsKey(data.index))
                 {
-                    dataDic.Add(data.index, data);
+                    dataMap.Add(data.index, data);
                 }
                 else
                 {

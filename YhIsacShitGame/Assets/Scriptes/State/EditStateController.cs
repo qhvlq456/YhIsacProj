@@ -29,7 +29,7 @@ namespace YhProj.Game.State
             
         }
         /// <summary>
-        /// state 를 리턴하는 함수
+        /// state 를 생성 후 리턴하는 함수
         /// </summary>
         /// <typeparam name="T"> 가져오고 싶은 상태 클래스 </typeparam>
         /// <param name="args"> 새롭게 생성 될 경우 해당 매개변수 </param>

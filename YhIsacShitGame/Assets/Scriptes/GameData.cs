@@ -4,6 +4,7 @@ namespace YhProj.Game
     public enum BaseType
     {
         none,
+        grid,
         tile,
         character,
         build,

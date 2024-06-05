@@ -13,6 +13,7 @@ namespace YhProj.Game.Map
         public Vector3 startPos;
         public Vector3 endPos;
 
+        public int tileSize;
         public int lv;
         public int stage;
         public int row;

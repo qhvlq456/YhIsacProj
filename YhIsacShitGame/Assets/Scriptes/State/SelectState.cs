@@ -8,6 +8,7 @@ using YhProj.Game.UI;
 namespace YhProj.Game.State
 {
     // 선택에 대한 행동을 구현해야 함
+    // 오브젝트에 대한 클릭인가? build를 하기위한클릭인가?, drag를 위한 클릭인가?
     public class SelectState : State
     {
         #region Factory Method
@@ -30,7 +31,8 @@ namespace YhProj.Game.State
             if (editorTileObject != null)
             {
                 editorTileObject.Create(editorTileObject.gameData);
-                Managers.Instance.GetManager<UIManager>().ShowUI<MapToolBodyUI, EditorTileObject>(UIRootType.Contextual,"MapToolUI", editorTileObject);
+                // 후에 ui paramter같은 클래스를 만들어서 사용
+                // Managers.Instance.GetManager<UIManager>().ShowUI<MapToolBodyUI, EditorTileObject>(UIRootType.Contextual,"MapToolUI", editorTileObject);
             }
             else
             {

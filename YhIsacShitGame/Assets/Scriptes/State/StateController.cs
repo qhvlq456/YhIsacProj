@@ -2,7 +2,7 @@ namespace YhProj.Game.State
 {
     public abstract class StateController : IController
     {
-        public State currentState { get; set; }
+        public State currentState;
 
         public virtual void OnEnter()
         {

@@ -300,6 +300,8 @@ namespace YhProj.Game.UI
         {
         }
 
+        #region Show
+
         public T ShowUI<T>(UIRootType rootType, string uiName) where T : Component
         {
             var uiInfo = GetUIInfo(rootType, uiName);
@@ -336,7 +338,9 @@ namespace YhProj.Game.UI
 
             return baseUI.GetComponent<T>();
         }
+        #endregion
 
+        #region Hide
         public void HideUI(string _uiName)
         {
             UIDerived derived = rootDerivedMap.Values.First(x => x.IsConstains(_uiName));
@@ -377,6 +381,7 @@ namespace YhProj.Game.UI
                 derived.HideAllUI();
             }
         }
+        #endregion
 
         private UIInfo GetUIInfo(UIRootType rootType, string uiName)
         {

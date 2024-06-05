@@ -12,6 +12,8 @@ using System.IO;
 using System.Text;
 using System.Linq;
 using YhProj.Game.Play;
+using Unity.VisualScripting;
+
 
 
 #if UNITY_EDITOR
@@ -215,6 +217,21 @@ namespace YhProj.Game
             T copyObj = UnityEngine.Object.Instantiate(resObj).GetComponent<T>();
 
             return copyObj;
+        }
+
+        public static T InstantiateResource<T>(GameObject _origin) where T : UnityEngine.Object 
+        {
+            T ret = null;
+
+            if(_origin == null)
+            {
+                Debug.LogWarningFormat("Util _origin Warning \n resobj : {0}", _origin);
+                return null;
+            }
+
+            ret = UnityEngine.Object.Instantiate(_origin).GetComponent<T>();
+            return ret;
+
         }
         #endregion
 
