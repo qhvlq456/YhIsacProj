@@ -27,6 +27,7 @@ namespace YhProj.Game.Map
         // 여기서 combine해서 결과물 도출하여야 함
 
         // navmesh를 구워야 함
+        private TileDataHandler tileDataHandler;
         private List<TileObject> instanceTileList = new List<TileObject>();
         public List<TileObject> InstanceTileList => instanceTileList;
         
@@ -36,7 +37,6 @@ namespace YhProj.Game.Map
         public void OnStart()
         {
             StageData stageData = GameManager.Instance.stageData;
-            TileHandler handler = GetDataHandler<TileHandler>();
 
             string log = "";
 
@@ -52,7 +52,7 @@ namespace YhProj.Game.Map
 
                 // 생성하는 부분이 사라졌네??
                 TileObject tileObject = null;
-                TileData tileData = handler.GetData<TileData>(list[i]);
+                TileData tileData = tileDataHandler.GetData(list[i]);
 
                 tileObject.transform.SetParent(root);
                 tileObject.transform.localPosition = new Vector3(x, 0, z);
@@ -86,12 +86,7 @@ namespace YhProj.Game.Map
             }
 
             // 나중에 각 매니저마다 비동기식으로 로드 할 것
-            dataHandlerMap.Add(typeof(TileHandler), new TileHandler());
-
-            foreach(var item in  dataHandlerMap)
-            {
-                item.Value.LoadJsonData();
-            }
+            tileDataHandler.LoadJsonData();
         }
         // 타일에 대한 delete, update라고 생각하면 안되긴 함...
         public override void Dispose()
@@ -130,7 +125,7 @@ namespace YhProj.Game.Map
 
 
         #region Grid
-        public bool IsBuildable(Vector3 _position)
+        public bool IsBuildable(Vector3Int _startPosition, Vector2Int _size)
         {
             // 예시: position에 빌드 가능한지 판단하는 로직
             foreach (var tile in instanceTileList)
@@ -142,7 +137,7 @@ namespace YhProj.Game.Map
         }
         #endregion
     }
-    public sealed class TileHandler : BaseDataHandler
+    public sealed class TileDataHandler : BaseDataHandler<TileData>
     {
         public static string json_tile_file_name = "StageData.json";
         public override void LoadJsonData()
@@ -169,7 +164,7 @@ namespace YhProj.Game.Map
         }
 
 
-        public override void SaveJsonData<T>(params T[] _params)
+        public override void SaveJsonData(params JsonReceiveDataArgs[] _params)
         {
             // 각 tiledata 클래스 별로 나누어 저장을 해야 할지 아님 한번에 tiledata로 저장해야 할지 알아보긴 해야 함
 
@@ -177,7 +172,7 @@ namespace YhProj.Game.Map
 
             foreach (var tileData in tileDataList)
             {
-                AddData(tileData);
+                AddData(tileData.index, tileData);
             }
 
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());

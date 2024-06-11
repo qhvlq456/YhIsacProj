@@ -95,7 +95,7 @@ public class MapToolBodyUI : BaseUI
         }
         else
         {
-            TileData originData = editorTileObject.gameData as TileData;
+            TileData originData = editorTileObject.tileData;
 
             TileData newTileData = new TileDataBuilder().SetRoadType(categoryUIDic["elementtype"].GetValue())
                 .SetDirection(categoryUIDic["direction"].GetValue())
@@ -125,9 +125,9 @@ public class MapToolBodyUI : BaseUI
     {
         string showInfoStr = "";
 
-        if (editorTileObject.gameData != null)
+        if (editorTileObject.tileData != null)
         {
-            TileData tileData = editorTileObject.gameData as TileData;
+            TileData tileData = editorTileObject.tileData as TileData;
 
             showInfoStr = $"Tile Data \n " +
                 $"name : {tileData.name}, " +

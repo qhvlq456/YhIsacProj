@@ -21,9 +21,9 @@ namespace YhProj.Game
             httpHandler = handler;
         }
 
-        public static void SendData<T>(T data) where T : GameData
+        public static void SendData(params ServerReceiveEventArgs[] _data)
         {
-            string jsonData = JsonUtility.ToJson(data); // 게임 데이터를 JSON 문자열로 변환
+            string jsonData = JsonUtility.ToJson(_data); // 게임 데이터를 JSON 문자열로 변환
 
             httpHandler.Post(serverUrl, jsonData, (_success, _response) =>
             {
@@ -82,5 +82,16 @@ namespace YhProj.Game
             response = _response;
         }
     }
+    // 후에 수정
+    public class ServerReceiveEventArgs : EventArgs
+    {
+        public bool success { get; private set; }
+        public string response { get; private set; }
 
+        public ServerReceiveEventArgs(bool _success, string _response)
+        {
+            success = _success;
+            response = _response;
+        }
+    }
 }

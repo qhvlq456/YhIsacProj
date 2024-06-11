@@ -9,6 +9,7 @@ namespace YhProj.Game.Character
 {
     public class CharacterManager : BaseManager, IGameFlow
     {
+        private CharacterDataHandler characterDataHandler;
         private List<CharacterObject> instanceCharList = new List<CharacterObject>();
         private IFactorySelector factorySelector;
         public override void Load()
@@ -19,14 +20,7 @@ namespace YhProj.Game.Character
                 root.transform.position = Vector3.zero;
             }
 
-            // 아님 나중에 basemanager로 load부분 gameadta load하는 부분으로 통합 작업 필요
-            // 나중에 각 매니저마다 비동기식으로 로드 할 것
-            dataHandlerMap.Add(typeof(CharDataHandler), new CharDataHandler());
-
-            foreach (var item in dataHandlerMap)
-            {
-                item.Value.LoadJsonData();
-            }
+            characterDataHandler.LoadJsonData();
         }
         public override void Update()
         {
@@ -41,7 +35,6 @@ namespace YhProj.Game.Character
         public void OnStart()
         {
             StageData stageData = GameManager.Instance.stageData;
-            CharDataHandler handler = GetDataHandler<CharDataHandler>();
 
             string log = "";
 
@@ -49,7 +42,7 @@ namespace YhProj.Game.Character
 
             for (int i = 0; i < list.Count; i++)
             {
-                CharacterData charData = handler.GetData<CharacterData>(list[i]);
+                CharacterData charData = characterDataHandler.GetData(list[i]);
 
                 if (charData != null)
                 {
@@ -91,7 +84,7 @@ namespace YhProj.Game.Character
     }
 
     // Data류 클래스들은 idatahandler를 통해 재구현하고 클래스로 데이터 보관
-    public sealed class CharDataHandler : BaseDataHandler
+    public sealed class CharacterDataHandler : BaseDataHandler<CharacterData>
     {
         public static string json_char_hero_file_name = "StageData.json";
         public static string json_enemy_hero_file_name = "StageData.json";
@@ -123,7 +116,8 @@ namespace YhProj.Game.Character
             // GameUtil.CreateJsonFile(StaticDefine.json_data_path, StaticDefine.JSON_MAP_FILE_NAME, GetDataList());
         }
 
-        public override void SaveJsonData<T>(params T[] _params)
+
+        public override void SaveJsonData(params JsonReceiveDataArgs[] _params)
         {
             List<CharacterData> charList = _params.OfType<CharacterData>().ToList();
         }

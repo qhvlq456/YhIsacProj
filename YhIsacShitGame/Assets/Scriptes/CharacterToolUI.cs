@@ -8,6 +8,8 @@ using YhProj.Game.Character;
 using YhProj.Game.YhEditor;
 using UnityEngine.Events;
 using YhProj.Game.Map;
+using UnityEngine.Rendering;
+using YhProj.Game.Play;
 
 public class CharacterToolUI : EditorUI
 {
@@ -82,12 +84,13 @@ public class CharacterToolUI : EditorUI
     [SerializeField]
     private List<sCharInputButton> charInputBtnList = new List<sCharInputButton>();
 
+    private CharacterDataHandler handler;
 
     private CharacterData curCharData = null;
 
     public override void Show(UIInfo _uiInfo)
     {
-        baseDataHandler = EditorManager.Instance.GetDataHandler<CharDataHandler>();
+        handler = EditorManager.Instance.characterDataHandler;
 
         foreach (var btn in charToolBtnList)
         {
@@ -128,7 +131,8 @@ public class CharacterToolUI : EditorUI
     {
         if (curCharData != null) 
         {
-            EditorManager.Instance.Save(baseDataHandler, curCharData);
+            // StageDataHandler stageHandler = EditorManager.Instance.stageDatahandeHandler;
+            // EditorManager.Instance.Save(stageHandler, new YhProj.Game.JsonReceiveDataArgs());
         }
     }
     public void LoadBtnClick()
@@ -156,7 +160,7 @@ public class CharacterToolUI : EditorUI
         int range = GetInputFieldToType<int>(dic[InputType.range]);
         int moveSpeed = GetInputFieldToType<int>(dic[InputType.moveSpeed]);
 
-        CharacterData characterData = baseDataHandler.GetData<CharacterData>(index);
+        CharacterData characterData = handler.GetData(index);
         characterData = characterData == null ? new CharacterData() : characterData;
         //logText.text = "Stage : " + stage.ToString();
 
@@ -176,7 +180,7 @@ public class CharacterToolUI : EditorUI
         if (charDropDown.options.Count > 0)
         {
             int idx = int.Parse(charDropDown.options[charDropDown.value].text);
-            CharacterData charData = baseDataHandler.GetData<CharacterData>(idx);
+            CharacterData charData = handler.GetData(idx);
 
             curCharData = charData;
 
@@ -192,9 +196,11 @@ public class CharacterToolUI : EditorUI
 
         int stage = GetInputFieldToType<int>(inputField);
 
-        if (baseDataHandler.ContainsData(stage))
+        StageDataHandler stageHandler = EditorManager.Instance.stageDatahandeHandler;
+
+        if (stageHandler.ContainsData(stage))
         {
-            StageData stageData = baseDataHandler.GetData<StageData>(stage);
+            StageData stageData = stageHandler.GetData(stage);
             EditorManager.Instance.Delete(stageData);
         }
         else

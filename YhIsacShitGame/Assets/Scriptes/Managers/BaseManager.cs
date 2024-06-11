@@ -14,26 +14,6 @@ namespace YhProj.Game
      */
     public abstract class BaseManager
     {
-        protected Dictionary<Type, BaseDataHandler> dataHandlerMap = new Dictionary<Type, BaseDataHandler>();
-        public T GetDataHandler<T>() where T : BaseDataHandler, new()
-        {
-            Type type = typeof(T);
-
-            if (dataHandlerMap.ContainsKey(type))
-            {
-                return dataHandlerMap[type] as T;
-            }
-            else
-            {
-                T newHandler = new T();
-                dataHandlerMap[type] = newHandler;
-                newHandler.LoadJsonData();
-                return newHandler;
-            }
-        }
-
-        public BaseDataHandler GetDataHandler(Type _type) => dataHandlerMap.TryGetValue(_type, out BaseDataHandler handler) ? handler : null;
-
         public Transform root { get; protected set; }
         // data의 load 플로우들을 정의
         public abstract void Load();

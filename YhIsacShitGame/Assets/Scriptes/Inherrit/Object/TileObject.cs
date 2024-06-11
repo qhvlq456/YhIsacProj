@@ -1,16 +1,19 @@
+using UnityEngine;
+
 namespace YhProj.Game.Map
 {
-    public class TileObject : BaseObject
+    public class TileObject : MonoBehaviour
     {
-        public override void Create<T>(T _baseData)
+        public TileData tileData;
+        public virtual void Create<T>(T _data) where T : TileData
         {
-            gameData = _baseData as TileData;
+            tileData = _data;
         }
-        public override void Update()
+        public virtual void Update()
         {
             
         }
-        public override void Delete()
+        public virtual void Delete()
         {
             Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(BaseType.tile, transform);
         }

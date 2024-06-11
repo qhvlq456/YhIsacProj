@@ -55,8 +55,6 @@ namespace YhProj.Game.Map
 
             transform.localScale = Vector3.one * 0.8f;
 
-            TileData tileData = gameData as TileData;
-
             switch (tileData.elementType)
             {
                 case ElementType.mine:

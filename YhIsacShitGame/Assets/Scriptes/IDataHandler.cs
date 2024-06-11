@@ -5,50 +5,43 @@ using YhProj.Game.User;
 
 namespace YhProj.Game
 {
-    public struct Tests
+    // 후에 수정
+    public class JsonReceiveDataArgs
     {
-        public int i;
-        public string s;
+
     }
     public interface IDataHandler
     {
         void LoadJsonData();
-        void SaveJsonData();
-        void SaveJsonData<T>(params T[] _params) where T : GameData;
+        void SaveJsonData(params JsonReceiveDataArgs[] _params);
     }
     // 서버 통신을 위한 인터페이스
     public interface IServerDataHandler
     {
-        // void DBSend();
-        void DBSend<T>(params T[] _parameteres) where T : GameData;
-        // void DBCallback<T>(params T[] _params) where T : GameData;
+        void DBRecive(params ServerReceiveEventArgs[] _parameteres);
         void DBCallback(object _sender, ServerCallbackEventArgs _args);
     }
     /// <summary>
     /// Data들 로드,저장 여부를 컨트롤 함
     /// </summary>
-    public abstract class BaseDataHandler : IDataHandler, IServerDataHandler
+    public abstract class BaseDataHandler<T> : IDataHandler, IServerDataHandler  where T : class
     {
         // key : index, value : gamedata
-        protected Dictionary<int, GameData> dataMap = new Dictionary<int, GameData>();
+        protected Dictionary<int, T> dataMap = new Dictionary<int, T>();
         public BaseDataHandler()
         {
             ServerCommunicator.OnServerCallback += DBCallback;
         }
-        public virtual void AddData<T>(T _data) where T : GameData
+        public virtual void AddData(int idx, T _data)
         {
-            if (ContainsData(_data.index))
+            if (ContainsData(idx))
             {
-                dataMap[_data.index] = _data;
+                dataMap[idx] = _data;
             }
             else
             {
-                dataMap.Add(_data.index, _data);
+                dataMap.Add(idx, _data);
             }
-        }
-        public T Test<T>() where T : struct
-        {
-            return default(T);
         }
 
         public virtual void DeleteData(int _index)
@@ -59,9 +52,9 @@ namespace YhProj.Game
             }
         }
 
-        public virtual T GetData<T>(int _index) where T : GameData
+        public virtual T GetData(int _index)
         {
-            return ContainsData(_index) ? dataMap[_index] as T: null;
+            return ContainsData(_index) ? dataMap[_index] : null;
         }
 
         public virtual bool ContainsData(int _index)
@@ -69,16 +62,16 @@ namespace YhProj.Game
             return dataMap.ContainsKey(_index);
         }
 
-        public virtual List<T> GetDataList<T>() where T : GameData
+        public virtual List<T> GetDataList()
         {
             return dataMap.Values.OfType<T>().ToList();
         }
         public abstract void LoadJsonData();
         public abstract void SaveJsonData();
 
-        public abstract void SaveJsonData<T>(params T[] _params) where T : GameData;
+        public abstract void SaveJsonData(params JsonReceiveDataArgs[] _params);
 
-        public virtual void DBSend<T>(params T[] _parameteres) where T : GameData
+        public virtual void DBRecive(params ServerReceiveEventArgs[] _parameteres)
         {
             ServerCommunicator.SendData(_parameteres);
         }

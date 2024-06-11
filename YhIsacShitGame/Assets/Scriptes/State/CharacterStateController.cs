@@ -23,7 +23,8 @@ namespace YhProj.Game.State
             {
                 currentState.Exit();
                 currentState = _nextState;
-                currentState.Enter(null);
+                // 다른 state를 생각해봐야겠구나
+                // currentState.Enter(null);
             }
         }
     }

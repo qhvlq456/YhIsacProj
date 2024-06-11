@@ -14,7 +14,7 @@ namespace YhProj.Game.Play
     // GamePlayPanelUI
     public class GameManager : Singleton<GameManager>
     {
-        public StageHandler stageHandler;
+        public StageDataHandler stageHandler;
         // 플레이어가 선택한 스테이지 데이터
         public StageData stageData;
         private List<IGameFlow> gameFlowList = new List<IGameFlow>();
@@ -29,14 +29,14 @@ namespace YhProj.Game.Play
         //}
         protected override void Awake()
         {
-            stageHandler = new StageHandler();
+            stageHandler = new StageDataHandler();
             stageHandler.LoadJsonData();
         }
 
         #region GameFlow
         public void LoadGame(int _stage)
         {
-            stageData = stageHandler.GetData<StageData>(_stage);
+            stageData = stageHandler.GetData(_stage);
             gameFlowList = Managers.Instance.GameFlowManagerList;
         }
         public void StartGame()
@@ -75,7 +75,7 @@ namespace YhProj.Game.Play
 
     // 이게 mapmanager에 있어야 할 이유가 없는데 제일 root인데 ;;
     // Data류 클래스들은 idatahandler를 통해 재구현하고 클래스로 데이터 보관
-    public sealed class StageHandler : BaseDataHandler
+    public sealed class StageDataHandler : BaseDataHandler<StageData>
     {
         public static string json_stage_file_name = "StageData.json";
 
@@ -87,9 +87,9 @@ namespace YhProj.Game.Play
 
             foreach (var data in stageDataList)
             {
-                if (!dataDic.ContainsKey(data.index))
+                if (!dataMap.ContainsKey(data.index))
                 {
-                    dataDic.Add(data.index, data);
+                    dataMap.Add(data.index, data);
                 }
                 else
                 {
@@ -100,19 +100,20 @@ namespace YhProj.Game.Play
 
         public override void SaveJsonData()
         {
-            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
+            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList());
         }
 
-        public override void SaveJsonData<T>(params T[] _params)
+
+        public override void SaveJsonData(params JsonReceiveDataArgs[] _params)
         {
             List<StageData> stageList = _params.OfType<StageData>().ToList();
 
             foreach (var stage in stageList)
             {
-                AddData(stage);
+                AddData(stage.index, stage);
             }
 
-            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList<StageData>());
+            GameUtil.CreateJsonFile(StaticDefine.json_data_path, json_stage_file_name, GetDataList());
         }
     }
 }

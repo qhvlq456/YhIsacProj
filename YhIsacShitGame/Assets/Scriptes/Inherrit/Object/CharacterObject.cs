@@ -1,26 +1,45 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using YhProj.Game.Map;
 
 namespace YhProj.Game.Character
 {
-    public class CharacterObject : BaseObject
+    public class CharacterObject : MonoBehaviour, ISelectable, IGrid
     {
+        public CharacterData characterData;
         [SerializeField]
         protected NavMeshAgent agent;
 
         [SerializeField]
         protected Animator animator;
 
+        public GridData GridData { get; set; }
+
         // hero는 타일 위치, enemy : start postion ~ end postion으로 이동
-        public override void Create<T>(T _data)
+        public virtual void Create<T>(T _characterData) where T : CharacterData
         {
-            gameData = _data as CharacterData;
+            characterData = _characterData;
         }
-        public override void Delete()
+        public virtual void Update()
+        {
+
+        }
+        public virtual void Delete()
         {
             Managers.Instance.GetManager<ObjectPoolManager>().Retrieve(BaseType.character, transform);
+        }
+
+        public virtual void Select()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Unselect()
+        {
+            throw new NotImplementedException();
         }
     }
 }

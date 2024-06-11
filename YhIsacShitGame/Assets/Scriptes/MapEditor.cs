@@ -11,14 +11,12 @@ namespace YhProj.Game.YhEditor
     // 또 두개 다 분리 stagedata라고 생각해야 함
     public class MapEditor : BaseEditor
     {
+        private List<TileObject> tileObjectList = new List<TileObject>();
         private ITileFactory tileFactory;
         public MapEditor()
         {
             // 후에 인터페이스를 이용한 다향성으로 스위칭
             // tileFactory = new TileFactory();
-
-            dataHandlerMap.Add(typeof(StageHandler), new StageHandler());
-            dataHandlerMap.Add(typeof(TileHandler), new TileHandler());
         }
         
         public override void Initialize()
@@ -38,7 +36,7 @@ namespace YhProj.Game.YhEditor
         /// <param name="_gameData">stage data </param>
         public override void Create(GameData _gameData)
         {
-            TileHandler handler = GetDataHandler<TileHandler>();
+            TileDataHandler handler = EditorManager.Instance.tileDataHandler;
 
             StageData stageData = _gameData as StageData;
 
@@ -55,7 +53,7 @@ namespace YhProj.Game.YhEditor
                 int x = i % stageData.col;
 
                 TileObject tileObject = null;
-                TileData tileData = handler.GetData<TileData>(list[i]);
+                TileData tileData = handler.GetData(list[i]);
 
                 switch (tileData.elementType)
                 {
@@ -67,7 +65,7 @@ namespace YhProj.Game.YhEditor
 
                 tileObject.transform.SetParent(root);
                 tileObject.transform.localPosition = new Vector3(x, 0, z);
-                objectList.Add(tileObject);
+                tileObjectList.Add(tileObject);
                 log += $"idx = {tileData.index}, road type = {tileData.elementType}, \n";
             }
 
@@ -78,7 +76,7 @@ namespace YhProj.Game.YhEditor
         {
             if(_gameData is TileData tileData)
             {
-                TileObject tileObject = objectList.Select(x => x as TileObject).Where(x => x.gameData.index == _gameData.index).First();
+                TileObject tileObject = tileObjectList.Where(x => x.tileData.index == _gameData.index).First();
                 tileObject?.Delete();
             }
             else
@@ -90,7 +88,7 @@ namespace YhProj.Game.YhEditor
 
         public override void Dispose()
         {
-            base.Dispose();
+            
         }
 
     }

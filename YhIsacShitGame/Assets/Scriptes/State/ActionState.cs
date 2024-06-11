@@ -6,7 +6,7 @@ namespace YhProj.Game.State
 {
     public class ActionState : State
     {
-        public override void Enter(BaseObject _baseObject)
+        public override void Enter(ISelectable _selectable)
         {
 
         }

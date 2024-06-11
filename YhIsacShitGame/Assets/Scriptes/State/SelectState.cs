@@ -13,10 +13,6 @@ namespace YhProj.Game.State
     {
         #region Factory Method
         public SelectState() { }
-        public SelectState(BaseObject _baseObject) 
-        { 
-            
-        }
         // 팩토리 메서드
         public static SelectState Create()
         {
@@ -24,13 +20,13 @@ namespace YhProj.Game.State
         }
         #endregion
 
-        public override void Enter(BaseObject _baseObject)
+        public override void Enter(ISelectable _selectable)
         {
-            EditorTileObject editorTileObject = _baseObject as EditorTileObject;
             // 초기화 설정
-            if (editorTileObject != null)
+            if (_selectable != null)
             {
-                editorTileObject.Create(editorTileObject.gameData);
+                _selectable.Select();
+                // editorTileObject.Create(editorTileObject.gameData);
                 // 후에 ui paramter같은 클래스를 만들어서 사용
                 // Managers.Instance.GetManager<UIManager>().ShowUI<MapToolBodyUI, EditorTileObject>(UIRootType.Contextual,"MapToolUI", editorTileObject);
             }

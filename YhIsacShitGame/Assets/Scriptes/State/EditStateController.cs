@@ -110,7 +110,7 @@ namespace YhProj.Game.State
                 currentState = GetState<NoneState>();
             }
 
-            currentState.Enter(null);
+            // currentState.Enter(null);
         }
         // move state도 설정하여야 함
         private void ChangeStateOnMouseDrag()
@@ -137,9 +137,9 @@ namespace YhProj.Game.State
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                BaseObject baseObject = hit.collider.GetComponent<BaseObject>();
+                ISelectable selectable = hit.collider.GetComponent<ISelectable>();
 
-                if (baseObject != null)
+                if (selectable != null)
                 {
                     // hold인지 select인지 시간초 보고 판단하여야 함
                     currentState = GetState<SelectState>();
@@ -163,11 +163,11 @@ namespace YhProj.Game.State
                 // 선택 상태 
                 if (currentState is SelectState)
                 {
-                    BaseObject baseObject = hit.collider.GetComponent<BaseObject>();
+                    ISelectable selectable = hit.collider.GetComponent<ISelectable>();
 
-                    if (baseObject != null)
+                    if (selectable != null)
                     {
-                        currentState.Enter(baseObject);
+                        currentState.Enter(selectable);
                     }
                 }
                 // 홀드 상태

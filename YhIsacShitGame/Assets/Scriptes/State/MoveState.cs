@@ -16,12 +16,12 @@ namespace YhProj.Game.State
         {
             base.Update();
         }
-        public override void Enter(BaseObject _baseObject)
+        public override void Enter(ISelectable _selectable)
         {
-            base.Enter(_baseObject);
+            base.Enter(_selectable);
         }
 
-        public override void Enter(System.Numerics.Vector3 _position)
+        public override void Enter(Vector3 _position)
         {
             base.Enter(_position);
         }

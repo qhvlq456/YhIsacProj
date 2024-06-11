@@ -9,6 +9,7 @@ namespace YhProj.Game.YhEditor
     public class CharacterEditor : BaseEditor
     {
         private ICharacterFactory characterFacotry;
+        private List<CharacterObject> characterObjectList = new List<CharacterObject>();
         public override void Initialize()
         {
             BoxCollider bottomColider = GameUtil.AttachObj<BoxCollider>("Bottom");
@@ -37,13 +38,13 @@ namespace YhProj.Game.YhEditor
             charObject.transform.SetParent(root);
             // 일단 기획에 없음으로 zero
             charObject.transform.localPosition = Vector3.zero;
-            objectList.Add(charObject);
+            characterObjectList.Add(charObject);
         }
         public override void Delete(GameData _gameData)
         {
             if (_gameData is CharacterData charData)
             {
-                CharacterObject charObject = objectList.Select(x => x as CharacterObject).Where(x => x.gameData.index == _gameData.index).First();
+                CharacterObject charObject = characterObjectList.Where(x => x.characterData.index == _gameData.index).First();
                 charObject?.Delete();
             }
             else
@@ -54,7 +55,7 @@ namespace YhProj.Game.YhEditor
 
         public override void Dispose()
         {
-            base.Dispose();
+            
         }
 
         public override void Update()

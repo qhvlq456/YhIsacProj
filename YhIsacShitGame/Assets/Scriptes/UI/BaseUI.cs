@@ -25,7 +25,8 @@ namespace YhProj.Game.UI
             uiInfo = _uiInfo;
             gameObject.SetActive(true);
         }
-        public virtual void Show<T>(UIInfo _uiInfo, T _param) where T : BaseObject
+        // 후에 파라미터 제너릭이 아닌 클래스 args로 변경
+        public virtual void Show<T>(UIInfo _uiInfo, T _param)
         {
             Show(_uiInfo);
         }

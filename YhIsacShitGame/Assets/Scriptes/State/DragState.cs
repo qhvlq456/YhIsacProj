@@ -24,7 +24,7 @@ namespace YhProj.Game.State
             return new DragState(_taget, _moveSpeed);
         }
 
-        public override void Enter(BaseObject _baseObject)
+        public override void Enter(ISelectable _selectable)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 

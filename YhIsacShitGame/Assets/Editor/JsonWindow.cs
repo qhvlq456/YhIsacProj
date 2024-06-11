@@ -42,7 +42,7 @@ namespace YhProj.Game.YhEditor
             // 스크롤 뷰
             scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
-            List<int> tileIdxList = EditorManager.Instance.GetDataHandler<StageHandler>().GetData<StageData>(stageData.stage).tileIdxList;
+            List<int> tileIdxList = EditorManager.Instance.stageDatahandeHandler.GetData(stageData.stage).tileIdxList;
             tileIdxList = tileIdxList == null ? new List<int>() : tileIdxList;
             int tileCount = stageData.row * stageData.col;
 

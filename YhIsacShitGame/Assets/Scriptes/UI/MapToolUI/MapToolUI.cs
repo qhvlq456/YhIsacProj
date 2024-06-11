@@ -68,9 +68,11 @@ public class MapToolUI : EditorUI
     [SerializeField]
     private StageData curStageData = null;
 
+
+    private StageDataHandler stageHandler;
     public override void Show(UIInfo _uiInfo)
     {
-        baseDataHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
+        stageHandler = EditorManager.Instance.stageDatahandeHandler;
 
         foreach (var dropDown in textDropDownList)
         {
@@ -133,7 +135,7 @@ public class MapToolUI : EditorUI
             int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
             //StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
-            StageData stageData = baseDataHandler.GetData<StageData>(idx);
+            StageData stageData = stageHandler.GetData(idx);
 
             curStageData = stageData;
 
@@ -161,7 +163,7 @@ public class MapToolUI : EditorUI
 
             // IDataHandler dataHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
-            EditorManager.Instance.Save(baseDataHandler, curStageData);
+            // EditorManager.Instance.Save(stageHandler, curStageData);
             TMP_Dropdown stageDropDown = textDropDownList.Find(x => x.dropDownType == DropDownType.stage).Dropdown;
             UpdateDropDown(stageDropDown);
         }
@@ -199,7 +201,7 @@ public class MapToolUI : EditorUI
 
         // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
-        List<int> tileIdxList = baseDataHandler.GetData<StageData>(stage).tileIdxList;
+        List<int> tileIdxList = stageHandler.GetData(stage).tileIdxList;
         tileIdxList = tileIdxList == null ? new List<int>() : tileIdxList;
         int tileCount = row * col;
 
@@ -233,7 +235,7 @@ public class MapToolUI : EditorUI
         if (stageDropDown.options.Count > 0)
         {
             int idx = int.Parse(stageDropDown.options[stageDropDown.value].text);
-            StageData stageData = baseDataHandler.GetData<StageData>(idx);
+            StageData stageData = stageHandler.GetData(idx);
 
             curStageData = stageData;
 
@@ -256,9 +258,9 @@ public class MapToolUI : EditorUI
 
         // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
-        if (baseDataHandler.ContainsData(stage))
+        if (stageHandler.ContainsData(stage))
         {
-            StageData stageData = baseDataHandler.GetData<StageData>(stage);
+            StageData stageData = stageHandler.GetData(stage);
             EditorManager.Instance.Delete(stageData);
             logText.text = "Delete Stage Success!!";
         }
@@ -274,7 +276,7 @@ public class MapToolUI : EditorUI
 
         // StageHandler stageHandler = EditorManager.Instance.GetDataHandler<StageHandler>();
 
-        StageData stageData = baseDataHandler.GetData<StageData>(idx);
+        StageData stageData = stageHandler.GetData(idx);
 
         if (stageData != null)
         {
@@ -307,7 +309,7 @@ public class MapToolUI : EditorUI
         TMP_Dropdown stageDropDown = _dropDown;
         stageDropDown.ClearOptions();
 
-        var stageList = baseDataHandler.GetDataList<StageData>();
+        var stageList = stageHandler.GetDataList();
         List<string> dropDownOptionList = stageList.Select(x => x.stage.ToString()).ToList();
 
         stageDropDown.AddOptions(dropDownOptionList);

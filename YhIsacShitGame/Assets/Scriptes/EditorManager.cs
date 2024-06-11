@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.UI;
 using UnityEngine;
+using YhProj.Game.Character;
+using YhProj.Game.Map;
 using YhProj.Game.State;
 using YhProj.Game.UI;
+using YhProj.Game.Play;
 
 namespace YhProj.Game.YhEditor
 {
@@ -53,8 +56,11 @@ namespace YhProj.Game.YhEditor
         private BaseEditor baseEditor;
         private StateController stateController;
 
-        public T GetDataHandler<T>() where T : BaseDataHandler, new() => baseEditor.GetDataHandler<T>();
+        // public T GetDataHandler<T>() where T : BaseDataHandler, new() => baseEditor.GetDataHandler<T>();
 
+        public CharacterDataHandler characterDataHandler;
+        public StageDataHandler stageDatahandeHandler;
+        public TileDataHandler tileDataHandler;
 
         protected override void Awake()
         {
@@ -87,7 +93,7 @@ namespace YhProj.Game.YhEditor
             stateController?.Dispose();
         }
 
-        public void Save<T>(IDataHandler _dataHandler, params T[] _params) where T : GameData
+        public void Save<T>(IDataHandler _dataHandler, params JsonReceiveDataArgs[] _params)
         {
             if(_dataHandler != null)
             {

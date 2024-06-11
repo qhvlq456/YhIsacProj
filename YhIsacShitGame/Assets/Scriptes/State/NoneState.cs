@@ -12,7 +12,7 @@ namespace YhProj.Game.State
             return new NoneState();
         }
 
-        public override void Enter(BaseObject _baseObject)
+        public override void Enter(ISelectable _selectable)
         {
             
         }
